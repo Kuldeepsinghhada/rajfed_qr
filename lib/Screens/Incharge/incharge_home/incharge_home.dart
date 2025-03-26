@@ -12,9 +12,9 @@ import 'package:rajfed_qr/Screens/Incharge/upload_warehouse_screen/upload_wareho
 import 'package:rajfed_qr/Screens/Operator/Home/op_home_service.dart';
 import 'package:rajfed_qr/Screens/Operator/Home/views/Information_row.dart';
 import 'package:rajfed_qr/Screens/Operator/Home/views/custom_drawer.dart';
-import 'package:rajfed_qr/Screens/change_password/change_password.dart';
+import 'package:rajfed_qr/Screens/ChangePassword/change_password.dart';
 import 'package:rajfed_qr/Screens/login/login_screen.dart';
-import 'package:rajfed_qr/Screens/qr_scanner_screen/qr_code_screen.dart';
+import 'package:rajfed_qr/Screens/QRScannerScreen/qr_code_screen.dart';
 import 'package:rajfed_qr/common_views/common_button.dart';
 import 'package:rajfed_qr/common_views/loader_dialog.dart';
 import 'package:rajfed_qr/models/incharge_details.dart';
