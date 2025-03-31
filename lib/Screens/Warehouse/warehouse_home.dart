@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:ai_barcode_scanner/ai_barcode_scanner.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -7,8 +10,6 @@ import 'package:rajfed_qr/APIService/api_service.dart';
 import 'package:rajfed_qr/APIService/shared_preference_helper.dart';
 import 'package:rajfed_qr/Screens/Incharge/Rejected/rejected_screen.dart';
 import 'package:rajfed_qr/Screens/Incharge/dispatched/dispatched_screen.dart';
-import 'package:rajfed_qr/Screens/Incharge/upload_warehouse_screen/upload_warehouse_screen.dart';
-import 'package:rajfed_qr/Screens/Operator/Home/op_home_service.dart';
 import 'package:rajfed_qr/Screens/Operator/Home/views/Information_row.dart';
 import 'package:rajfed_qr/Screens/Operator/Home/views/custom_drawer.dart';
 import 'package:rajfed_qr/Screens/Warehouse/warehouse_service.dart';
@@ -17,9 +18,7 @@ import 'package:rajfed_qr/Screens/login/login_screen.dart';
 import 'package:rajfed_qr/Screens/QRScannerScreen/qr_code_screen.dart';
 import 'package:rajfed_qr/common_views/common_button.dart';
 import 'package:rajfed_qr/common_views/loader_dialog.dart';
-import 'package:rajfed_qr/models/incharge_details.dart';
-import 'package:rajfed_qr/models/operator_details.dart';
-import 'package:rajfed_qr/models/saved_qr_model.dart';
+import 'package:rajfed_qr/models/dispatch_incharge_model.dart';
 import 'package:rajfed_qr/utils/enums.dart';
 import 'package:rajfed_qr/utils/toast_formatter.dart';
 
@@ -34,6 +33,7 @@ class _WarehouseHomeState extends State<WarehouseHome> {
   final _formKey = GlobalKey<FormState>(); // Key to track form state
 
   final TextEditingController _searchController = TextEditingController();
+  final TextEditingController _commentController = TextEditingController();
 
   final scanController = MobileScannerController(
     detectionSpeed: DetectionSpeed.noDuplicates,
@@ -41,12 +41,7 @@ class _WarehouseHomeState extends State<WarehouseHome> {
 
   final FocusNode _focusNode = FocusNode();
 
-  InchargeDetails? inchargeDetails;
-  OperatorDetails? operatorDetails;
-
-  List<SavedQrModel> scannedNumberList = [];
-  List<SavedQrModel> savedQrIds = [];
-
+  DispatchInchargeModel? qrCodeDetail;
   String _selectedOption = "Accept";
 
   @override
@@ -59,6 +54,51 @@ class _WarehouseHomeState extends State<WarehouseHome> {
   void dispose() {
     _focusNode.dispose(); // Dispose of the FocusNode
     super.dispose();
+  }
+
+  void acceptOrRejectByWarehouse() async {
+    final dio = Dio();
+    showLoadingDialog(context);
+    List<dynamic> list = [];
+    if (_selectedOption == "Accept") {
+      list = [
+        {"qrCode": _searchController.text}
+      ];
+    } else {
+      list = [
+        {"qrCode": _searchController.text, "message": _commentController.text}
+      ];
+    }
+    print(list);
+    Response response;
+    try {
+      var token = await SharedPreferenceHelper.instance.getToken();
+      response = await dio.post(
+        _selectedOption == "Accept"
+            ? "https://rajfed.rajasthan.gov.in/rajfed_API/QrScanner/ReceivedInWareHousePartially"
+            : 'https://rajfed.rajasthan.gov.in/rajfed_API/QrScanner/RejectedInWareHousePartially',
+        data: jsonEncode(list),
+        options: Options(
+          headers: {
+            "Authorization": "Bearer $token",
+            "Content-Type": "application/json"
+          },
+        ),
+      );
+      if (response.statusCode! >= 200 && response.statusCode! < 300) {
+        showSuccessToast("Success");
+        qrCodeDetail = null;
+        _searchController.text = "";
+        _commentController.text = "";
+        Navigator.pop(context);
+      } else {
+        Navigator.pop(context);
+        showErrorToast('Record Not updated');
+      }
+    } catch (e) {
+      Navigator.pop(context);
+      showErrorToast('Record Not updated');
+    }
   }
 
   /// API CALLS
@@ -75,7 +115,6 @@ class _WarehouseHomeState extends State<WarehouseHome> {
     );
     if (data != null) {
       _searchController.text = data.toString();
-
       setState(() {});
     }
   }
@@ -98,60 +137,6 @@ class _WarehouseHomeState extends State<WarehouseHome> {
     } catch (e) {
       Navigator.pop(context);
       showErrorToast("Something went wrong");
-    }
-  }
-
-  void getSavedQrCodes() async {
-    savedQrIds.clear();
-    scannedNumberList.clear();
-    showLoadingDialog(context);
-    try {
-      var response = await OPHomeService.instance
-          .farmerSavedList(operatorDetails?.farmerRegID ?? '');
-      if (response?.status == true) {
-        Navigator.pop(context);
-        for (var item in response?.data) {
-          if (item.status == 0) {
-            savedQrIds.add(item);
-          }
-        }
-        setState(() {});
-      } else {
-        Navigator.pop(context);
-        showErrorToast(response?.error ?? 'Something went wrong');
-      }
-    } catch (e) {
-      Navigator.pop(context);
-      showErrorToast("Something went wrong");
-    }
-  }
-
-  /// Action and Dialog
-  void scanQrCode(BuildContext context, bool isBulk) async {
-    var data = await Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => QRScannerScreen(),
-      ),
-    );
-    print("Scanned Barcode: $data");
-    if (data != null) {
-      if (isBulk == false) {
-        if (scannedNumberList.contains(data)) {
-          showErrorToast("Duplicate entry not allowed");
-          return;
-        }
-        int remainingRecord =
-            (operatorDetails?.transctionBardana ?? 0) - (savedQrIds.length);
-        if (scannedNumberList.length <= remainingRecord) {
-          scannedNumberList.add(data);
-        } else {
-          Fluttertoast.showToast(
-              msg: "You can upload max $remainingRecord onwards");
-        }
-      } else {
-        //qrController.text = data;
-      }
-      setState(() {});
     }
   }
 
@@ -203,7 +188,7 @@ class _WarehouseHomeState extends State<WarehouseHome> {
         if (response?.status == true) {
           Navigator.pop(context);
           setState(() {
-            inchargeDetails = response?.data;
+            qrCodeDetail = response?.data.length > 0 ? response?.data[0] : null;
           });
           // getOperatorDetails(inchargeDetails?.farmerRegId ?? '');
         } else {
@@ -215,77 +200,6 @@ class _WarehouseHomeState extends State<WarehouseHome> {
         Navigator.pop(context);
         showErrorToast("Something went wrong");
       }
-    }
-  }
-
-  void getOperatorDetails(String farmerId) async {
-    _focusNode.unfocus();
-    var valid = _formKey.currentState?.validate();
-    if (valid == true) {
-      showLoadingDialog(context);
-      try {
-        var response = await OPHomeService.instance.operatorDetails(farmerId);
-        if (response?.status == true) {
-          Navigator.pop(context);
-          setState(() {
-            operatorDetails = response?.data;
-          });
-          getSavedQrCodes();
-        } else {
-          Navigator.pop(context);
-          Fluttertoast.showToast(
-              msg: response?.error ?? 'Something went wrong');
-        }
-      } catch (e) {
-        Navigator.pop(context);
-        showErrorToast("Something went wrong");
-      }
-    }
-  }
-
-  void addQrCode(bool isAll) async {
-    var purchaseCenterId =
-        await SharedPreferenceHelper.instance.getPurchaseCenterId();
-    if (isAll) {
-      for (var item in savedQrIds) {
-        if (item.qrCode != null &&
-            !scannedNumberList.any((obj) => obj.qrCode == item.qrCode)) {
-          var object = SavedQrModel();
-          object.qrCode = item.qrCode;
-          object.farmerRegId = operatorDetails?.farmerRegID;
-          object.lotNo = operatorDetails?.lotId;
-          object.cropId = inchargeDetails?.cropID;
-          object.purchaseCenterId = purchaseCenterId;
-          scannedNumberList.add(object);
-        }
-      }
-    } else {
-      if (!scannedNumberList
-          .any((obj) => obj.qrCode == _searchController.text.trim())) {
-        var object = SavedQrModel();
-        object.qrCode = _searchController.text;
-        object.farmerRegId = operatorDetails?.farmerRegID;
-        object.lotNo = operatorDetails?.lotId;
-        object.cropId = inchargeDetails?.cropID;
-        object.purchaseCenterId = purchaseCenterId;
-        scannedNumberList.add(object);
-      }
-    }
-    setState(() {});
-  }
-
-  void navigateToUploadWareHouseScreen() async {
-    var status = await Navigator.push(
-        context,
-        MaterialPageRoute(
-            builder: (context) =>
-                UploadWarehouseScreen(qrCodeList: scannedNumberList)));
-    if (status == true) {
-      savedQrIds.clear();
-      operatorDetails = null;
-      inchargeDetails = null;
-      _searchController.text = "";
-      setState(() {});
     }
   }
 
@@ -397,15 +311,15 @@ class _WarehouseHomeState extends State<WarehouseHome> {
   }
 
   Widget informationView() {
-    return operatorDetails != null
+    return qrCodeDetail != null
         ? Padding(
             padding: const EdgeInsets.only(top: 30.0),
             child: Column(
               spacing: 10,
               children: [
-                InformationView(details: operatorDetails),
+                InformationView(details: null, model: qrCodeDetail),
                 SizedBox(
-                  height: operatorDetails != null ? 10 : 0,
+                  height: qrCodeDetail != null ? 10 : 0,
                 ),
               ],
             ),
@@ -414,7 +328,7 @@ class _WarehouseHomeState extends State<WarehouseHome> {
   }
 
   Widget radioButtonView() {
-    return operatorDetails != null
+    return qrCodeDetail != null
         ? Column(
             children: [
               Row(
@@ -432,12 +346,13 @@ class _WarehouseHomeState extends State<WarehouseHome> {
                           });
                         },
                       ),
-                      Text("Accept"),
+                      Text(
+                        "Accept",
+                        style: TextStyle(fontSize: 18, color: Colors.black),
+                      ),
                     ],
                   ),
-
                   SizedBox(width: 20), // Space between buttons
-
                   // Reject Option
                   Row(
                     children: [
@@ -450,12 +365,62 @@ class _WarehouseHomeState extends State<WarehouseHome> {
                           });
                         },
                       ),
-                      Text("Reject"),
+                      Text(
+                        "Reject",
+                        style: TextStyle(fontSize: 18, color: Colors.black),
+                      ),
                     ],
                   ),
                 ],
               ),
-              CommonButton(text: "Submit", onPressed: () {})
+              SizedBox(
+                height: 20,
+              ),
+              Visibility(
+                  visible: _selectedOption == "Reject",
+                  child: TextField(
+                    controller: _commentController,
+                    maxLines: 3, // Allows multiple lines for comments
+                    decoration: InputDecoration(
+                      hintText: "Write a comment...",
+                      border: OutlineInputBorder(
+                        borderRadius:
+                            BorderRadius.circular(15), // Rounded corners
+                        borderSide:
+                            BorderSide(color: Colors.grey), // Border color
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(15),
+                        borderSide: BorderSide(
+                            color: Colors.blue, width: 2), // Highlighted border
+                      ),
+                      contentPadding:
+                          EdgeInsets.all(15), // Padding inside TextField
+                    ),
+                  )),
+              SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: () {
+                  if (_selectedOption == "Reject" &&
+                      _commentController.text.trim().isEmpty) {
+                    showErrorToast("Please add comment");
+                    return;
+                  }
+                  acceptOrRejectByWarehouse();
+                },
+                style: ElevatedButton.styleFrom(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(30), // Rounded edges
+                  ),
+                  padding: EdgeInsets.symmetric(
+                      horizontal: 30, vertical: 15), // Button size
+                  backgroundColor: Colors.green, // Button color
+                ),
+                child: Text(
+                  "        Submit       ",
+                  style: TextStyle(fontSize: 18, color: Colors.white),
+                ),
+              )
             ],
           )
         : SizedBox();

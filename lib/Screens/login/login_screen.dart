@@ -34,14 +34,20 @@ class _LoginPageState extends State<LoginPage> {
         if (response?.status == true) {
           var userType = await SharedPreferenceHelper.instance.getUserType();
           if (userType == 10) {
-            Navigator.pushReplacement(
-                context, MaterialPageRoute(builder: (_) => MyHomePage()));
+            Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(builder: (_) => MyHomePage()),
+                (route) => false);
           } else if (userType == 2) {
-            Navigator.pushReplacement(
-                context, MaterialPageRoute(builder: (_) => InchargeHome()));
+            Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(builder: (_) => InchargeHome()),
+                (route) => false);
           } else if (userType == 5) {
-            Navigator.pushReplacement(
-                context, MaterialPageRoute(builder: (_) => WarehouseHome()));
+            Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(builder: (_) => WarehouseHome()),
+                (route) => false);
           }
         } else {
           Navigator.pop(context);

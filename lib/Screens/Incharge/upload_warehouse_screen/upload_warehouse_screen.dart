@@ -93,28 +93,7 @@ class _UploadWarehouseScreenState extends State<UploadWarehouseScreen> {
   }
 
   void dispatchedToWarehouse() async {
-    request();
-    return;
-    await Future.delayed(Duration(microseconds: 200));
-    showLoadingDialog(context);
-    try {
-      var response =
-          await InchargeService.instance.dispatchToWareHouse(qrCodeList);
-      Navigator.pop(context);
-      if (response?.status == true) {
-        Fluttertoast.showToast(msg: "Record sent to warehouse successfully");
-        Navigator.pop(context, true);
-      } else {
-        showErrorToast(response?.error ?? 'Something Went wrong');
-      }
-    } catch (e) {
-      Navigator.pop(context);
-      showErrorToast("Something went wrong");
-    }
-  }
-
-  final dio = Dio();
-  void request() async {
+    final dio = Dio();
     showLoadingDialog(context);
     List<dynamic> list = [];
     for (var item in qrCodeList) {

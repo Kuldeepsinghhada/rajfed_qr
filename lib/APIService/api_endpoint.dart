@@ -20,4 +20,6 @@ class APIEndPoint {
   static String wareHouseDetails = "WarehouseDetailsQrCodeWise";
   static String wareHouseAccepted = "WarehouseAcceptedRecords";
   static String wareHouseRejected = "WareHouseRejectedRecords";
+  static String rejectedInWareHousePartially = "RejectedInWareHousePartially";
+  static String receivedInWareHousePartially = "ReceivedInWareHousePartially";
 }

@@ -24,8 +24,11 @@ class WarehouseService {
       var response = await ApiService.instance.apiCall(
           APIEndPoint.wareHouseDetails + query, HttpRequestType.get, null);
       if (response.status) {
-        var data = InchargeDetails.fromJson(response.data['response']['data']);
-        return APIResponse(true, data, "");
+        List<DispatchInchargeModel> wareHouseList =
+        (response.data['response']['data'] as List)
+            .map((item) => DispatchInchargeModel.fromJson(item))
+            .toList();
+        return APIResponse(true, wareHouseList, "");
       }
       return APIResponse(false, null, response.error);
     } catch (e) {
@@ -104,6 +107,27 @@ class WarehouseService {
             (response.data['response']['data'] as List)
                 .map((item) => DispatchInchargeModel.fromJson(item))
                 .toList();
+        return APIResponse(true, dispatchList, "");
+      }
+      return APIResponse(false, null, response.error);
+    } catch (e) {
+      showErrorToast("Something went wrong");
+      return null;
+    }
+  }
+
+  Future<APIResponse?> acceptQrCodeByWarehouse(String vehicleNo) async {
+    try {
+      var purchaseCenterID =
+      await SharedPreferenceHelper.instance.getPurchaseCenterId();
+      var query = "?VehicleNo=$vehicleNo&warehouseId=$purchaseCenterID";
+      var response = await ApiService.instance.apiCall(
+          APIEndPoint.wareHouseAccepted + query, HttpRequestType.get, null);
+      if (response.status) {
+        List<DispatchInchargeModel> dispatchList =
+        (response.data['response']['data'] as List)
+            .map((item) => DispatchInchargeModel.fromJson(item))
+            .toList();
         return APIResponse(true, dispatchList, "");
       }
       return APIResponse(false, null, response.error);

@@ -7,16 +7,27 @@ void showLoadingDialog(BuildContext context) {
     barrierDismissible: false, // Prevent closing by tapping outside
     builder: (context) {
       return Dialog(
+        backgroundColor: Colors.transparent,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         child: Padding(
           padding: EdgeInsets.all(20),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              CircularProgressIndicator(),
-              SizedBox(width: 16),
-              Text("Loading...", style: TextStyle(fontSize: 16)),
-            ],
+          child: UnconstrainedBox(
+            child: Container(
+              width: 120,
+              padding: EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                  color: ThemeData().dialogBackgroundColor,
+                  borderRadius: BorderRadius.circular(12)),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  SizedBox(height: 4),
+                  CircularProgressIndicator(),
+                  SizedBox(height: 8),
+                  Text("Loading...", style: TextStyle(fontSize: 16)),
+                ],
+              ),
+            ),
           ),
         ),
       );

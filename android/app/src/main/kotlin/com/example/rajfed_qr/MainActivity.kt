@@ -1,4 +1,4 @@
-package com.example.rajfed_qr
+package com.rajfed.qr
 
 import io.flutter.embedding.android.FlutterActivity
 

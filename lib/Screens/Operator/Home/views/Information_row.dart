@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:rajfed_qr/models/dispatch_incharge_model.dart';
 import 'package:rajfed_qr/models/operator_details.dart';
 import 'package:rajfed_qr/utils/date_formatter.dart';
 
 class InformationView extends StatelessWidget {
-  const InformationView({required this.details, super.key});
+  const InformationView({required this.details,this.model, super.key});
   final OperatorDetails? details;
+  final DispatchInchargeModel? model;
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -24,23 +26,41 @@ class InformationView extends StatelessWidget {
       child: Column(
         children: [
           InformationRow(
-              title: "Registration no.", subtitle: details?.farmerRegID ?? ''),
-          InformationRow(title: "Name", subtitle: details?.farmerName ?? ''),
+              title: "Lot No.", subtitle: (details?.lotId ?? model?.lotNo ?? 'NA').toString()),
+          InformationRow(
+              title: "Registration no.", subtitle: details?.farmerRegID ?? model?.farmerRegId ?? ''),
+          Visibility(
+              visible: details != null,
+              child: InformationRow(title: "Name", subtitle: details?.farmerName ?? '')),
           InformationRow(
               title: "Purchase Center",
-              subtitle: details?.purchaseCenterKendra ?? ''),
-          InformationRow(
+              subtitle: details?.purchaseCenterKendra ?? model?.purchaseCenterKendra ?? ''),
+          Visibility(
+            visible: details != null,
+            child: InformationRow(
               title: "Purchase Date",
               subtitle:
-                  DateFormatter.formatDateToDDMMMYYYY(details?.regDate ?? '')),
+                  DateFormatter.formatDateToDDMMMYYYY(details?.regDate ?? '')),),
+          Visibility(
+              visible: model?.dispatchDateTime != null,
+              child: InformationRow(
+                  title: "Dispatch Date",
+                  subtitle: DateFormatter.formatDateToDDMMMYYYY(
+                      model?.dispatchDateTime ?? 'NA'))),
+          Visibility(
+              visible: model?.receivedDateTime != null,
+              child: InformationRow(
+                  title: "Received Date",
+                  subtitle: DateFormatter.formatDateToDDMMMYYYY(
+                      model?.receivedDateTime ?? 'NA'))),
           InformationRow(
               title: "Quantity(Qt)",
-              subtitle: "${details?.transctionQty ?? ''}"),
-          InformationRow(
+              subtitle: "${details?.transctionQty ?? model?.qtl.toString() ?? 'NA'}"),
+          details != null ? InformationRow(
               title: "No. of Bardana",
-              subtitle: "${details?.transctionBardana ?? ''}"),
+              subtitle: "${details?.transctionBardana ?? 'NA'}"): SizedBox(),
           InformationRow(
-              title: "Copy Type", subtitle: details?.cropTypeEN ?? '')
+              title: "Copy Type", subtitle: details?.cropTypeEN ?? model?.cropEN ?? 'NA')
         ],
       ),
     );

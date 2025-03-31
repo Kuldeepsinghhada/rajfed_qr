@@ -129,6 +129,13 @@ class _MyHomePageState extends State<MyHomePage> {
 
   /// Action and Dialog
   void scanQrCode(BuildContext context, bool isBulk) async {
+    int remainingRecord =
+        (operatorDetails?.transctionBardana ?? 0) - (savedQrIds.length);
+    if (scannedNumberList.length <= remainingRecord) {
+    } else {
+      Fluttertoast.showToast(msg: "You have already uploaded maximum records");
+      return;
+    }
     var data = await Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => QRScannerScreen(),
@@ -327,17 +334,24 @@ class _MyHomePageState extends State<MyHomePage> {
                       int remainingRecord =
                           (operatorDetails?.transctionBardana ?? 0) -
                               (savedQrIds.length);
-                      for (var i = 0; i < count; i++) {
-                        if (scannedNumberList.length <= remainingRecord) {
-                          scannedNumberList.add("${code + i}");
-                        } else {
-                          Fluttertoast.showToast(
-                              msg:
-                                  "You can upload max $remainingRecord records onwards");
+                      if (scannedNumberList.length <= remainingRecord) {
+                        for (var i = 0; i < count; i++) {
+                          if (scannedNumberList.length <= remainingRecord) {
+                            scannedNumberList.add("${code + i}");
+                          } else {
+                            Fluttertoast.showToast(
+                                msg:
+                                    "You can upload max $remainingRecord records onwards");
+                            break;
+                          }
                         }
+                        qrController.text = "";
+                        countController.text = "";
+                      } else {
+                        Fluttertoast.showToast(
+                            msg:
+                                "You can upload max $remainingRecord records onwards");
                       }
-                      qrController.text = "";
-                      countController.text = "";
                       Navigator.pop(context);
                     } catch (e) {
                       showErrorToast("Invalid value");
@@ -478,6 +492,8 @@ class _MyHomePageState extends State<MyHomePage> {
           } else if (value == "Change Password") {
             Navigator.push(context,
                 MaterialPageRoute(builder: (_) => ChangePasswordScreen()));
+          } else if (value == "Home") {
+            //Navigator.pop(context);
           } else {
             Navigator.push(
                 context, MaterialPageRoute(builder: (_) => RejectedScreen()));
@@ -587,7 +603,17 @@ class _MyHomePageState extends State<MyHomePage> {
                       child: CommonButton(
                         text: 'Manual',
                         onPressed: () {
-                          showQRCodeDialog(context);
+                          int remainingRecord =
+                              (operatorDetails?.transctionBardana ?? 0) -
+                                  (savedQrIds.length);
+                          if (scannedNumberList.length <= remainingRecord) {
+                            showQRCodeDialog(context);
+                          } else {
+                            Fluttertoast.showToast(
+                                msg:
+                                    "You have already uploaded maximum records");
+                            return;
+                          }
                         },
                       ),
                     )
@@ -596,7 +622,16 @@ class _MyHomePageState extends State<MyHomePage> {
                 CommonButton(
                   text: 'Bulk Entry',
                   onPressed: () {
-                    showBulkQRCodeDialog(context);
+                    int remainingRecord =
+                        (operatorDetails?.transctionBardana ?? 0) -
+                            (savedQrIds.length);
+                    if (scannedNumberList.length <= remainingRecord) {
+                      showBulkQRCodeDialog(context);
+                    } else {
+                      Fluttertoast.showToast(
+                          msg: "You have already uploaded maximum records");
+                      return;
+                    }
                   },
                 ),
                 savedCodeList(),
@@ -613,7 +648,7 @@ class _MyHomePageState extends State<MyHomePage> {
             mainAxisSize: MainAxisSize.min,
             children: [
               CommonButton(
-                  text: 'Saved Stocks',
+                  text: 'Saved QR',
                   onPressed: () {
                     showModalBottomSheet(
                       context: context,
