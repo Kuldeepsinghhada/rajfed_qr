@@ -18,6 +18,7 @@ class APIEndPoint {
   // WareHouse Detail
 
   static String wareHouseDetails = "WarehouseDetailsQrCodeWise";
+  static String getItemByVehicleNo = "WarehouseDetailsVehicleWise";
   static String wareHouseAccepted = "WarehouseAcceptedRecords";
   static String wareHouseRejected = "WareHouseRejectedRecords";
   static String rejectedInWareHousePartially = "RejectedInWareHousePartially";

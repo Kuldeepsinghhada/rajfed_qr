@@ -3,8 +3,9 @@ import 'package:flutter/material.dart';
 class CommonButton extends StatelessWidget {
   final String text;
   final VoidCallback onPressed;
-
-  const CommonButton({super.key, required this.text, required this.onPressed});
+  Color? bgColor = Colors.green.shade400;
+  CommonButton(
+      {super.key, required this.text, required this.onPressed, this.bgColor});
 
   @override
   Widget build(BuildContext context) {
@@ -13,10 +14,11 @@ class CommonButton extends StatelessWidget {
       child: ElevatedButton(
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.green.shade400, // Button color
+          backgroundColor: bgColor ?? Colors.green.shade400, // Button color
           foregroundColor: Colors.white, // Text color
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(4), // Common corners with radius 4
+            borderRadius:
+                BorderRadius.circular(4), // Common corners with radius 4
           ),
           padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
         ),

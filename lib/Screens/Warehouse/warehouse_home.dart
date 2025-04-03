@@ -10,8 +10,10 @@ import 'package:rajfed_qr/APIService/api_service.dart';
 import 'package:rajfed_qr/APIService/shared_preference_helper.dart';
 import 'package:rajfed_qr/Screens/Incharge/Rejected/rejected_screen.dart';
 import 'package:rajfed_qr/Screens/Incharge/dispatched/dispatched_screen.dart';
+import 'package:rajfed_qr/Screens/Incharge/upload_warehouse_screen/upload_warehouse_screen.dart';
 import 'package:rajfed_qr/Screens/Operator/Home/views/Information_row.dart';
 import 'package:rajfed_qr/Screens/Operator/Home/views/custom_drawer.dart';
+import 'package:rajfed_qr/Screens/Warehouse/partial_reject_screen.dart';
 import 'package:rajfed_qr/Screens/Warehouse/warehouse_service.dart';
 import 'package:rajfed_qr/Screens/ChangePassword/change_password.dart';
 import 'package:rajfed_qr/Screens/login/login_screen.dart';
@@ -41,7 +43,7 @@ class _WarehouseHomeState extends State<WarehouseHome> {
 
   final FocusNode _focusNode = FocusNode();
 
-  DispatchInchargeModel? qrCodeDetail;
+  List<DispatchInchargeModel> wareHouseList = [];
   String _selectedOption = "Accept";
 
   @override
@@ -87,17 +89,18 @@ class _WarehouseHomeState extends State<WarehouseHome> {
       );
       if (response.statusCode! >= 200 && response.statusCode! < 300) {
         showSuccessToast("Success");
-        qrCodeDetail = null;
+        //qrCodeDetail = null;
         _searchController.text = "";
         _commentController.text = "";
         Navigator.pop(context);
+        setState(() {});
       } else {
         Navigator.pop(context);
-        showErrorToast('Record Not updated');
+        showErrorToast('Something wend wrong');
       }
     } catch (e) {
       Navigator.pop(context);
-      showErrorToast('Record Not updated');
+      showErrorToast('Something wend wrong');
     }
   }
 
@@ -184,20 +187,21 @@ class _WarehouseHomeState extends State<WarehouseHome> {
       showLoadingDialog(context);
       try {
         var response = await WarehouseService.instance
-            .wareHouseDetails(_searchController.text);
+            .getListByVehicleNo(_searchController.text);
+        Navigator.pop(context);
         if (response?.status == true) {
-          Navigator.pop(context);
-          setState(() {
-            qrCodeDetail = response?.data.length > 0 ? response?.data[0] : null;
-          });
-          // getOperatorDetails(inchargeDetails?.farmerRegId ?? '');
+          if (response?.data.length > 0) {
+            setState(() {
+              wareHouseList = response?.data ?? [];
+            });
+          } else {
+            showErrorToast("No data fount");
+          }
         } else {
-          Navigator.pop(context);
           Fluttertoast.showToast(
               msg: response?.error ?? 'Something went wrong');
         }
       } catch (e) {
-        Navigator.pop(context);
         showErrorToast("Something went wrong");
       }
     }
@@ -235,7 +239,7 @@ class _WarehouseHomeState extends State<WarehouseHome> {
             key: _formKey,
             child: Column(
               spacing: 0,
-              children: [searchBar(), informationView(), radioButtonView()],
+              children: [searchBar(), lotWiseList()],
             ),
           ),
         ),
@@ -252,31 +256,25 @@ class _WarehouseHomeState extends State<WarehouseHome> {
           child: TextFormField(
             focusNode: _focusNode,
             controller: _searchController,
-            keyboardType: TextInputType.number, // Numeric keyboard
-            inputFormatters: [
-              FilteringTextInputFormatter
-                  .digitsOnly, // Restricts to numbers only
-            ],
+            inputFormatters: [UpperCaseTextFormatter()],
             style: TextStyle(fontWeight: FontWeight.w600),
             decoration: InputDecoration(
-                hintText: "Enter QR Code",
-                hintStyle: TextStyle(fontWeight: FontWeight.w500),
-                filled: true,
-                fillColor: Colors.grey[100],
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(30),
-                  borderSide: BorderSide.none,
-                ),
-                contentPadding:
-                    EdgeInsets.symmetric(vertical: 14, horizontal: 16),
-                suffixIcon: IconButton(
-                    onPressed: () {
-                      getQrCodeByScan();
-                    },
-                    icon: Icon(Icons.qr_code_scanner))),
+              hintText: "Vehicle number",
+              hintStyle: TextStyle(fontWeight: FontWeight.w500),
+              filled: true,
+              fillColor: Colors.grey[100],
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(30),
+                borderSide: BorderSide.none,
+              ),
+              contentPadding:
+                  EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+            ),
             validator: (value) {
               if (value != null && value.trim().isEmpty) {
-                return "Please enter registration number";
+                return "Please enter correct number";
+              } else if ((value ?? '').trim().length < 10) {
+                return "Please enter correct number";
               }
               return null;
             },
@@ -310,118 +308,98 @@ class _WarehouseHomeState extends State<WarehouseHome> {
     );
   }
 
-  Widget informationView() {
-    return qrCodeDetail != null
+  Widget lotWiseList() {
+    return wareHouseList.isNotEmpty
         ? Padding(
-            padding: const EdgeInsets.only(top: 30.0),
+            padding: const EdgeInsets.only(top: 20),
             child: Column(
-              spacing: 10,
+              mainAxisSize: MainAxisSize.min,
               children: [
-                InformationView(details: null, model: qrCodeDetail),
-                SizedBox(
-                  height: qrCodeDetail != null ? 10 : 0,
+                Container(
+                  decoration: BoxDecoration(
+                      border: Border.all(color: Colors.green.shade400)),
+                  child: Column(
+                    children: [
+                      Container(
+                        height: 50,
+                        color: Colors.green.shade400,
+                        child: Row(
+                          children: [
+                            SizedBox(
+                              width: 10,
+                            ),
+                            Icon(
+                              Icons.add_box_outlined,
+                              color: Colors.white,
+                            ),
+                            Expanded(
+                              child: Padding(
+                                padding: const EdgeInsets.only(left: 12.0),
+                                child: Text(
+                                  "Lots",
+                                  style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w600,
+                                      color: Colors.white),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      ListView.separated(
+                        itemCount: wareHouseList.length,
+                        physics: NeverScrollableScrollPhysics(),
+                        shrinkWrap: true,
+                        padding: EdgeInsets.all(0),
+                        itemBuilder: (context, index) {
+                          return InformationView(
+                              details: null, model: wareHouseList[index]);
+                        },
+                        separatorBuilder: (context, index) {
+                          return SizedBox(
+                            height: 12,
+                          );
+                        },
+                      ),
+                    ],
+                  ),
                 ),
+                SizedBox(height: 20),
+                Row(
+                  spacing: 10,
+                  children: [
+                    Expanded(
+                        child: CommonButton(
+                      text: 'Accept All',
+                      onPressed: () {
+                        //saveQrAPICall();
+                      },
+                    )),
+                    Expanded(
+                        child: CommonButton(
+                      text: 'Reject All',
+                      bgColor: Colors.red,
+                      onPressed: () {
+                        //saveQrAPICall();
+                      },
+                    ))
+                  ],
+                ),
+                SizedBox(
+                  height: 10,
+                ),
+                CommonButton(
+                  text: 'Partially Reject',
+                  onPressed: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => PartialRejectScreen()));
+                  },
+                )
               ],
             ),
-          )
-        : SizedBox();
-  }
-
-  Widget radioButtonView() {
-    return qrCodeDetail != null
-        ? Column(
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  // Accept Option
-                  Row(
-                    children: [
-                      Radio<String>(
-                        value: "Accept",
-                        groupValue: _selectedOption,
-                        onChanged: (value) {
-                          setState(() {
-                            _selectedOption = value!;
-                          });
-                        },
-                      ),
-                      Text(
-                        "Accept",
-                        style: TextStyle(fontSize: 18, color: Colors.black),
-                      ),
-                    ],
-                  ),
-                  SizedBox(width: 20), // Space between buttons
-                  // Reject Option
-                  Row(
-                    children: [
-                      Radio<String>(
-                        value: "Reject",
-                        groupValue: _selectedOption,
-                        onChanged: (value) {
-                          setState(() {
-                            _selectedOption = value!;
-                          });
-                        },
-                      ),
-                      Text(
-                        "Reject",
-                        style: TextStyle(fontSize: 18, color: Colors.black),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-              SizedBox(
-                height: 20,
-              ),
-              Visibility(
-                  visible: _selectedOption == "Reject",
-                  child: TextField(
-                    controller: _commentController,
-                    maxLines: 3, // Allows multiple lines for comments
-                    decoration: InputDecoration(
-                      hintText: "Write a comment...",
-                      border: OutlineInputBorder(
-                        borderRadius:
-                            BorderRadius.circular(15), // Rounded corners
-                        borderSide:
-                            BorderSide(color: Colors.grey), // Border color
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(15),
-                        borderSide: BorderSide(
-                            color: Colors.blue, width: 2), // Highlighted border
-                      ),
-                      contentPadding:
-                          EdgeInsets.all(15), // Padding inside TextField
-                    ),
-                  )),
-              SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: () {
-                  if (_selectedOption == "Reject" &&
-                      _commentController.text.trim().isEmpty) {
-                    showErrorToast("Please add comment");
-                    return;
-                  }
-                  acceptOrRejectByWarehouse();
-                },
-                style: ElevatedButton.styleFrom(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(30), // Rounded edges
-                  ),
-                  padding: EdgeInsets.symmetric(
-                      horizontal: 30, vertical: 15), // Button size
-                  backgroundColor: Colors.green, // Button color
-                ),
-                child: Text(
-                  "        Submit       ",
-                  style: TextStyle(fontSize: 18, color: Colors.white),
-                ),
-              )
-            ],
           )
         : SizedBox();
   }
