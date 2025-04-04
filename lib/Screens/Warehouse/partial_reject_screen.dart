@@ -1,16 +1,17 @@
+import 'dart:convert';
 import 'package:ai_barcode_scanner/ai_barcode_scanner.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:rajfed_qr/APIService/api_endpoint.dart';
-import 'package:rajfed_qr/APIService/api_service.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:rajfed_qr/APIService/shared_preference_helper.dart';
-import 'package:rajfed_qr/Screens/Operator/Home/op_home_service.dart';
-import 'package:rajfed_qr/Screens/login/login_screen.dart';
+import 'package:rajfed_qr/Screens/Incharge/incharge_home/incharge_service.dart';
 import 'package:rajfed_qr/Screens/QRScannerScreen/qr_code_screen.dart';
+import 'package:rajfed_qr/Screens/Warehouse/warehouse_service.dart';
 import 'package:rajfed_qr/common_views/common_button.dart';
 import 'package:rajfed_qr/common_views/loader_dialog.dart';
+import 'package:rajfed_qr/models/incharge_details.dart';
 import 'package:rajfed_qr/models/operator_details.dart';
-import 'package:rajfed_qr/utils/enums.dart';
 import 'package:rajfed_qr/utils/toast_formatter.dart';
 
 class PartialRejectScreen extends StatefulWidget {
@@ -25,7 +26,7 @@ class _PartialRejectScreenState extends State<PartialRejectScreen> {
 
   final TextEditingController _searchController = TextEditingController();
   final TextEditingController qrController = TextEditingController();
-  final TextEditingController countController = TextEditingController();
+  final TextEditingController _commentController = TextEditingController();
   final scanController = MobileScannerController(
     detectionSpeed: DetectionSpeed.noDuplicates,
   );
@@ -34,7 +35,7 @@ class _PartialRejectScreenState extends State<PartialRejectScreen> {
 
   OperatorDetails? operatorDetails;
 
-  List<String> scannedNumberList = [];
+  List<ScanModel> scannedNumberList = [];
   bool isShowSavedStock = false;
 
   @override
@@ -53,47 +54,6 @@ class _PartialRejectScreenState extends State<PartialRejectScreen> {
   void getUserDetails() async {
     userName = await SharedPreferenceHelper.instance.getUserName() ?? '';
     setState(() {});
-  }
-
-  void logoutAPICall() async {
-    showLoadingDialog(context);
-    try {
-      var data = await ApiService.instance
-          .apiCall(APIEndPoint.logout, HttpRequestType.get, null);
-      Navigator.pop(context);
-      if (data.status == true) {
-        SharedPreferenceHelper.instance.clearData();
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => LoginPage()),
-        );
-      } else {
-        showErrorToast(data.error);
-      }
-    } catch (e) {
-      Navigator.pop(context);
-      showErrorToast("Something went wrong");
-    }
-  }
-
-  void saveQrAPICall() async {
-    showLoadingDialog(context);
-    try {
-      var data = await OPHomeService.instance.saveFarmerQrCode(
-          operatorDetails?.farmerRegID ?? "",
-          scannedNumberList,
-          (operatorDetails?.lotId ?? "").toString());
-      Navigator.pop(context);
-      if (data?.status == true) {
-        scannedNumberList.clear();
-        showSuccessToast('Record Saved Successfully');
-      } else {
-        showErrorToast(data?.error ?? 'Something Went wrong');
-      }
-    } catch (e) {
-      Navigator.pop(context);
-      showErrorToast("Something went wrong");
-    }
   }
 
   /// Action and Dialog
@@ -159,12 +119,125 @@ class _PartialRejectScreenState extends State<PartialRejectScreen> {
       ),
     );
     if (data != null) {
-      if (!scannedNumberList.contains(_searchController.text)) {
-        if (data.toString().trim().isNotEmpty) {
-          scannedNumberList.add(data.toString());
-        }
+      _searchController.text = data.toString();
+      getDetailsByQrCode();
+    }
+  }
+
+  void showRejectedDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text("Confirmation"),
+          content: TextField(
+            maxLines: 3,
+            controller: _commentController,
+            decoration: InputDecoration(
+              hintText: "Rejection reason...",
+              border: OutlineInputBorder(),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context); // Close the dialog
+              },
+              child: Text(
+                "Cancel",
+                style: TextStyle(color: Colors.green, fontSize: 18),
+              ),
+            ),
+            TextButton(
+              onPressed: () {
+                if (_commentController.text.trim().isEmpty) {
+                  Fluttertoast.showToast(msg: "Please enter rejection reason");
+                  return;
+                }
+                Navigator.pop(context);
+                acceptOrRejectByWarehouse();
+              },
+              child: Text("Confirm",
+                  style: TextStyle(color: Colors.red, fontSize: 18)),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void acceptOrRejectByWarehouse() async {
+    final dio = Dio();
+    showLoadingDialog(context);
+    List<dynamic> list = [];
+    for (var item in scannedNumberList) {
+      list.add({
+        "lotNo": item.lotNo,
+        "status": "R",
+        "message": _commentController.text,
+        "qrCode": item.qrCode
+      });
+    }
+    print(
+        "URL: https://rajfed.rajasthan.gov.in/rajfed_API/QrScanner/ReceivedInWareHouseLotWise");
+    print("Body: $list");
+    Response response;
+    try {
+      var token = await SharedPreferenceHelper.instance.getToken();
+      response = await dio.post(
+        'https://rajfed.rajasthan.gov.in/rajfed_API/QrScanner/ReceivedInWareHouseLotWise',
+        data: jsonEncode(list),
+        options: Options(
+          headers: {
+            "Authorization": "Bearer $token",
+            "Content-Type": "application/json"
+          },
+        ),
+      );
+      print("Response: $response");
+      if (response.statusCode! >= 200 && response.statusCode! < 300) {
+        showSuccessToast("Rejected Successfully");
+        Navigator.pop(context);
+        Navigator.pop(context, true);
+        setState(() {});
+      } else {
+        Navigator.pop(context);
+        showErrorToast('Something wend wrong');
       }
-      setState(() {});
+    } catch (e) {
+      print("Error: ${e.toString()}");
+      Navigator.pop(context);
+      showErrorToast('Something wend wrong');
+    }
+  }
+
+  void getDetailsByQrCode() async {
+    _focusNode.unfocus();
+    var valid = _formKey.currentState?.validate();
+    if (valid == true) {
+      showLoadingDialog(context);
+      try {
+        var response = await WarehouseService.instance
+            .wareHouseDetails(_searchController.text);
+        if (response?.status == true) {
+          Navigator.pop(context);
+          InchargeDetails? inchargeDetails = response?.data[0];
+          bool exists = scannedNumberList
+              .any((warehouse) => warehouse.qrCode == _searchController.text);
+          if ((!exists && _searchController.text.trim().isNotEmpty)) {
+            scannedNumberList.add(ScanModel(_searchController.text,
+                (inchargeDetails?.lotNo ?? 0).toString()));
+            setState(() {});
+          }
+        } else {
+          Navigator.pop(context);
+          Fluttertoast.showToast(
+              msg: response?.error ?? 'Something went wrong');
+        }
+      } catch (e) {
+        Navigator.pop(context);
+        showErrorToast("Something went wrong");
+      }
     }
   }
 
@@ -234,11 +307,7 @@ class _PartialRejectScreenState extends State<PartialRejectScreen> {
         // Search Button
         GestureDetector(
           onTap: () {
-            if ((!scannedNumberList.contains(_searchController.text) &&
-                _searchController.text.trim().isNotEmpty)) {
-              scannedNumberList.add(_searchController.text);
-              setState(() {});
-            }
+            getDetailsByQrCode();
           },
           child: Container(
             padding: EdgeInsets.all(14),
@@ -335,7 +404,7 @@ class _PartialRejectScreenState extends State<PartialRejectScreen> {
                                       padding:
                                           const EdgeInsets.only(left: 20.0),
                                       child: Text(
-                                        scannedNumberList[index],
+                                        scannedNumberList[index].qrCode,
                                         style: TextStyle(
                                             fontWeight: FontWeight.w600,
                                             fontSize: 16),
@@ -366,7 +435,7 @@ class _PartialRejectScreenState extends State<PartialRejectScreen> {
                   text: 'Reject All',
                   bgColor: Colors.red,
                   onPressed: () {
-                    saveQrAPICall();
+                    showRejectedDialog(context);
                   },
                 )
               ],
@@ -374,4 +443,10 @@ class _PartialRejectScreenState extends State<PartialRejectScreen> {
           )
         : SizedBox();
   }
+}
+
+class ScanModel {
+  String qrCode;
+  String lotNo;
+  ScanModel(this.qrCode, this.lotNo);
 }

@@ -21,6 +21,8 @@ import 'package:rajfed_qr/Screens/QRScannerScreen/qr_code_screen.dart';
 import 'package:rajfed_qr/common_views/common_button.dart';
 import 'package:rajfed_qr/common_views/loader_dialog.dart';
 import 'package:rajfed_qr/models/dispatch_incharge_model.dart';
+import 'package:rajfed_qr/models/operator_details.dart';
+import 'package:rajfed_qr/utils/date_formatter.dart';
 import 'package:rajfed_qr/utils/enums.dart';
 import 'package:rajfed_qr/utils/toast_formatter.dart';
 
@@ -36,7 +38,7 @@ class _WarehouseHomeState extends State<WarehouseHome> {
 
   final TextEditingController _searchController = TextEditingController();
   final TextEditingController _commentController = TextEditingController();
-
+  bool isReject = false;
   final scanController = MobileScannerController(
     detectionSpeed: DetectionSpeed.noDuplicates,
   );
@@ -44,7 +46,8 @@ class _WarehouseHomeState extends State<WarehouseHome> {
   final FocusNode _focusNode = FocusNode();
 
   List<DispatchInchargeModel> wareHouseList = [];
-  String _selectedOption = "Accept";
+  List<int> selectedList = [];
+  bool isAllSelect = false;
 
   @override
   void initState() {
@@ -58,27 +61,26 @@ class _WarehouseHomeState extends State<WarehouseHome> {
     super.dispose();
   }
 
-  void acceptOrRejectByWarehouse() async {
+  void acceptOrRejectByWarehouse(String status) async {
     final dio = Dio();
     showLoadingDialog(context);
     List<dynamic> list = [];
-    if (_selectedOption == "Accept") {
-      list = [
-        {"qrCode": _searchController.text}
-      ];
-    } else {
-      list = [
-        {"qrCode": _searchController.text, "message": _commentController.text}
-      ];
+    for (var item in selectedList) {
+      list.add({
+        "lotNo": item,
+        "status": status,
+        "message": status == "R" ? _commentController.text : "string",
+        "qrCode": "string"
+      });
     }
-    print(list);
+    print(
+        "URL: https://rajfed.rajasthan.gov.in/rajfed_API/QrScanner/ReceivedInWareHouseLotWise");
+    print("Body: $list");
     Response response;
     try {
       var token = await SharedPreferenceHelper.instance.getToken();
       response = await dio.post(
-        _selectedOption == "Accept"
-            ? "https://rajfed.rajasthan.gov.in/rajfed_API/QrScanner/ReceivedInWareHousePartially"
-            : 'https://rajfed.rajasthan.gov.in/rajfed_API/QrScanner/RejectedInWareHousePartially',
+        'https://rajfed.rajasthan.gov.in/rajfed_API/QrScanner/ReceivedInWareHouseLotWise',
         data: jsonEncode(list),
         options: Options(
           headers: {
@@ -87,21 +89,68 @@ class _WarehouseHomeState extends State<WarehouseHome> {
           },
         ),
       );
+      print("Response: $response");
       if (response.statusCode! >= 200 && response.statusCode! < 300) {
-        showSuccessToast("Success");
-        //qrCodeDetail = null;
-        _searchController.text = "";
+        showSuccessToast(
+            status == "A" ? "Accepted Successfully" : "Rejected Successfully");
+        //_searchController.text = "";
         _commentController.text = "";
         Navigator.pop(context);
+        for (var item in selectedList) {
+          wareHouseList.removeWhere((warehouse) => warehouse.lotNo == item);
+        }
         setState(() {});
       } else {
         Navigator.pop(context);
         showErrorToast('Something wend wrong');
       }
     } catch (e) {
+      print("Error: ${e.toString()}");
       Navigator.pop(context);
       showErrorToast('Something wend wrong');
     }
+  }
+
+  void showRejectedDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text("Confirmation"),
+          content: TextField(
+            maxLines: 3,
+            controller: _commentController,
+            decoration: InputDecoration(
+              hintText: "Rejection reason...",
+              border: OutlineInputBorder(),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context); // Close the dialog
+              },
+              child: Text(
+                "Cancel",
+                style: TextStyle(color: Colors.green, fontSize: 18),
+              ),
+            ),
+            TextButton(
+              onPressed: () {
+                if (_commentController.text.trim().isEmpty) {
+                  Fluttertoast.showToast(msg: "Please enter rejection reason");
+                  return;
+                }
+                Navigator.pop(context);
+                acceptOrRejectByWarehouse("R");
+              },
+              child: Text("Confirm",
+                  style: TextStyle(color: Colors.red, fontSize: 18)),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   /// API CALLS
@@ -344,6 +393,23 @@ class _WarehouseHomeState extends State<WarehouseHome> {
                                 ),
                               ),
                             ),
+                            Checkbox(
+                                value: isAllSelect,
+                                checkColor: Colors.black,
+                                activeColor: Colors.white,
+                                onChanged: (value) {
+                                  setState(() {
+                                    isAllSelect = value ?? false;
+                                    if (value != true) {
+                                      selectedList.clear();
+                                    } else {
+                                      selectedList.clear();
+                                      for (var item in wareHouseList) {
+                                        selectedList.add(item.lotNo ?? 0);
+                                      }
+                                    }
+                                  });
+                                })
                           ],
                         ),
                       ),
@@ -353,8 +419,23 @@ class _WarehouseHomeState extends State<WarehouseHome> {
                         shrinkWrap: true,
                         padding: EdgeInsets.all(0),
                         itemBuilder: (context, index) {
-                          return InformationView(
-                              details: null, model: wareHouseList[index]);
+                          return LotView(
+                            details: null,
+                            model: wareHouseList[index],
+                            isSelected: selectedList
+                                .contains(wareHouseList[index].lotNo),
+                            onCheckPressed: () {
+                              if (selectedList
+                                  .contains(wareHouseList[index].lotNo)) {
+                                selectedList.remove(wareHouseList[index].lotNo);
+                              } else {
+                                selectedList
+                                    .add(wareHouseList[index].lotNo ?? 0);
+                              }
+                              print(selectedList);
+                              setState(() {});
+                            },
+                          );
                         },
                         separatorBuilder: (context, index) {
                           return SizedBox(
@@ -366,41 +447,181 @@ class _WarehouseHomeState extends State<WarehouseHome> {
                   ),
                 ),
                 SizedBox(height: 20),
-                Row(
-                  spacing: 10,
-                  children: [
-                    Expanded(
-                        child: CommonButton(
-                      text: 'Accept All',
-                      onPressed: () {
-                        //saveQrAPICall();
-                      },
-                    )),
-                    Expanded(
-                        child: CommonButton(
-                      text: 'Reject All',
-                      bgColor: Colors.red,
-                      onPressed: () {
-                        //saveQrAPICall();
-                      },
+                Visibility(
+                    visible: selectedList.isNotEmpty,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Row(
+                          spacing: 10,
+                          children: [
+                            Expanded(
+                                child: CommonButton(
+                              text: 'Accept',
+                              onPressed: () {
+                                showDialog(
+                                  context: context,
+                                  builder: (context) {
+                                    return AlertDialog(
+                                      title: Text("Confirm"),
+                                      content: Text(
+                                          "Are you sure you want to Accept all Lots?"),
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () {
+                                            Navigator.pop(
+                                                context); // Close the dialog
+                                            print("Rejected");
+                                          },
+                                          child: Text(
+                                            "Cancel",
+                                            style: TextStyle(
+                                                color: Colors.red,
+                                                fontSize: 18),
+                                          ),
+                                        ),
+                                        TextButton(
+                                          onPressed: () {
+                                            Navigator.pop(context);
+                                            acceptOrRejectByWarehouse("A");
+                                          },
+                                          child: Text(
+                                            "Accept",
+                                            style: TextStyle(
+                                                color: Colors.green,
+                                                fontSize: 18),
+                                          ),
+                                        ),
+                                      ],
+                                    );
+                                  },
+                                );
+                              },
+                            )),
+                            Expanded(
+                                child: CommonButton(
+                              text: 'Reject',
+                              bgColor: Colors.red,
+                              onPressed: () {
+                                showRejectedDialog(context);
+                              },
+                            ))
+                          ],
+                        ),
+                        SizedBox(
+                          height: 10,
+                        ),
+                        CommonButton(
+                          text: 'Partially Reject',
+                          onPressed: () async {
+                            var status = await Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) =>
+                                        PartialRejectScreen()));
+                            if(status == true){
+                              getDetailsByQrCode();
+                            }
+                          },
+                        )
+                      ],
                     ))
-                  ],
-                ),
-                SizedBox(
-                  height: 10,
-                ),
-                CommonButton(
-                  text: 'Partially Reject',
-                  onPressed: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => PartialRejectScreen()));
-                  },
-                )
               ],
             ),
           )
         : SizedBox();
+  }
+}
+
+class LotView extends StatelessWidget {
+  const LotView(
+      {required this.details,
+      this.model,
+      required this.isSelected,
+      required this.onCheckPressed,
+      super.key});
+  final OperatorDetails? details;
+  final DispatchInchargeModel? model;
+  final bool isSelected;
+  final VoidCallback onCheckPressed;
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white, // Background color
+        borderRadius: BorderRadius.circular(4), // Rounded corners
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.3), // Shadow color
+            spreadRadius: 2, // Spread of shadow
+            blurRadius: 10, // Blur effect
+            offset: Offset(4, 4), // Shadow position
+          ),
+        ],
+      ),
+      padding: EdgeInsets.all(16),
+      child: Row(
+        children: [
+          Expanded(
+            child: Column(
+              children: [
+                InformationRow(
+                    title: "Lot No.",
+                    subtitle:
+                        (details?.lotId ?? model?.lotNo ?? 'NA').toString()),
+                InformationRow(
+                    title: "Registration no.",
+                    subtitle: details?.farmerRegID ?? model?.farmerRegId ?? ''),
+                Visibility(
+                    visible: details != null,
+                    child: InformationRow(
+                        title: "Name", subtitle: details?.farmerName ?? '')),
+                InformationRow(
+                    title: "Purchase Center",
+                    subtitle: details?.purchaseCenterKendra ??
+                        model?.purchaseCenterKendra ??
+                        ''),
+                Visibility(
+                  visible: details != null,
+                  child: InformationRow(
+                      title: "Purchase Date",
+                      subtitle: DateFormatter.formatDateToDDMMMYYYY(
+                          details?.regDate ?? '')),
+                ),
+                Visibility(
+                    visible: model?.dispatchDateTime != null,
+                    child: InformationRow(
+                        title: "Dispatch Date",
+                        subtitle: DateFormatter.formatDateToDDMMMYYYY(
+                            model?.dispatchDateTime ?? 'NA'))),
+                Visibility(
+                    visible: model?.receivedDateTime != null,
+                    child: InformationRow(
+                        title: "Received Date",
+                        subtitle: DateFormatter.formatDateToDDMMMYYYY(
+                            model?.receivedDateTime ?? 'NA'))),
+                InformationRow(
+                    title: "Quantity(Qt)",
+                    subtitle:
+                        "${details?.transctionQty ?? model?.qtl.toString() ?? 'NA'}"),
+                details != null
+                    ? InformationRow(
+                        title: "No. of Bardana",
+                        subtitle: "${details?.transctionBardana ?? 'NA'}")
+                    : SizedBox(),
+                InformationRow(
+                    title: "Copy Type",
+                    subtitle: details?.cropTypeEN ?? model?.cropEN ?? 'NA')
+              ],
+            ),
+          ),
+          Checkbox(
+              value: isSelected,
+              onChanged: (valur) {
+                onCheckPressed();
+              })
+        ],
+      ),
+    );
   }
 }

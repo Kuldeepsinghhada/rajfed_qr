@@ -4,6 +4,7 @@ import 'package:rajfed_qr/APIService/shared_preference_helper.dart';
 import 'package:rajfed_qr/models/APIModel/api_response.dart';
 import 'package:rajfed_qr/models/dispatch_incharge_model.dart';
 import 'package:rajfed_qr/models/district_model.dart';
+import 'package:rajfed_qr/models/incharge_details.dart';
 import 'package:rajfed_qr/models/warehouse_model.dart';
 import 'package:rajfed_qr/utils/enums.dart';
 import 'package:rajfed_qr/utils/toast_formatter.dart';
@@ -115,18 +116,20 @@ class WarehouseService {
     }
   }
 
-  Future<APIResponse?> acceptQrCodeByWarehouse(String vehicleNo) async {
+  Future<APIResponse?> wareHouseDetails(String qrCode) async {
     try {
       var purchaseCenterID =
           await SharedPreferenceHelper.instance.getPurchaseCenterId();
-      var query = "?VehicleNo=$vehicleNo&warehouseId=$purchaseCenterID";
+
+      var query = "?QrCode=$qrCode&WareHouseId=$purchaseCenterID";
+
       var response = await ApiService.instance.apiCall(
-          APIEndPoint.wareHouseAccepted + query, HttpRequestType.get, null);
+          APIEndPoint.wareHouseDetails + query, HttpRequestType.get, null);
       if (response.status) {
-        List<DispatchInchargeModel> dispatchList =
-            (response.data['response']['data'] as List)
-                .map((item) => DispatchInchargeModel.fromJson(item))
-                .toList();
+        List<InchargeDetails> dispatchList =
+        (response.data['response']['data'] as List)
+            .map((item) => InchargeDetails.fromJson(item))
+            .toList();
         return APIResponse(true, dispatchList, "");
       }
       return APIResponse(false, null, response.error);
