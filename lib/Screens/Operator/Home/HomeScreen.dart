@@ -131,7 +131,7 @@ class _MyHomePageState extends State<MyHomePage> {
   void scanQrCode(BuildContext context, bool isBulk) async {
     int remainingRecord =
         (operatorDetails?.transctionBardana ?? 0) - (savedQrIds.length);
-    if (scannedNumberList.length <= remainingRecord) {
+    if (scannedNumberList.length <= remainingRecord - 1) {
     } else {
       Fluttertoast.showToast(msg: "You have already uploaded maximum records");
       return;
@@ -178,12 +178,13 @@ class _MyHomePageState extends State<MyHomePage> {
                 FilteringTextInputFormatter
                     .digitsOnly, // Restricts to numbers only
               ],
+              maxLength: 12,
               decoration: InputDecoration(
-                hintText: "Enter QR Code",
-                border: OutlineInputBorder(),
-              ),
+                  hintText: "Enter QR Code",
+                  border: OutlineInputBorder(),
+                  counter: null),
               validator: (value) {
-                if (value != null && value.trim().isEmpty) {
+                if (value != null && value.trim().length != 12) {
                   return "Please enter code";
                 } else if (scannedNumberList.contains(value)) {
                   return "Duplicate entry not allowed";
@@ -208,7 +209,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     int remainingRecord =
                         (operatorDetails?.transctionBardana ?? 0) -
                             (savedQrIds.length);
-                    if (scannedNumberList.length <= remainingRecord) {
+                    if (scannedNumberList.length <= remainingRecord - 1) {
                       scannedNumberList.add(qrController.text);
                     } else {
                       Fluttertoast.showToast(
@@ -256,7 +257,8 @@ class _MyHomePageState extends State<MyHomePage> {
                   Expanded(
                     child: TextFormField(
                       controller: qrController,
-                      keyboardType: TextInputType.number, // Numeric keyboard
+                      keyboardType: TextInputType.number,
+                      maxLength: 12,
                       inputFormatters: [
                         FilteringTextInputFormatter
                             .digitsOnly, // Restricts to numbers only
@@ -266,8 +268,8 @@ class _MyHomePageState extends State<MyHomePage> {
                         border: OutlineInputBorder(),
                       ),
                       validator: (value) {
-                        if (value != null && value.trim().isEmpty) {
-                          return "Please enter code";
+                        if (value != null && value.trim().length != 12) {
+                          return "Please enter correct code";
                         } else if (scannedNumberList.contains(value)) {
                           return "Duplicate entry not allowed";
                         }
@@ -334,10 +336,16 @@ class _MyHomePageState extends State<MyHomePage> {
                       int remainingRecord =
                           (operatorDetails?.transctionBardana ?? 0) -
                               (savedQrIds.length);
-                      if (scannedNumberList.length <= remainingRecord) {
+                      if (scannedNumberList.length <= remainingRecord - 1) {
                         for (var i = 0; i < count; i++) {
-                          if (scannedNumberList.length <= remainingRecord) {
-                            scannedNumberList.add("${code + i}");
+                          if (scannedNumberList.length <= remainingRecord - 1) {
+                            String? leadingZeros =
+                                RegExp(r'^0+').stringMatch(qrController.text);
+                            var number = "${leadingZeros ?? ''}${code + i}";
+                            if (number.length > 12) {
+                              number = number.replaceFirst("0", "");
+                            }
+                            scannedNumberList.add(number);
                           } else {
                             Fluttertoast.showToast(
                                 msg:
@@ -517,6 +525,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Widget searchBar() {
     return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Search Field
         Expanded(
@@ -528,11 +537,13 @@ class _MyHomePageState extends State<MyHomePage> {
               FilteringTextInputFormatter
                   .digitsOnly, // Restricts to numbers only
             ],
+            maxLength: 8,
             style: TextStyle(fontWeight: FontWeight.w600),
             decoration: InputDecoration(
               hintText: "Farmer Reg. number",
               hintStyle: TextStyle(fontWeight: FontWeight.w500),
               filled: true,
+              counter: Text(''),
               fillColor: Colors.grey[100],
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(30),
@@ -542,8 +553,10 @@ class _MyHomePageState extends State<MyHomePage> {
                   EdgeInsets.symmetric(vertical: 14, horizontal: 16),
             ),
             validator: (value) {
-              if (value != null && value.trim().isEmpty) {
-                return "Please enter registration number";
+              if (value != null &&
+                  value.trim().isNotEmpty &&
+                  value.trim().length != 8) {
+                return "Please enter correct registration number";
               }
               return null;
             },
@@ -606,7 +619,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           int remainingRecord =
                               (operatorDetails?.transctionBardana ?? 0) -
                                   (savedQrIds.length);
-                          if (scannedNumberList.length <= remainingRecord) {
+                          if (scannedNumberList.length <= remainingRecord - 1) {
                             showQRCodeDialog(context);
                           } else {
                             Fluttertoast.showToast(
@@ -625,7 +638,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     int remainingRecord =
                         (operatorDetails?.transctionBardana ?? 0) -
                             (savedQrIds.length);
-                    if (scannedNumberList.length <= remainingRecord) {
+                    if (scannedNumberList.length <= remainingRecord - 1) {
                       showBulkQRCodeDialog(context);
                     } else {
                       Fluttertoast.showToast(

@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:rajfed_qr/APIService/shared_preference_helper.dart';
-import 'package:rajfed_qr/Screens/Incharge/incharge_home/incharge_service.dart';
 import 'package:rajfed_qr/Screens/QRScannerScreen/qr_code_screen.dart';
 import 'package:rajfed_qr/Screens/Warehouse/warehouse_service.dart';
 import 'package:rajfed_qr/common_views/common_button.dart';
@@ -221,13 +220,18 @@ class _PartialRejectScreenState extends State<PartialRejectScreen> {
             .wareHouseDetails(_searchController.text);
         if (response?.status == true) {
           Navigator.pop(context);
-          InchargeDetails? inchargeDetails = response?.data[0];
+          InchargeDetails? inchargeDetails =
+              response?.data.isNotEmpty ? response?.data[0] : null;
           bool exists = scannedNumberList
               .any((warehouse) => warehouse.qrCode == _searchController.text);
-          if ((!exists && _searchController.text.trim().isNotEmpty)) {
-            scannedNumberList.add(ScanModel(_searchController.text,
-                (inchargeDetails?.lotNo ?? 0).toString()));
-            setState(() {});
+          if (inchargeDetails != null) {
+            if ((!exists && _searchController.text.trim().isNotEmpty)) {
+              scannedNumberList.add(ScanModel(_searchController.text,
+                  (inchargeDetails.lotNo ?? 0).toString()));
+              setState(() {});
+            }
+          } else {
+            showErrorToast("Record not found");
           }
         } else {
           Navigator.pop(context);
@@ -271,6 +275,7 @@ class _PartialRejectScreenState extends State<PartialRejectScreen> {
           child: TextFormField(
             focusNode: _focusNode,
             controller: _searchController,
+            maxLength: 12,
             keyboardType: TextInputType.number, // Numeric keyboard
             inputFormatters: [
               FilteringTextInputFormatter
@@ -295,7 +300,7 @@ class _PartialRejectScreenState extends State<PartialRejectScreen> {
                     icon: Icon(Icons.qr_code_scanner))),
             validator: (value) {
               if (value != null && value.trim().isEmpty) {
-                return "Please enter registration number";
+                return "Please enter correct code";
               }
               return null;
             },

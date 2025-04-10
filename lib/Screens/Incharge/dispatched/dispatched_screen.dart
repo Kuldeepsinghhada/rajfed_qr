@@ -159,6 +159,7 @@ class _DiapatchInchargeScreenState extends State<DiapatchInchargeScreen> {
     return Form(
       key: _formKey,
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Search Field
           Expanded(
@@ -167,6 +168,7 @@ class _DiapatchInchargeScreenState extends State<DiapatchInchargeScreen> {
               controller: vehicleController,
               inputFormatters: [UpperCaseTextFormatter()],
               style: TextStyle(fontWeight: FontWeight.w600),
+              maxLength: 10,
               decoration: InputDecoration(
                 hintText: "Vehicle number",
                 hintStyle: TextStyle(fontWeight: FontWeight.w500),
@@ -182,7 +184,7 @@ class _DiapatchInchargeScreenState extends State<DiapatchInchargeScreen> {
               validator: (value) {
                 if (value != null && value.trim().isEmpty) {
                   return "Please enter correct number";
-                } else if ((value ?? '').trim().length < 10) {
+                } else if ((value ?? '').trim().length != 10) {
                   return "Please enter correct number";
                 }
                 return null;

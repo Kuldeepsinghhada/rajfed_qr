@@ -363,6 +363,7 @@ class _InchargeHomeState extends State<InchargeHome> {
 
   Widget searchBar() {
     return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Search Field
         Expanded(
@@ -374,6 +375,7 @@ class _InchargeHomeState extends State<InchargeHome> {
               FilteringTextInputFormatter
                   .digitsOnly, // Restricts to numbers only
             ],
+            maxLength: 12,
             style: TextStyle(fontWeight: FontWeight.w600),
             decoration: InputDecoration(
                 hintText: "Enter QR Code",
@@ -392,8 +394,8 @@ class _InchargeHomeState extends State<InchargeHome> {
                     },
                     icon: Icon(Icons.qr_code_scanner))),
             validator: (value) {
-              if (value != null && value.trim().isEmpty) {
-                return "Please enter registration number";
+              if (value != null && value.trim().length != 12) {
+                return "Please enter QR code";
               }
               return null;
             },

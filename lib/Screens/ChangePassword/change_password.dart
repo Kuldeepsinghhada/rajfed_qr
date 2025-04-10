@@ -3,7 +3,6 @@ import 'package:crypto/crypto.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:rajfed_qr/APIService/shared_preference_helper.dart';
-import 'package:rajfed_qr/Screens/ChangePassword/change_password.dart';
 import 'package:rajfed_qr/Screens/ChangePassword/change_password_service.dart';
 import 'package:rajfed_qr/common_views/common_button.dart';
 import 'package:rajfed_qr/common_views/loader_dialog.dart';

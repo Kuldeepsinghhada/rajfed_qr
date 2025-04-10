@@ -1,3 +1,4 @@
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:rajfed_qr/APIService/api_endpoint.dart';
 import 'package:rajfed_qr/APIService/api_service.dart';
 import 'package:rajfed_qr/APIService/shared_preference_helper.dart';
@@ -63,10 +64,14 @@ class OPHomeService {
       var purchaseCenterID =
           await SharedPreferenceHelper.instance.getPurchaseCenterId();
 
+      DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+      AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
+      print('Running on ${androidInfo.model}');
+
       Map<String, dynamic> body = {
         "farmerRegNo": farmerRegNo,
         "qr_code": qrCode,
-        "device_info": "string",
+        "device_info": androidInfo.model.toString(),
         "purchaseCenter_ID": purchaseCenterID,
         "lotNo": lotNo
       };

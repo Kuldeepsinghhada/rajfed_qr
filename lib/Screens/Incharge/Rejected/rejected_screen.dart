@@ -222,6 +222,7 @@ class _RejectedInchargeScreenState extends State<RejectedInchargeScreen> {
               focusNode: _focusNode,
               controller: vehicleController,
               inputFormatters: [UpperCaseTextFormatter()],
+              maxLength: 10,
               style: TextStyle(fontWeight: FontWeight.w600),
               decoration: InputDecoration(
                 hintText: "Vehicle number",
@@ -238,7 +239,7 @@ class _RejectedInchargeScreenState extends State<RejectedInchargeScreen> {
               validator: (value) {
                 if (value != null && value.trim().isEmpty) {
                   return "Please enter correct number";
-                } else if ((value ?? '').trim().length < 10) {
+                } else if ((value ?? '').trim().length != 10) {
                   return "Please enter correct number";
                 }
                 return null;
