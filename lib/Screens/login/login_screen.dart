@@ -24,6 +24,14 @@ class _LoginPageState extends State<LoginPage> {
 
   bool isLoading = false;
 
+  bool _obscureText = true;
+
+  void _toggleVisibility() {
+    setState(() {
+      _obscureText = !_obscureText;
+    });
+  }
+
   onLoginPressed() async {
     var valid = _formKey.currentState?.validate();
     if (valid == true) {
@@ -126,7 +134,7 @@ class _LoginPageState extends State<LoginPage> {
 
                   // Password Field
                   TextFormField(
-                    obscureText: true,
+                    obscureText: !_obscureText,
                     controller: _passwordController,
                     decoration: InputDecoration(
                       //hintText: "Password",
@@ -157,6 +165,14 @@ class _LoginPageState extends State<LoginPage> {
                             color: Colors.red,
                             width: 2), // Red border for errors
                         borderRadius: BorderRadius.circular(30),
+                      ),
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          _obscureText
+                              ? Icons.visibility_off
+                              : Icons.visibility,
+                        ),
+                        onPressed: _toggleVisibility,
                       ),
                     ),
                     validator: (value) {
