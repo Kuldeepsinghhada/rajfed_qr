@@ -101,7 +101,7 @@ class _InchargeHomeState extends State<InchargeHome> {
 
   void getSavedQrCodes() async {
     savedQrIds.clear();
-    scannedNumberList.clear();
+    // scannedNumberList.clear();
     showLoadingDialog(context);
     try {
       var response = await OPHomeService.instance
@@ -303,6 +303,7 @@ class _InchargeHomeState extends State<InchargeHome> {
         scannedNumberList.add(object);
       }
     }
+    showSuccessToast("Added Successfully");
     setState(() {});
   }
 
@@ -370,11 +371,11 @@ class _InchargeHomeState extends State<InchargeHome> {
           child: TextFormField(
             focusNode: _focusNode,
             controller: _searchController,
-            keyboardType: TextInputType.number, // Numeric keyboard
-            inputFormatters: [
-              FilteringTextInputFormatter
-                  .digitsOnly, // Restricts to numbers only
-            ],
+            // keyboardType: TextInputType.number, // Numeric keyboard
+            // inputFormatters: [
+            //   FilteringTextInputFormatter
+            //       .digitsOnly, // Restricts to numbers only
+            // ],
             maxLength: 12,
             style: TextStyle(fontWeight: FontWeight.w600),
             decoration: InputDecoration(

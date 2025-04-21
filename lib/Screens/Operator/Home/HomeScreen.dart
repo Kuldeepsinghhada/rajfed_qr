@@ -173,11 +173,11 @@ class _MyHomePageState extends State<MyHomePage> {
             title: Text("Enter QR Code"),
             content: TextFormField(
               controller: qrController,
-              keyboardType: TextInputType.number, // Numeric keyboard
-              inputFormatters: [
-                FilteringTextInputFormatter
-                    .digitsOnly, // Restricts to numbers only
-              ],
+              // keyboardType: TextInputType.number, // Numeric keyboard
+              // inputFormatters: [
+              //   FilteringTextInputFormatter
+              //       .digitsOnly, // Restricts to numbers only
+              // ],
               maxLength: 12,
               decoration: InputDecoration(
                   hintText: "Enter QR Code",
@@ -257,12 +257,12 @@ class _MyHomePageState extends State<MyHomePage> {
                   Expanded(
                     child: TextFormField(
                       controller: qrController,
-                      keyboardType: TextInputType.number,
+                      //keyboardType: TextInputType.number,
                       maxLength: 12,
-                      inputFormatters: [
-                        FilteringTextInputFormatter
-                            .digitsOnly, // Restricts to numbers only
-                      ],
+                      // inputFormatters: [
+                      //   FilteringTextInputFormatter
+                      //       .digitsOnly, // Restricts to numbers only
+                      // ],
                       decoration: InputDecoration(
                         hintText: "Enter Code",
                         border: OutlineInputBorder(),
@@ -285,6 +285,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     width: 70,
                     child: TextFormField(
                       controller: countController,
+                      maxLength: 3,
                       keyboardType: TextInputType.number, // Numeric keyboard
                       inputFormatters: [
                         FilteringTextInputFormatter
@@ -331,7 +332,9 @@ class _MyHomePageState extends State<MyHomePage> {
                   var status = _formMultiQrCodeKey.currentState?.validate();
                   if (status == true) {
                     try {
-                      var code = int.parse(qrController.text);
+                      var code = qrController.text.contains("RJ")
+                          ? int.parse(qrController.text.replaceAll("RJ", ""))
+                          : int.parse(qrController.text);
                       var count = int.parse(countController.text);
                       int remainingRecord =
                           (operatorDetails?.transctionBardana ?? 0) -
@@ -340,8 +343,9 @@ class _MyHomePageState extends State<MyHomePage> {
                         for (var i = 0; i < count; i++) {
                           if (scannedNumberList.length <= remainingRecord - 1) {
                             String? leadingZeros =
-                                RegExp(r'^0+').stringMatch(qrController.text);
-                            var number = "${leadingZeros ?? ''}${code + i}";
+                                RegExp(r'^0+').stringMatch(qrController.text.replaceAll("RJ", "").toString());
+                            var number =
+                                "${qrController.text.contains('RJ') ? "RJ" : ""}${leadingZeros ?? ''}${code + i}";
                             if (number.length > 12) {
                               number = number.replaceFirst("0", "");
                             }

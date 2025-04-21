@@ -108,8 +108,8 @@ class _DiapatchInchargeScreenState extends State<DiapatchInchargeScreen> {
                         InformationRow(
                             title: "Registration no.",
                             subtitle: details.farmerRegId ?? 'NA'),
-                        InformationRow(
-                            title: "QR Code", subtitle: details.qrCode ?? 'NA'),
+                        // InformationRow(
+                        //     title: "QR Code", subtitle: details.qrCode ?? 'NA'),
                         InformationRow(
                             title: "Purchase Center",
                             subtitle: details.purchaseCenterKendra ?? 'NA'),

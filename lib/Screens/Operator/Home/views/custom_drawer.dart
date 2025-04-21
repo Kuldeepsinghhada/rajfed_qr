@@ -98,7 +98,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: Text(
-              "Version 1.0.0",
+              "Version 1.1.1",
               style: TextStyle(color: Colors.grey),
             ),
           ),
