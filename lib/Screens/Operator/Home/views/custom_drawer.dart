@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:rajfed_qr/APIService/shared_preference_helper.dart';
 
 class CustomDrawer extends StatefulWidget {
@@ -17,7 +18,16 @@ class _CustomDrawerState extends State<CustomDrawer> {
   @override
   void initState() {
     getUserType();
+    getPackageDetail();
     super.initState();
+  }
+
+  String buildNumber = "";
+
+  getPackageDetail() async {
+    PackageInfo packageInfo = await PackageInfo.fromPlatform();
+    buildNumber = "Version: ${packageInfo.version}(${packageInfo.buildNumber})";
+    setState(() {});
   }
 
   getUserType() async {
@@ -98,7 +108,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: Text(
-              "Version 1.1.1",
+              buildNumber,
               style: TextStyle(color: Colors.grey),
             ),
           ),

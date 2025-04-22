@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:rajfed_qr/Screens/Incharge/incharge_home/incharge_home.dart';
 import 'package:rajfed_qr/Screens/Warehouse/warehouse_home.dart';
 import 'package:rajfed_qr/Screens/login/login_service.dart';
@@ -25,6 +26,20 @@ class _LoginPageState extends State<LoginPage> {
   bool isLoading = false;
 
   bool _obscureText = true;
+
+  String buildNumber = "";
+
+  getPackageDetail() async {
+    PackageInfo packageInfo = await PackageInfo.fromPlatform();
+    buildNumber = "Version: ${packageInfo.version}(${packageInfo.buildNumber})";
+    setState(() {});
+  }
+
+  @override
+  void initState() {
+    getPackageDetail();
+    super.initState();
+  }
 
   void _toggleVisibility() {
     setState(() {
@@ -78,136 +93,147 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: Center(
-        child: SingleChildScrollView(
-          child: Form(
-            key: _formKey,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 30),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment:
-                    CrossAxisAlignment.center, // Center align everything
-                children: [
-                  // Logo
-                  Image.asset("images/satya.png", height: 120),
-                  SizedBox(height: 30),
-                  // Username Field
-                  TextFormField(
-                    controller: _usernameController,
-                    decoration: InputDecoration(
-                      filled: true,
-                      label: Text("UserName",
-                          style: TextStyle(color: Colors.black)),
-                      fillColor: Colors.grey[200],
-                      contentPadding: EdgeInsets.only(left: 20, right: 20),
-                      border: OutlineInputBorder(
-                        borderRadius:
-                            BorderRadius.circular(30), // Rounded corners
-                        borderSide: BorderSide.none,
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: Colors.grey, width: 0),
-                        borderRadius: BorderRadius.circular(30),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(
-                            color: Colors.grey,
-                            width: 2), // Blue border on focus
-                        borderRadius: BorderRadius.circular(30),
-                      ),
-                      errorBorder: OutlineInputBorder(
-                        borderSide: BorderSide(
-                            color: Colors.red,
-                            width: 2), // Red border for errors
-                        borderRadius: BorderRadius.circular(30),
-                      ),
-                    ),
-                    validator: (value) {
-                      if (value != null && value.trim().isEmpty) {
-                        return "Please enter username";
-                      }
-                      return null;
-                    },
-                  ),
-                  SizedBox(height: 15),
-
-                  // Password Field
-                  TextFormField(
-                    obscureText: !_obscureText,
-                    controller: _passwordController,
-                    decoration: InputDecoration(
-                      //hintText: "Password",
-                      label: Text(
-                        "Password",
-                        style: TextStyle(color: Colors.black),
-                      ),
-                      filled: true,
-                      contentPadding: EdgeInsets.only(left: 20, right: 20),
-                      fillColor: Colors.grey[200],
-                      border: OutlineInputBorder(
-                        borderRadius:
-                            BorderRadius.circular(30), // Rounded corners
-                        borderSide: BorderSide.none,
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: Colors.grey, width: 0),
-                        borderRadius: BorderRadius.circular(30),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(
-                            color: Colors.grey,
-                            width: 2), // Blue border on focus
-                        borderRadius: BorderRadius.circular(30),
-                      ),
-                      errorBorder: OutlineInputBorder(
-                        borderSide: BorderSide(
-                            color: Colors.red,
-                            width: 2), // Red border for errors
-                        borderRadius: BorderRadius.circular(30),
-                      ),
-                      suffixIcon: IconButton(
-                        icon: Icon(
-                          _obscureText
-                              ? Icons.visibility_off
-                              : Icons.visibility,
+      body: Stack(
+        alignment: Alignment.bottomCenter,
+        children: [
+          Center(
+            child: SingleChildScrollView(
+              child: Form(
+                key: _formKey,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 30),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment:
+                        CrossAxisAlignment.center, // Center align everything
+                    children: [
+                      // Logo
+                      Image.asset("images/satya.png", height: 120),
+                      SizedBox(height: 30),
+                      // Username Field
+                      TextFormField(
+                        controller: _usernameController,
+                        decoration: InputDecoration(
+                          filled: true,
+                          label: Text("UserName",
+                              style: TextStyle(color: Colors.black)),
+                          fillColor: Colors.grey[200],
+                          contentPadding: EdgeInsets.only(left: 20, right: 20),
+                          border: OutlineInputBorder(
+                            borderRadius:
+                                BorderRadius.circular(30), // Rounded corners
+                            borderSide: BorderSide.none,
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderSide:
+                                BorderSide(color: Colors.grey, width: 0),
+                            borderRadius: BorderRadius.circular(30),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                                color: Colors.grey,
+                                width: 2), // Blue border on focus
+                            borderRadius: BorderRadius.circular(30),
+                          ),
+                          errorBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                                color: Colors.red,
+                                width: 2), // Red border for errors
+                            borderRadius: BorderRadius.circular(30),
+                          ),
                         ),
-                        onPressed: _toggleVisibility,
+                        validator: (value) {
+                          if (value != null && value.trim().isEmpty) {
+                            return "Please enter username";
+                          }
+                          return null;
+                        },
                       ),
-                    ),
-                    validator: (value) {
-                      if (value != null && value.trim().isEmpty) {
-                        return "Please enter password";
-                      }
-                      return null;
-                    },
-                  ),
-                  SizedBox(height: 30),
+                      SizedBox(height: 15),
 
-                  // Login Button
-                  SizedBox(
-                    width: double.infinity, // Make button full width
-                    child: ElevatedButton(
-                      onPressed: () {
-                        onLoginPressed();
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.green[400],
-                        foregroundColor: Colors.black,
-                        shape: RoundedRectangleBorder(
-                          borderRadius:
-                              BorderRadius.circular(30), // Rounded button
+                      // Password Field
+                      TextFormField(
+                        obscureText: !_obscureText,
+                        controller: _passwordController,
+                        decoration: InputDecoration(
+                          //hintText: "Password",
+                          label: Text(
+                            "Password",
+                            style: TextStyle(color: Colors.black),
+                          ),
+                          filled: true,
+                          contentPadding: EdgeInsets.only(left: 20, right: 20),
+                          fillColor: Colors.grey[200],
+                          border: OutlineInputBorder(
+                            borderRadius:
+                                BorderRadius.circular(30), // Rounded corners
+                            borderSide: BorderSide.none,
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderSide:
+                                BorderSide(color: Colors.grey, width: 0),
+                            borderRadius: BorderRadius.circular(30),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                                color: Colors.grey,
+                                width: 2), // Blue border on focus
+                            borderRadius: BorderRadius.circular(30),
+                          ),
+                          errorBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                                color: Colors.red,
+                                width: 2), // Red border for errors
+                            borderRadius: BorderRadius.circular(30),
+                          ),
+                          suffixIcon: IconButton(
+                            icon: Icon(
+                              _obscureText
+                                  ? Icons.visibility_off
+                                  : Icons.visibility,
+                            ),
+                            onPressed: _toggleVisibility,
+                          ),
                         ),
-                        padding: EdgeInsets.symmetric(vertical: 15),
+                        validator: (value) {
+                          if (value != null && value.trim().isEmpty) {
+                            return "Please enter password";
+                          }
+                          return null;
+                        },
                       ),
-                      child: Text("Login", style: TextStyle(fontSize: 18)),
-                    ),
+                      SizedBox(height: 30),
+
+                      // Login Button
+                      SizedBox(
+                        width: double.infinity, // Make button full width
+                        child: ElevatedButton(
+                          onPressed: () {
+                            onLoginPressed();
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.green[400],
+                            foregroundColor: Colors.black,
+                            shape: RoundedRectangleBorder(
+                              borderRadius:
+                                  BorderRadius.circular(30), // Rounded button
+                            ),
+                            padding: EdgeInsets.symmetric(vertical: 15),
+                          ),
+                          child: Text("Login", style: TextStyle(fontSize: 18)),
+                        ),
+                      ),
+                    ],
                   ),
-                ],
+                ),
               ),
             ),
           ),
-        ),
+          Padding(
+            padding: const EdgeInsets.only(bottom: 10),
+            child: Text(buildNumber),
+          )
+        ],
       ),
     );
   }

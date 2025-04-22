@@ -14,6 +14,7 @@ import 'package:rajfed_qr/Screens/login/login_screen.dart';
 import 'package:rajfed_qr/Screens/QRScannerScreen/qr_code_screen.dart';
 import 'package:rajfed_qr/common_views/common_button.dart';
 import 'package:rajfed_qr/common_views/loader_dialog.dart';
+import 'package:rajfed_qr/models/crop_list_model.dart';
 import 'package:rajfed_qr/models/operator_details.dart';
 import 'package:rajfed_qr/models/saved_qr_model.dart';
 import 'package:rajfed_qr/utils/enums.dart';
@@ -47,9 +48,14 @@ class _MyHomePageState extends State<MyHomePage> {
 
   bool isShowSavedStock = false;
 
+  String? selectedCropValue;
+  List<CropModel> cropList = [];
+  List<String> cropStringList = [];
+
   @override
   void initState() {
     getUserDetails();
+    getCropAPICall();
     super.initState();
   }
 
@@ -57,6 +63,30 @@ class _MyHomePageState extends State<MyHomePage> {
   void dispose() {
     _focusNode.dispose(); // Dispose of the FocusNode
     super.dispose();
+  }
+
+  void getCropAPICall() async {
+    await Future.delayed(Duration(milliseconds: 100));
+    showLoadingDialog(context);
+    try {
+      var response = await OPHomeService.instance.getCropList();
+      Navigator.pop(context);
+      if (response.status == true) {
+        cropList = response.data;
+        cropList.removeWhere((obj) => obj.cropID == 0);
+        for (var item in cropList) {
+          if (item.cropDescEN != null) {
+            cropStringList.add(item.cropDescEN!);
+          }
+        }
+        setState(() {});
+      } else {
+        showErrorToast(response.error);
+      }
+    } catch (e) {
+      Navigator.pop(context);
+      showErrorToast("Something went wrong");
+    }
   }
 
   /// API CALLS
@@ -89,10 +119,16 @@ class _MyHomePageState extends State<MyHomePage> {
   void saveQrAPICall() async {
     showLoadingDialog(context);
     try {
+      var index = cropStringList.indexOf(selectedCropValue ?? '');
+      if (index < 0) {
+        showErrorToast("Crop not found");
+        return;
+      }
       var data = await OPHomeService.instance.saveFarmerQrCode(
           operatorDetails?.farmerRegID ?? "",
           scannedNumberList,
-          (operatorDetails?.lotId ?? "").toString());
+          (operatorDetails?.lotId ?? "").toString(),
+          cropList[index].cropID ?? 0);
       Navigator.pop(context);
       if (data?.status == true) {
         scannedNumberList.clear();
@@ -109,9 +145,14 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void getSavedQrCodes() async {
     showLoadingDialog(context);
+    var index = cropStringList.indexOf(selectedCropValue ?? '');
+    if (index < 0) {
+      showErrorToast("Crop not found");
+      return;
+    }
     try {
-      var response = await OPHomeService.instance
-          .farmerSavedList(operatorDetails?.farmerRegID ?? '');
+      var response = await OPHomeService.instance.farmerSavedList(
+          operatorDetails?.farmerRegID ?? '', cropList[index].cropID ?? 0);
       if (response?.status == true) {
         Navigator.pop(context);
         setState(() {
@@ -342,8 +383,10 @@ class _MyHomePageState extends State<MyHomePage> {
                       if (scannedNumberList.length <= remainingRecord - 1) {
                         for (var i = 0; i < count; i++) {
                           if (scannedNumberList.length <= remainingRecord - 1) {
-                            String? leadingZeros =
-                                RegExp(r'^0+').stringMatch(qrController.text.replaceAll("RJ", "").toString());
+                            String? leadingZeros = RegExp(r'^0+').stringMatch(
+                                qrController.text
+                                    .replaceAll("RJ", "")
+                                    .toString());
                             var number =
                                 "${qrController.text.contains('RJ') ? "RJ" : ""}${leadingZeros ?? ''}${code + i}";
                             if (number.length > 12) {
@@ -465,11 +508,16 @@ class _MyHomePageState extends State<MyHomePage> {
   void getOperatorDetails() async {
     _focusNode.unfocus();
     var valid = _formKey.currentState?.validate();
+    var index = cropStringList.indexOf(selectedCropValue ?? '');
+    if (index < 0) {
+      showErrorToast("Crop not found");
+      return;
+    }
     if (valid == true) {
       showLoadingDialog(context);
       try {
         var response = await OPHomeService.instance
-            .operatorDetails(_searchController.text);
+            .operatorDetails(_searchController.text,cropList[index].cropID ?? 0);
         if (response?.status == true) {
           Navigator.pop(context);
           setState(() {
@@ -528,68 +576,88 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Widget searchBar() {
-    return Row(
+    return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Search Field
-        Expanded(
-          child: TextFormField(
-            focusNode: _focusNode,
-            controller: _searchController,
-            keyboardType: TextInputType.number, // Numeric keyboard
-            inputFormatters: [
-              FilteringTextInputFormatter
-                  .digitsOnly, // Restricts to numbers only
-            ],
-            maxLength: 8,
-            style: TextStyle(fontWeight: FontWeight.w600),
-            decoration: InputDecoration(
-              hintText: "Farmer Reg. number",
-              hintStyle: TextStyle(fontWeight: FontWeight.w500),
-              filled: true,
-              counter: Text(''),
-              fillColor: Colors.grey[100],
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(30),
-                borderSide: BorderSide.none,
-              ),
-              contentPadding:
-                  EdgeInsets.symmetric(vertical: 14, horizontal: 16),
-            ),
-            validator: (value) {
-              if (value != null &&
-                  value.trim().isNotEmpty &&
-                  value.trim().length != 8) {
-                return "Please enter correct registration number";
-              }
-              return null;
-            },
-          ),
-        ),
-
-        SizedBox(width: 10), // Space between
-
-        // Search Button
-        GestureDetector(
-          onTap: () {
-            getOperatorDetails();
-          },
-          child: Container(
-            padding: EdgeInsets.all(14),
-            decoration: BoxDecoration(
-              color: Colors.green.shade400,
+        TextFormField(
+          focusNode: _focusNode,
+          controller: _searchController,
+          keyboardType: TextInputType.number, // Numeric keyboard
+          inputFormatters: [
+            FilteringTextInputFormatter.digitsOnly, // Restricts to numbers only
+          ],
+          maxLength: 8,
+          style: TextStyle(fontWeight: FontWeight.w600),
+          decoration: InputDecoration(
+            hintText: "Farmer Reg. number",
+            hintStyle: TextStyle(fontWeight: FontWeight.w500),
+            filled: true,
+            counter: Text(''),
+            fillColor: Colors.grey[100],
+            border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(30),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.blue.shade50,
-                  blurRadius: 8,
-                  offset: Offset(2, 2),
-                ),
-              ],
+              borderSide: BorderSide.none,
             ),
-            child: Icon(Icons.search, color: Colors.white),
+            contentPadding: EdgeInsets.symmetric(vertical: 14, horizontal: 16),
           ),
+          validator: (value) {
+            if (value?.trim().length != 8) {
+              return "Please enter correct registration number";
+            }
+            return null;
+          },
         ),
+        SizedBox(
+          height: 12,
+        ),
+        cropDropDown(),
+        SizedBox(
+          height: 30,
+        ),
+        Row(
+          children: [
+            Expanded(
+              child: ElevatedButton(
+                onPressed: () {
+                  getOperatorDetails();
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.green.shade400,
+                  foregroundColor: Colors.white,
+                  padding: EdgeInsets.symmetric(horizontal: 32, vertical: 14),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(30), // Rounded corners
+                  ),
+                  elevation: 5,
+                ),
+                child: Text(
+                  "Search".toUpperCase(),
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+                ),
+              ),
+            ),
+          ],
+        ),
+        // GestureDetector(
+        //   onTap: () {
+        //     getOperatorDetails();
+        //   },
+        //   child: Container(
+        //     padding: EdgeInsets.all(14),
+        //     decoration: BoxDecoration(
+        //       color: Colors.green.shade400,
+        //       borderRadius: BorderRadius.circular(30),
+        //       boxShadow: [
+        //         BoxShadow(
+        //           color: Colors.blue.shade50,
+        //           blurRadius: 8,
+        //           offset: Offset(2, 2),
+        //         ),
+        //       ],
+        //     ),
+        //     child: Icon(Icons.search, color: Colors.white),
+        //   ),
+        // ),
       ],
     );
   }
@@ -865,5 +933,47 @@ class _MyHomePageState extends State<MyHomePage> {
             ],
           )
         : SizedBox();
+  }
+
+  Widget cropDropDown() {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 16),
+      decoration: BoxDecoration(
+        color: Colors.grey[100],
+        //border: Border.all(color: Colors.deepPurple),
+        borderRadius: BorderRadius.circular(30), // Rounded corners
+      ),
+      child: DropdownButtonFormField<String>(
+        value: selectedCropValue,
+        icon: Icon(Icons.arrow_drop_down),
+        hint: Text(
+          'Please select crop',
+          style: TextStyle(fontWeight: FontWeight.w500, color: Colors.black87),
+        ),
+        isExpanded: true,
+        decoration: InputDecoration(border: InputBorder.none),
+        style: TextStyle(color: Colors.black, fontSize: 16),
+        onChanged: (String? newValue) {
+          setState(() {
+            selectedCropValue = newValue!;
+          });
+        },
+        validator: (value) {
+          if (value == null) {
+            return "Please select value";
+          }
+          setState(() {
+            selectedCropValue = value;
+          });
+          return null;
+        },
+        items: cropStringList.map((String value) {
+          return DropdownMenuItem<String>(
+            value: value,
+            child: Text(value),
+          );
+        }).toList(),
+      ),
+    );
   }
 }

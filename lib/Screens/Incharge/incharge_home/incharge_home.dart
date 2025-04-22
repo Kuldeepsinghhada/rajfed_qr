@@ -99,13 +99,13 @@ class _InchargeHomeState extends State<InchargeHome> {
     }
   }
 
-  void getSavedQrCodes() async {
+  void getSavedQrCodes(int cropId) async {
     savedQrIds.clear();
     // scannedNumberList.clear();
     showLoadingDialog(context);
     try {
       var response = await OPHomeService.instance
-          .farmerSavedList(operatorDetails?.farmerRegID ?? '');
+          .farmerSavedList(operatorDetails?.farmerRegID ?? '',cropId);
       if (response?.status == true) {
         Navigator.pop(context);
         for (var item in response?.data) {
@@ -237,7 +237,7 @@ class _InchargeHomeState extends State<InchargeHome> {
           setState(() {
             inchargeDetails = response?.data;
           });
-          getOperatorDetails(inchargeDetails?.farmerRegId ?? '');
+          getOperatorDetails(inchargeDetails?.farmerRegId ?? '',inchargeDetails?.cropID ?? 0);
         } else {
           Navigator.pop(context);
           Fluttertoast.showToast(
@@ -250,19 +250,19 @@ class _InchargeHomeState extends State<InchargeHome> {
     }
   }
 
-  void getOperatorDetails(String farmerId) async {
+  void getOperatorDetails(String farmerId,int cropId) async {
     _focusNode.unfocus();
     var valid = _formKey.currentState?.validate();
     if (valid == true) {
       showLoadingDialog(context);
       try {
-        var response = await OPHomeService.instance.operatorDetails(farmerId);
+        var response = await OPHomeService.instance.operatorDetails(farmerId,cropId);
         if (response?.status == true) {
           Navigator.pop(context);
           setState(() {
             operatorDetails = response?.data;
           });
-          getSavedQrCodes();
+          getSavedQrCodes(cropId);
         } else {
           Navigator.pop(context);
           Fluttertoast.showToast(
