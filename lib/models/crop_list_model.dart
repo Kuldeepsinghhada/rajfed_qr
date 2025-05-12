@@ -1,5 +1,3 @@
-
-
 class CropModel {
   int? cropID;
   String? cropDescEN;
@@ -14,10 +12,10 @@ class CropModel {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['crop_ID'] = this.cropID;
-    data['crop_descEN'] = this.cropDescEN;
-    data['crop_IsAcrive'] = this.cropIsAcrive;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['crop_ID'] = cropID;
+    data['crop_descEN'] = cropDescEN;
+    data['crop_IsAcrive'] = cropIsAcrive;
     return data;
   }
 }

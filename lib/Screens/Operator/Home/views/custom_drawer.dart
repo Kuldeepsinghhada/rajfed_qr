@@ -71,17 +71,17 @@ class _CustomDrawerState extends State<CustomDrawer> {
             ),
           ),
           Visibility(
-            visible: (userType == 2) || (userType == 5),
+            visible: (userType == 2) || (userType == 13),
             child: ListTile(
               leading: Icon(Icons.send_time_extension_outlined),
-              title: Text(userType == 5 ? "Accepted" : "Dispatched"),
+              title: Text(userType == 13 ? "Accepted" : "Dispatched"),
               onTap: () {
                 widget.callback("Dispatched");
               },
             ),
           ),
           Visibility(
-            visible: (userType == 2) || (userType == 5),
+            visible: (userType == 2) || (userType == 13),
             child: ListTile(
               leading: Icon(Icons.do_not_disturb_alt_sharp),
               title: Text("Rejected"),

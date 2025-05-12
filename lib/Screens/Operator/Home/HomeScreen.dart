@@ -5,6 +5,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:rajfed_qr/APIService/api_endpoint.dart';
 import 'package:rajfed_qr/APIService/api_service.dart';
 import 'package:rajfed_qr/APIService/shared_preference_helper.dart';
+import 'package:rajfed_qr/Screens/Operator/DeleteQr/delete_qr_screen.dart';
 import 'package:rajfed_qr/Screens/Operator/Home/op_home_service.dart';
 import 'package:rajfed_qr/Screens/Operator/Home/views/Information_row.dart';
 import 'package:rajfed_qr/Screens/Operator/Home/views/custom_drawer.dart';
@@ -516,8 +517,8 @@ class _MyHomePageState extends State<MyHomePage> {
     if (valid == true) {
       showLoadingDialog(context);
       try {
-        var response = await OPHomeService.instance
-            .operatorDetails(_searchController.text,cropList[index].cropID ?? 0);
+        var response = await OPHomeService.instance.operatorDetails(
+            _searchController.text, cropList[index].cropID ?? 0);
         if (response?.status == true) {
           Navigator.pop(context);
           setState(() {
@@ -729,98 +730,118 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Widget savedCodeList() {
     return savedQrIds.isNotEmpty
-        ? Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              CommonButton(
-                  text: 'Saved QR',
-                  onPressed: () {
-                    showModalBottomSheet(
-                      context: context,
-                      shape: RoundedRectangleBorder(
-                        borderRadius:
-                            BorderRadius.vertical(top: Radius.circular(16)),
-                      ),
-                      builder: (BuildContext context) {
-                        return Column(
-                          children: [
-                            Container(
-                              height: 50,
-                              width: MediaQuery.of(context).size.width,
-                              padding: EdgeInsets.only(left: 20, right: 10),
-                              decoration: BoxDecoration(
-                                  color: Colors.green.shade400,
-                                  borderRadius: BorderRadius.only(
-                                      topLeft: Radius.circular(16),
-                                      topRight: Radius.circular(16))),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    "Saved Stock",
-                                    style: TextStyle(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.w700,
-                                        fontSize: 18),
+        ? SizedBox(
+            height: 60,
+            child: Row(
+              //mainAxisSize: MainAxisSize.min,
+              children: [
+                Expanded(
+                  child: CommonButton(
+                      text: 'Saved QR',
+                      onPressed: () {
+                        showModalBottomSheet(
+                          context: context,
+                          shape: RoundedRectangleBorder(
+                            borderRadius:
+                                BorderRadius.vertical(top: Radius.circular(16)),
+                          ),
+                          builder: (BuildContext context) {
+                            return Column(
+                              children: [
+                                Container(
+                                  height: 50,
+                                  width: MediaQuery.of(context).size.width,
+                                  padding: EdgeInsets.only(left: 20, right: 10),
+                                  decoration: BoxDecoration(
+                                      color: Colors.green.shade400,
+                                      borderRadius: BorderRadius.only(
+                                          topLeft: Radius.circular(16),
+                                          topRight: Radius.circular(16))),
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        "Saved Stock",
+                                        style: TextStyle(
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.w700,
+                                            fontSize: 18),
+                                      ),
+                                      IconButton(
+                                          onPressed: () {
+                                            Navigator.pop(context);
+                                          },
+                                          icon: Icon(
+                                            Icons.close,
+                                            color: Colors.white,
+                                          ))
+                                    ],
                                   ),
-                                  IconButton(
-                                      onPressed: () {
-                                        Navigator.pop(context);
-                                      },
-                                      icon: Icon(
-                                        Icons.close,
-                                        color: Colors.white,
-                                      ))
-                                ],
-                              ),
-                            ),
-                            Expanded(
-                              child: ListView.builder(
-                                  itemCount: savedQrIds.length,
-                                  shrinkWrap: true,
-                                  itemBuilder: (context, index) {
-                                    return Padding(
-                                      padding:
-                                          const EdgeInsets.only(left: 16.0),
-                                      child: Row(
-                                        children: [
-                                          SizedBox(
-                                            width: 35,
-                                            child: Center(
-                                              child: Text(
-                                                  (index + 1).toString(),
-                                                  style: TextStyle(
-                                                      fontWeight:
-                                                          FontWeight.w600,
-                                                      fontSize: 16)),
-                                            ),
-                                          ),
-                                          Expanded(
-                                            child: Padding(
-                                              padding:
-                                                  const EdgeInsets.symmetric(
+                                ),
+                                Expanded(
+                                  child: ListView.builder(
+                                      itemCount: savedQrIds.length,
+                                      shrinkWrap: true,
+                                      itemBuilder: (context, index) {
+                                        return Padding(
+                                          padding:
+                                              const EdgeInsets.only(left: 16.0),
+                                          child: Row(
+                                            children: [
+                                              SizedBox(
+                                                width: 35,
+                                                child: Center(
+                                                  child: Text(
+                                                      (index + 1).toString(),
+                                                      style: TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.w600,
+                                                          fontSize: 16)),
+                                                ),
+                                              ),
+                                              Expanded(
+                                                child: Padding(
+                                                  padding: const EdgeInsets
+                                                      .symmetric(
                                                       vertical: 12.0,
                                                       horizontal: 20),
-                                              child: Text(
-                                                savedQrIds[index].qrCode ?? '',
-                                                style: TextStyle(
-                                                    fontWeight: FontWeight.w600,
-                                                    fontSize: 16),
+                                                  child: Text(
+                                                    savedQrIds[index].qrCode ??
+                                                        '',
+                                                    style: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.w600,
+                                                        fontSize: 16),
+                                                  ),
+                                                ),
                                               ),
-                                            ),
+                                            ],
                                           ),
-                                        ],
-                                      ),
-                                    );
-                                  }),
-                            ),
-                          ],
+                                        );
+                                      }),
+                                ),
+                              ],
+                            );
+                          },
                         );
-                      },
-                    );
-                  }),
-            ],
+                      }),
+                ),
+                SizedBox(width: 10),
+                Expanded(
+                  child: CommonButton(
+                      text: 'Delete QR',
+                      bgColor: Colors.red.shade400,
+                      onPressed: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) =>
+                                    DeleteQrScreen(savedQrIds: savedQrIds)));
+                      }),
+                )
+              ],
+            ),
           )
         : SizedBox();
   }
@@ -937,12 +958,12 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Widget cropDropDown() {
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 16),
-      decoration: BoxDecoration(
-        color: Colors.grey[100],
-        //border: Border.all(color: Colors.deepPurple),
-        borderRadius: BorderRadius.circular(30), // Rounded corners
-      ),
+      padding: EdgeInsets.symmetric(horizontal: 0),
+      // decoration: BoxDecoration(
+      //   color: Colors.grey[100],
+      //   //border: Border.all(color: Colors.deepPurple),
+      //   borderRadius: BorderRadius.circular(30), // Rounded corners
+      // ),
       child: DropdownButtonFormField<String>(
         value: selectedCropValue,
         icon: Icon(Icons.arrow_drop_down),
@@ -951,7 +972,18 @@ class _MyHomePageState extends State<MyHomePage> {
           style: TextStyle(fontWeight: FontWeight.w500, color: Colors.black87),
         ),
         isExpanded: true,
-        decoration: InputDecoration(border: InputBorder.none),
+        decoration: InputDecoration(
+          fillColor: Colors.grey[100],
+          filled: true,
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(30),
+            borderSide: BorderSide(color: Colors.transparent, width: 2),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(30),
+            borderSide: BorderSide(color: Colors.transparent, width: 1.5),
+          ),
+        ),
         style: TextStyle(color: Colors.black, fontSize: 16),
         onChanged: (String? newValue) {
           setState(() {

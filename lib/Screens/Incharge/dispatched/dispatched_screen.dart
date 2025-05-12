@@ -71,7 +71,7 @@ class _DiapatchInchargeScreenState extends State<DiapatchInchargeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(userType == 5 ? "Accepted Records" : "Dispatch Records"),
+        title: Text(userType == 13 ? "Accepted Records" : "Dispatch Records"),
       ),
       body: Column(
         children: [

@@ -16,7 +16,7 @@ void main() async {
     initialRoute = MyHomePage();
   }else if(userType == 2){
     initialRoute = InchargeHome();
-  }else if(userType == 5){
+  }else if(userType == 13){
     initialRoute = WarehouseHome();
   }
   runApp(MyApp(initialRoute: initialRoute));
