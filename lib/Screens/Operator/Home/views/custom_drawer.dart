@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:rajfed_qr/APIService/shared_preference_helper.dart';
+import 'package:rajfed_qr/Screens/Operator/Home/op_home_service.dart';
+import 'package:rajfed_qr/common_views/loader_dialog.dart';
+import 'package:rajfed_qr/utils/location_service.dart';
+import 'package:rajfed_qr/utils/toast_formatter.dart';
 
 class CustomDrawer extends StatefulWidget {
   const CustomDrawer(
@@ -97,6 +102,16 @@ class _CustomDrawerState extends State<CustomDrawer> {
               widget.callback("Change Password");
             },
           ),
+          Visibility(
+            visible: true,
+            child: ListTile(
+              leading: Icon(Icons.location_on_outlined),
+              title: Text("Update Location"),
+              onTap: () {
+                saveLocation();
+              },
+            ),
+          ),
           ListTile(
             leading: Icon(Icons.logout),
             title: Text("Logout"),
@@ -115,5 +130,26 @@ class _CustomDrawerState extends State<CustomDrawer> {
         ],
       ),
     );
+  }
+
+  void saveLocation() async {
+    showLoadingDialog(context);
+    Position? position = await LocationService.instance.getLocation(context);
+    if (position == null) {
+      Navigator.pop(context);
+      return;
+    }
+    try {
+      var data = await OPHomeService.instance.operatorSaveLocation(position);
+      Navigator.pop(context);
+      if (data?.status == true) {
+        showSuccessToast("Location updated successfully");
+      } else {
+        showErrorToast(data?.error ?? 'Something Went wrong');
+      }
+    } catch (e) {
+      Navigator.pop(context);
+      showErrorToast("Something went wrong");
+    }
   }
 }
