@@ -5,6 +5,8 @@ import 'package:rajfed_qr/Screens/Warehouse/warehouse_home.dart';
 import 'Screens/Operator/Home/HomeScreen.dart';
 import 'Screens/login/login_screen.dart';
 
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
 void main() async {
 
   Widget initialRoute = LoginPage();
@@ -29,6 +31,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Rajfed Qr',
+      navigatorKey: navigatorKey,
       theme: ThemeData(
         primaryColor: Color(0xFFB7D77A), // Main color
         colorScheme: ColorScheme.fromSeed(

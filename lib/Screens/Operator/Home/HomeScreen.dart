@@ -2,6 +2,7 @@ import 'package:ai_barcode_scanner/ai_barcode_scanner.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:rajfed_qr/APIService/api_endpoint.dart';
 import 'package:rajfed_qr/APIService/api_service.dart';
 import 'package:rajfed_qr/APIService/shared_preference_helper.dart';
@@ -19,6 +20,7 @@ import 'package:rajfed_qr/models/crop_list_model.dart';
 import 'package:rajfed_qr/models/operator_details.dart';
 import 'package:rajfed_qr/models/saved_qr_model.dart';
 import 'package:rajfed_qr/utils/enums.dart';
+import 'package:rajfed_qr/utils/location_service.dart';
 import 'package:rajfed_qr/utils/toast_formatter.dart';
 
 class MyHomePage extends StatefulWidget {
@@ -119,6 +121,11 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void saveQrAPICall() async {
     showLoadingDialog(context);
+    Position? position = await LocationService.instance.getLocation(context);
+    if (position == null) {
+      Navigator.pop(context);
+      return;
+    }
     try {
       var index = cropStringList.indexOf(selectedCropValue ?? '');
       if (index < 0) {
