@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:rajfed_qr/APIService/shared_preference_helper.dart';
 import 'package:rajfed_qr/Screens/Incharge/incharge_home/incharge_home.dart';
+import 'package:rajfed_qr/Screens/Operator/OperatorDashboard/operator_dashboard.dart';
 import 'package:rajfed_qr/Screens/Warehouse/warehouse_home.dart';
 import 'Screens/Operator/Home/HomeScreen.dart';
 import 'Screens/login/login_screen.dart';
@@ -15,7 +16,7 @@ void main() async {
   var userType = await SharedPreferenceHelper.instance.getUserType();
   print("Token: $token");
   if(userType == 10){
-    initialRoute = MyHomePage();
+    initialRoute = OperatorDashboard();
   }else if(userType == 2){
     initialRoute = InchargeHome();
   }else if(userType == 13){

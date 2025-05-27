@@ -58,20 +58,20 @@ class ApiService {
         print(jsonDecode(response.body));
         var data = jsonDecode(response.body);
         return APIResponse(true, data, "error");
-      } else if(response.statusCode == 401 || response.statusCode == 403){
+      } else if (response.statusCode == 401 || response.statusCode == 403) {
         SharedPreferenceHelper.instance.clearData();
-        navigatorKey.currentState?.pushAndRemoveUntil(
-          MaterialPageRoute(builder: (_) => LoginPage()),
-              (route) => false,
-        );
-        var data = jsonDecode(response.body);
-        return APIResponse(false, null,
-            data['response']['error_message']);
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          Navigator.pushReplacement(
+            navigatorKey.currentContext!,
+            MaterialPageRoute(builder: (context) => LoginPage()),
+          );
+        });
+        return APIResponse(
+            false, null, "Token has expired or is invalid");
       } else {
         var data = jsonDecode(response.body);
         print(data['response']['error_message']);
-        return APIResponse(false, null,
-            data['response']['error_message']);
+        return APIResponse(false, null, data['response']['error_message']);
       }
     } catch (e) {
       throw APIResponse(false, null, "API Call Failed: $e");
