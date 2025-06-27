@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:rajfed_qr/APIService/shared_preference_helper.dart';
 import 'package:rajfed_qr/Screens/Incharge/incharge_home/incharge_home.dart';
+import 'package:rajfed_qr/Screens/Location/location_service.dart';
 import 'package:rajfed_qr/Screens/Warehouse/warehouse_home.dart';
 import 'Screens/Operator/Home/HomeScreen.dart';
 import 'Screens/login/login_screen.dart';
@@ -48,7 +49,7 @@ class MyApp extends StatelessWidget {
         ),
         useMaterial3: true,
       ),
-      home: initialRoute,
+      home: LocationService(),
     );
   }
 }

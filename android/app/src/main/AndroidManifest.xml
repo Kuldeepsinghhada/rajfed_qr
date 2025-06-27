@@ -1,9 +1,23 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="false" />
+
     <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
     <application
         android:label="Rajfed Qr"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
+        <service
+            android:name="rekab.app.background_locator.IsolateHolderService"
+            android:foregroundServiceType="location"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="TODO" />
         <activity
             android:name=".MainActivity"
             android:exported="true"

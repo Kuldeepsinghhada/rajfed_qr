@@ -55,8 +55,10 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   void initState() {
-    getUserDetails();
-    getCropAPICall();
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      getUserDetails();
+      getCropAPICall();
+    });
     super.initState();
   }
 
