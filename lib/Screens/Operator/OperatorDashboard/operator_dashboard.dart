@@ -12,15 +12,16 @@ class OperatorDashboard extends StatefulWidget {
 }
 
 class _OperatorDashboardState extends State<OperatorDashboard> {
-  int _selectedIndex = 0;
+  int selectedIndex = 1;
+  var pageController = PageController(initialPage: 1, keepPage: true);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         body: SafeArea(
           top: false,
-          child: IndexedStack(
-            index: _selectedIndex,
+          child: PageView(
+            controller: pageController,
             children: [
               DataScreen(),
               MyHomePage(),
@@ -30,14 +31,18 @@ class _OperatorDashboardState extends State<OperatorDashboard> {
           ),
         ),
         bottomNavigationBar: BottomNavigationBar(
+          backgroundColor: Colors.green,
           selectedItemColor: Colors.green,
           unselectedItemColor: Colors.grey,
-          currentIndex: _selectedIndex,
+          showUnselectedLabels: true,
+          currentIndex: selectedIndex,
           onTap: (int index) {
-            setState(() => _selectedIndex = index);
+            selectedIndex = index;
+            setState(() => pageController.jumpToPage(index));
           },
           items: const [
-            BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
+            BottomNavigationBarItem(
+                icon: Icon(Icons.analytics_outlined), label: 'Data'),
             BottomNavigationBarItem(
                 icon: Icon(Icons.qr_code_scanner_rounded), label: 'Add QR'),
             BottomNavigationBarItem(

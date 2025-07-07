@@ -5,6 +5,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:rajfed_qr/APIService/api_endpoint.dart';
 import 'package:rajfed_qr/APIService/api_service.dart';
+import 'package:rajfed_qr/APIService/data_manager.dart';
 import 'package:rajfed_qr/APIService/shared_preference_helper.dart';
 import 'package:rajfed_qr/Screens/Operator/DeleteQr/delete_qr_screen.dart';
 import 'package:rajfed_qr/Screens/Operator/Home/op_home_service.dart';
@@ -82,6 +83,8 @@ class _MyHomePageState extends State<MyHomePage> {
             cropStringList.add(item.cropDescEN!);
           }
         }
+        DataManager.instance.cropList = cropList;
+        DataManager.instance.cropStringList = cropStringList;
         setState(() {});
       } else {
         showErrorToast(response.error);
@@ -548,26 +551,26 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        //backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: Text('Home'),
       ),
-      drawer: CustomDrawer(
-        userName: userName,
-        callback: (value) {
-          Navigator.pop(context);
-          if (value == "Logout") {
-            showLogoutDialog(context);
-          } else if (value == "Change Password") {
-            Navigator.push(context,
-                MaterialPageRoute(builder: (_) => ChangePasswordScreen()));
-          } else if (value == "Home") {
-            //Navigator.pop(context);
-          } else {
-            Navigator.push(
-                context, MaterialPageRoute(builder: (_) => RejectedScreen()));
-          }
-        },
-      ),
+      // drawer: CustomDrawer(
+      //   userName: userName,
+      //   callback: (value) {
+      //     Navigator.pop(context);
+      //     if (value == "Logout") {
+      //       showLogoutDialog(context);
+      //     } else if (value == "Change Password") {
+      //       Navigator.push(context,
+      //           MaterialPageRoute(builder: (_) => ChangePasswordScreen()));
+      //     } else if (value == "Home") {
+      //       //Navigator.pop(context);
+      //     } else {
+      //       Navigator.push(
+      //           context, MaterialPageRoute(builder: (_) => RejectedScreen()));
+      //     }
+      //   },
+      // ),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 30),

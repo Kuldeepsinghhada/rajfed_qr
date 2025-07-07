@@ -52,7 +52,7 @@ class ApiService {
           response = await http.delete(Uri.parse(url), headers: headers);
           break;
       }
-      print("Response: ${response.body}");
+      print("Response: ${response.statusCode} ${response.body}");
       // Handle response
       if (response.statusCode >= 200 && response.statusCode < 300) {
         print(jsonDecode(response.body));

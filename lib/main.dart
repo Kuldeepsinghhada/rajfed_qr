@@ -9,17 +9,17 @@ import 'Screens/login/login_screen.dart';
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 void main() async {
-
   Widget initialRoute = LoginPage();
   WidgetsFlutterBinding.ensureInitialized();
   var token = await SharedPreferenceHelper.instance.getToken();
   var userType = await SharedPreferenceHelper.instance.getUserType();
   print("Token: $token");
-  if(userType == 10){
+  print("UserType: $userType");
+  if (userType == 10) {
     initialRoute = OperatorDashboard();
-  }else if(userType == 2){
+  } else if (userType == 2) {
     initialRoute = InchargeHome();
-  }else if(userType == 13){
+  } else if (userType == 13) {
     initialRoute = WarehouseHome();
   }
   runApp(MyApp(initialRoute: initialRoute));
@@ -42,10 +42,13 @@ class MyApp extends StatelessWidget {
         ),
         scaffoldBackgroundColor: Colors.white,
         appBarTheme: AppBarTheme(
-            backgroundColor: Color(0xFFB7D77A),
-            titleTextStyle: TextStyle(color: Colors.black, fontSize: 20),
-            iconTheme: IconThemeData(color: Colors.black),
-            elevation: 10),
+          centerTitle: true,
+          backgroundColor: Color(0xFFB7D77A),
+          titleTextStyle: TextStyle(
+              color: Colors.black, fontSize: 20, fontWeight: FontWeight.w600),
+          iconTheme: IconThemeData(color: Colors.black),
+          elevation: 10,
+        ),
         buttonTheme: ButtonThemeData(
           buttonColor: Colors.green[400],
           textTheme: ButtonTextTheme.primary,
@@ -56,4 +59,3 @@ class MyApp extends StatelessWidget {
     );
   }
 }
-
