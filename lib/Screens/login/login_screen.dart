@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:rajfed_qr/APIService/shared_preference_helper.dart';
+import 'package:rajfed_qr/Screens/Incharge/incharge_dashboard/incharge_dashboard_screen.dart';
 import 'package:rajfed_qr/Screens/Incharge/incharge_home/incharge_home.dart';
 import 'package:rajfed_qr/Screens/Operator/Home/HomeScreen.dart';
 import 'package:rajfed_qr/Screens/Operator/OperatorDashboard/operator_dashboard.dart';
@@ -64,7 +65,7 @@ class _LoginPageState extends State<LoginPage> {
           } else if (userType == 2) {
             Navigator.pushAndRemoveUntil(
                 context,
-                MaterialPageRoute(builder: (_) => InchargeHome()),
+                MaterialPageRoute(builder: (_) => InchargeDashboard()),
                 (route) => false);
           } else if (userType == 13) {
             Navigator.pushAndRemoveUntil(

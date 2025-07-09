@@ -329,24 +329,24 @@ class _InchargeHomeState extends State<InchargeHome> {
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: Text('Home'),
       ),
-      drawer: CustomDrawer(
-        userName: userName,
-        callback: (value) {
-          Navigator.pop(context);
-          if (value == "Logout") {
-            showLogoutDialog(context);
-          } else if (value == "Change Password") {
-            Navigator.push(context,
-                MaterialPageRoute(builder: (_) => ChangePasswordScreen()));
-          } else if (value == "Dispatched") {
-            Navigator.push(context,
-                MaterialPageRoute(builder: (_) => DiapatchInchargeScreen()));
-          } else if (value == "Rejected") {
-            Navigator.push(context,
-                MaterialPageRoute(builder: (_) => RejectedInchargeScreen()));
-          }
-        },
-      ),
+      // drawer: CustomDrawer(
+      //   userName: userName,
+      //   callback: (value) {
+      //     Navigator.pop(context);
+      //     if (value == "Logout") {
+      //       showLogoutDialog(context);
+      //     } else if (value == "Change Password") {
+      //       Navigator.push(context,
+      //           MaterialPageRoute(builder: (_) => ChangePasswordScreen()));
+      //     } else if (value == "Dispatched") {
+      //       Navigator.push(context,
+      //           MaterialPageRoute(builder: (_) => DiapatchInchargeScreen()));
+      //     } else if (value == "Rejected") {
+      //       Navigator.push(context,
+      //           MaterialPageRoute(builder: (_) => RejectedInchargeScreen()));
+      //     }
+      //   },
+      // ),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 30),

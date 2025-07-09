@@ -215,6 +215,7 @@ class _RejectedInchargeScreenState extends State<RejectedInchargeScreen> {
     return Form(
       key: _formKey,
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Search Field
           Expanded(

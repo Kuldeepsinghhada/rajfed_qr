@@ -1,17 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:rajfed_qr/Screens/Incharge/Rejected/rejected_screen.dart';
+import 'package:rajfed_qr/Screens/Incharge/dispatched/dispatched_screen.dart';
+import 'package:rajfed_qr/Screens/Incharge/incharge_home/incharge_home.dart';
 import 'package:rajfed_qr/Screens/Operator/DataScreen/data_screen.dart';
 import 'package:rajfed_qr/Screens/Operator/Home/HomeScreen.dart';
 import 'package:rajfed_qr/Screens/Operator/Profile/profile_screen.dart';
 import 'package:rajfed_qr/Screens/Operator/rejected_screen/rejected_screen.dart';
 
-class OperatorDashboard extends StatefulWidget {
-  const OperatorDashboard({super.key});
+class InchargeDashboard extends StatefulWidget {
+  const InchargeDashboard({super.key});
 
   @override
-  State<OperatorDashboard> createState() => _OperatorDashboardState();
+  State<InchargeDashboard> createState() => _InchargeDashboardState();
 }
 
-class _OperatorDashboardState extends State<OperatorDashboard> {
+class _InchargeDashboardState extends State<InchargeDashboard> {
   int selectedIndex = 1;
   var pageController = PageController(initialPage: 1, keepPage: true);
 
@@ -25,8 +28,9 @@ class _OperatorDashboardState extends State<OperatorDashboard> {
             physics: NeverScrollableScrollPhysics(),
             children: [
               DataScreen(),
-              MyHomePage(),
-              RejectedScreen(),
+              InchargeHome(),
+              DiapatchInchargeScreen(),
+              RejectedInchargeScreen(),
               ProfileScreen()
             ],
           ),
@@ -45,7 +49,9 @@ class _OperatorDashboardState extends State<OperatorDashboard> {
             BottomNavigationBarItem(
                 icon: Icon(Icons.analytics_outlined), label: 'Data'),
             BottomNavigationBarItem(
-                icon: Icon(Icons.qr_code_scanner_rounded), label: 'Add QR'),
+                icon: Icon(Icons.qr_code_scanner_rounded), label: 'QR'),
+            BottomNavigationBarItem(
+                icon: Icon(Icons.local_shipping_outlined), label: 'Dispatched'),
             BottomNavigationBarItem(
                 icon: Icon(Icons.blinds_closed_rounded), label: 'Rejected'),
             BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),

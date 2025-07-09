@@ -133,7 +133,7 @@ class _DataGridViewState extends State<DataGridView> {
                     style: TextStyle(
                         fontWeight: FontWeight.w600,
                         color: Colors.black,
-                        fontSize: 16),
+                        fontSize: 15),
                   ),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 0),

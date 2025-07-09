@@ -4,7 +4,9 @@ import 'package:intl/intl.dart';
 import 'package:rajfed_qr/APIService/data_manager.dart';
 import 'package:rajfed_qr/Screens/Operator/DataScreen/data_services.dart';
 import 'package:rajfed_qr/Screens/Operator/DataScreen/views/data_gridview.dart';
+import 'package:rajfed_qr/Screens/Operator/Home/op_home_service.dart';
 import 'package:rajfed_qr/common_views/loader_dialog.dart';
+import 'package:rajfed_qr/models/crop_list_model.dart';
 import 'package:rajfed_qr/models/dashboard_data_model.dart';
 import 'package:rajfed_qr/utils/toast_formatter.dart';
 
@@ -22,7 +24,11 @@ class _DataScreenState extends State<DataScreen> {
   DateTime? startDate;
   DateTime? endDate;
 
+  String? startStringDate;
+  String? endStringDate;
+
   List<String> cropItems = [];
+  List<CropModel> cropList = [];
   final dateFormat = DateFormat('dd/MM/yyyy');
 
   Future<bool> selectDate(BuildContext context, bool isStart) async {
@@ -54,6 +60,35 @@ class _DataScreenState extends State<DataScreen> {
 
   getCropList() {
     cropItems = DataManager.instance.cropStringList;
+    if (cropItems.isEmpty) {
+      getCropAPICall();
+    }
+  }
+
+  void getCropAPICall() async {
+    await Future.delayed(Duration(milliseconds: 100));
+    showLoadingDialog(context);
+    try {
+      var response = await OPHomeService.instance.getCropList();
+      Navigator.pop(context);
+      if (response.status == true) {
+        cropList = response.data;
+        cropList.removeWhere((obj) => obj.cropID == 0);
+        for (var item in cropList) {
+          if (item.cropDescEN != null) {
+            cropItems.add(item.cropDescEN!);
+          }
+        }
+        DataManager.instance.cropList = cropList;
+        DataManager.instance.cropStringList = cropItems;
+        setState(() {});
+      } else {
+        showErrorToast(response.error);
+      }
+    } catch (e) {
+      Navigator.pop(context);
+      showErrorToast("Something went wrong");
+    }
   }
 
   void getDashboardAPICall() async {
@@ -173,6 +208,8 @@ class _DataScreenState extends State<DataScreen> {
                     onPressed: () {
                       if (startDate == null && endDate == null) {
                       } else if (startDate != null && endDate != null) {
+                        endStringDate = dateFormat.format(endDate!);
+                        startStringDate = dateFormat.format(startDate!);
                       } else {
                         Fluttertoast.showToast(msg: "Select Start & End Date");
                         return;
@@ -225,22 +262,22 @@ class _DataScreenState extends State<DataScreen> {
               children: [
                 Expanded(
                     child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     selectedCrop != null
                         ? Text(
                             selectedCrop ?? '',
                             style: TextStyle(
-                                fontSize: 20, fontWeight: FontWeight.w700),
+                                fontSize: 15, fontWeight: FontWeight.w700),
                           )
                         : Container(
                             color: Colors.green,
                           ),
                     SizedBox(width: selectedCrop != null ? 12 : 0),
                     Text(
-                      "${startDate != null ? dateFormat.format(startDate!) : ""} - ${endDate != null ? dateFormat.format(endDate!) : ""}",
+                      "${startStringDate ?? ""} - ${endStringDate ?? ""}",
                       style:
-                          TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+                          TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
                     )
                   ],
                 )),
@@ -265,7 +302,7 @@ class _DataScreenState extends State<DataScreen> {
                             Icon(
                               Icons.filter_alt_outlined,
                               color: Colors.green,
-                              size: 24,
+                              size: 20,
                             ),
                             SizedBox(width: 3),
                             Text(
@@ -273,7 +310,7 @@ class _DataScreenState extends State<DataScreen> {
                               style: TextStyle(
                                   fontWeight: FontWeight.w700,
                                   color: Colors.green,
-                                  fontSize: 18),
+                                  fontSize: 16),
                             ),
                             SizedBox(
                                 width: (selectedCrop != null ||
