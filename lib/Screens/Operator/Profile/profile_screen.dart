@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:rajfed_qr/APIService/api_endpoint.dart';
 import 'package:rajfed_qr/APIService/api_service.dart';
@@ -96,6 +97,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
       Navigator.pop(context);
       return;
     }
+    XFile? image = await pickSelfie();
+    if(image == null){
+      showErrorToast("Data not updated");
+      Navigator.pop(context);
+      return;
+    }
     try {
       var data = await OPHomeService.instance.operatorSaveLocation(position);
       Navigator.pop(context);
@@ -129,6 +136,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
       Navigator.pop(context);
       showErrorToast("Something went wrong");
     }
+  }
+
+  Future<XFile?> pickSelfie() async {
+    final ImagePicker picker = ImagePicker();
+    final XFile? photo = await picker.pickImage(
+      source: ImageSource.camera,
+      preferredCameraDevice: CameraDevice.front, // Front camera for selfie
+    );
+    return photo; // This returns the picked selfie
   }
 
   @override
