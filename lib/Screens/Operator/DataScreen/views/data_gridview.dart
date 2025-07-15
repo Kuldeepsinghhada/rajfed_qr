@@ -92,20 +92,20 @@ class _DataGridViewState extends State<DataGridView> {
           // ),
           //elevation: 4,
           //color: items[index]['color'],
-          child: InkWell(
-            onTap: () {
-              if (index == 0) {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => TotalRegistrationScreen()));
-              } else if (index == 1) {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => TotalPurchaseScreen()));
-              }
-            },
+          child: SizedBox(
+            // onTap: () {
+            //   if (index == 0) {
+            //     Navigator.push(
+            //         context,
+            //         MaterialPageRoute(
+            //             builder: (context) => TotalRegistrationScreen()));
+            //   } else if (index == 1) {
+            //     Navigator.push(
+            //         context,
+            //         MaterialPageRoute(
+            //             builder: (context) => TotalPurchaseScreen()));
+            //   }
+            // },
             child: Container(
               padding: EdgeInsets.symmetric(vertical: 10, horizontal: 12),
               child: Column(
@@ -119,11 +119,11 @@ class _DataGridViewState extends State<DataGridView> {
                     children: [
                       Icon(items[index]["image"]!,
                           size: 30, color: Colors.black),
-                      Icon(
-                        Icons.arrow_forward_ios,
-                        color: Colors.black,
-                        size: 16,
-                      )
+                      // Icon(
+                      //   Icons.arrow_forward_ios,
+                      //   color: Colors.black,
+                      //   size: 16,
+                      // )
                     ],
                   )),
                   Text(

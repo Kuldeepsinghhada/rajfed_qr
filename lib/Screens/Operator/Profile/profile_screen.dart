@@ -97,12 +97,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
       Navigator.pop(context);
       return;
     }
-    XFile? image = await pickSelfie();
-    if(image == null){
-      showErrorToast("Data not updated");
-      Navigator.pop(context);
-      return;
-    }
+    // XFile? image = await pickSelfie();
+    // if(image == null){
+    //   showErrorToast("Data not updated");
+    //   Navigator.pop(context);
+    //   return;
+    // }
     try {
       var data = await OPHomeService.instance.operatorSaveLocation(position);
       Navigator.pop(context);
