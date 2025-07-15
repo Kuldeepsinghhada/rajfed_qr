@@ -6,8 +6,9 @@ class APIEndPoint {
   static String operatorRejected = "OperatorRejected";
   static String operatorSaveQr = "OperatorSaveQr";
   static String farmerSavedQrCode = "QrCodeByFarmerRegNo";
-  static String getCropList =  "cropmaster";
+  static String getCropList = "cropmaster";
   static String deleteQrCode = "DeleteQRCodes/deleteqrcode";
+  static String operatorSaveLocation = "operatorSaveLocation";
 
   // Incharge Endpoint
   static String inchargeDetails = "InchargeDetails";

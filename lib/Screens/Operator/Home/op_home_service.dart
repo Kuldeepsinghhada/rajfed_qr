@@ -1,4 +1,5 @@
 import 'package:device_info_plus/device_info_plus.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:rajfed_qr/APIService/api_endpoint.dart';
 import 'package:rajfed_qr/APIService/api_service.dart';
 import 'package:rajfed_qr/APIService/shared_preference_helper.dart';
@@ -92,8 +93,8 @@ class OPHomeService {
 
   Future<APIResponse> getCropList() async {
     try {
-      var response = await ApiService.instance.apiCall(
-          APIEndPoint.getCropList, HttpRequestType.get, null);
+      var response = await ApiService.instance
+          .apiCall(APIEndPoint.getCropList, HttpRequestType.get, null);
       if (response.status) {
         List<CropModel> cropList = (response.data['crops'] as List)
             .map((item) => CropModel.fromJson(item))
@@ -106,4 +107,25 @@ class OPHomeService {
     }
   }
 
+  Future<APIResponse?> operatorSaveLocation(Position position) async {
+    try {
+      var purchaseCenterID =
+          await SharedPreferenceHelper.instance.getPurchaseCenterId();
+      Map<String, dynamic> body = {
+        "purchaseCenter_ID": purchaseCenterID,
+        "lat": position.latitude.toString(),
+        "long": position.longitude.toString()
+      };
+
+      var response = await ApiService.instance.apiCall(
+          APIEndPoint.operatorSaveLocation, HttpRequestType.post, body);
+      if (response.status) {
+        return APIResponse(true, null, "");
+      }
+      return APIResponse(false, null, response.error);
+    } catch (e) {
+      showErrorToast("Something went wrong");
+      return null;
+    }
+  }
 }
