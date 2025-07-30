@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:rajfed_qr/Screens/Admin/total_purchase_screen.dart';
-import 'package:rajfed_qr/Screens/Admin/total_registration_screen.dart';
 import 'package:rajfed_qr/models/dashboard_data_model.dart';
 import 'package:rajfed_qr/utils/utilities.dart';
 
@@ -31,7 +29,8 @@ class _DataGridViewState extends State<DataGridView> {
         "title": "Total Purchase",
         "image": Icons.shopping_cart_outlined,
         'color': Color(0xFF1CC88A),
-        'amount': widget.dataModel?.purchaseTransactions
+        'amount': widget.dataModel?.purchaseTransactionsFarmers
+        //widget.dataModel?.purchaseTransactions ??
       },
       {
         "title": "Total Payment",
@@ -46,18 +45,18 @@ class _DataGridViewState extends State<DataGridView> {
         'amount': widget.dataModel?.qRGeneratedFarmers
       },
       {
-        "title": "QR Remaining",
-        "image": Icons.qr_code,
-        'color': Color(0xFFF65A5B),
-        'amount': (widget.dataModel?.totalRegisteredFarmers ?? 0) -
-            (widget.dataModel?.qRGeneratedFarmers ?? 0)
-      },
-      {
         "title": "Dispatched",
         "image": Icons.local_shipping_outlined,
         'color': Color(0xFF36B9CC),
         'amount': widget.dataModel?.dispatchedFarmers
-      }
+      },
+      {
+        "title": "Used Bardana",
+        "image": Icons.shopping_bag_outlined,
+        'color': Color(0xFFF65A5B),
+        'amount': (widget.dataModel?.totalRegisteredFarmers ?? 0) -
+            (widget.dataModel?.purchaseBardana ?? 0)
+      },
     ];
     setState(() {});
   }

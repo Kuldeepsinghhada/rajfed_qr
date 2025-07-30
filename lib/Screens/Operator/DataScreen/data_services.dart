@@ -19,17 +19,14 @@ class DataService {
       if (cropId != null) {
         query = "$query&CropId=$cropId";
       }
-     if(startDate != null){
-       query = "$query&StartDate=$startDate&EndDate=$endDate";
-     }
+      if (startDate != null) {
+        query = "$query&StartDate=$startDate&EndDate=$endDate";
+      }
       var response = await ApiService.instance.apiCall(
           APIEndPoint.dashboardData + query, HttpRequestType.get, null);
       if (response.status) {
         var data = response.data['response']['data'];
-        print(data);
-        List<DashboardDataModel> dataModel = (data as List)
-            .map((item) => DashboardDataModel.fromJson(item))
-            .toList();
+        DashboardDataModel dataModel = DashboardDataModel.fromJson(data);
         return APIResponse(true, dataModel, "");
       }
       return APIResponse(false, null, response.error);

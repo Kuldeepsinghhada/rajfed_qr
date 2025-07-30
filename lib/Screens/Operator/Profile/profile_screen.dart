@@ -165,7 +165,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   child: Image.asset('images/profile.png'),
                 ),
                 Text(
-                  "Kuldeep Singh" ?? '',
+                  userName ?? '',
                   style: TextStyle(fontSize: 24, fontWeight: FontWeight.w600),
                 ),
                 Text((userType ?? '').toUpperCase(),style: TextStyle(color: Colors.teal,fontWeight: FontWeight.w600),),

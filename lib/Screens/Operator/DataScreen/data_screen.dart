@@ -107,9 +107,7 @@ class _DataScreenState extends State<DataScreen> {
           cropId: cropId);
       Navigator.pop(context);
       if (response.status == true) {
-        if (response.data is List && response.data.isNotEmpty) {
-          dataModel = response.data[0];
-        }
+          dataModel = response.data;
         setState(() {});
       } else {
         showErrorToast(response.error);
