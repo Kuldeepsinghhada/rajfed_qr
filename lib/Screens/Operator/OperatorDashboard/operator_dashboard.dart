@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:rajfed_qr/Screens/Admin/admin_home_screen.dart';
-import 'package:rajfed_qr/Screens/Operator/DataScreen/data_screen.dart';
 import 'package:rajfed_qr/Screens/Operator/Home/HomeScreen.dart';
 import 'package:rajfed_qr/Screens/Operator/Profile/profile_screen.dart';
 import 'package:rajfed_qr/Screens/Operator/rejected_screen/rejected_screen.dart';

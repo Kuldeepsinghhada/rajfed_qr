@@ -41,13 +41,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   getUserType() async {
     userName = await SharedPreferenceHelper.instance.getUserName() ?? '';
-    purchaseCenterId = await SharedPreferenceHelper.instance.getPurchaseCenterId();
+    purchaseCenterId =
+        await SharedPreferenceHelper.instance.getPurchaseCenterId();
     var typeId = await SharedPreferenceHelper.instance.getUserType();
-    if(typeId == 10){
+    if (typeId == 10) {
       userType = "Operator";
-    }else if(typeId == 2){
+    } else if (typeId == 2) {
       userType = "Incharge";
-    }else{
+    } else {
       userType = "Warehouse";
     }
     setState(() {});
@@ -91,9 +92,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   void saveLocation() async {
+    if (!mounted) return;
     showLoadingDialog(context);
     Position? position = await LocationService.instance.getLocation(context);
     if (position == null) {
+      if (!mounted) return;
       Navigator.pop(context);
       return;
     }
@@ -105,6 +108,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     // }
     try {
       var data = await OPHomeService.instance.operatorSaveLocation(position);
+      if (!mounted) return;
       Navigator.pop(context);
       if (data?.status == true) {
         showSuccessToast("Location updated successfully");
@@ -112,16 +116,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
         showErrorToast(data?.error ?? 'Something Went wrong');
       }
     } catch (e) {
+      if (!mounted) return;
       Navigator.pop(context);
       showErrorToast("Something went wrong");
     }
   }
 
   void logoutAPICall() async {
+    if (!mounted) return;
     showLoadingDialog(context);
     try {
       var data = await ApiService.instance
           .apiCall(APIEndPoint.logout, HttpRequestType.get, null);
+      if (!mounted) return;
       Navigator.pop(context);
       if (data.status == true) {
         SharedPreferenceHelper.instance.clearData();
@@ -133,6 +140,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         showErrorToast(data.error);
       }
     } catch (e) {
+      if (!mounted) return;
       Navigator.pop(context);
       showErrorToast("Something went wrong");
     }
@@ -168,11 +176,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   userName ?? '',
                   style: TextStyle(fontSize: 24, fontWeight: FontWeight.w600),
                 ),
-                Text((userType ?? '').toUpperCase(),style: TextStyle(color: Colors.teal,fontWeight: FontWeight.w600),),
-                Text("Purchase Center ID : ${purchaseCenterId ?? ''}",style: TextStyle(color: Colors.teal,fontWeight: FontWeight.w600),)
+                Text(
+                  (userType ?? '').toUpperCase(),
+                  style: TextStyle(
+                      color: Colors.teal, fontWeight: FontWeight.w600),
+                ),
+                Text(
+                  "Purchase Center ID : ${purchaseCenterId ?? ''}",
+                  style: TextStyle(
+                      color: Colors.teal, fontWeight: FontWeight.w600),
+                )
               ],
             ),
-            SizedBox(height: 20,),
+            SizedBox(
+              height: 20,
+            ),
             Divider(
               height: 0,
             ),
@@ -184,7 +202,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 Navigator.push(context,
                     MaterialPageRoute(builder: (_) => ChangePasswordScreen()));
               },
-              trailing: Icon(Icons.arrow_forward_ios,size: 16,color: Colors.grey,),
+              trailing: Icon(
+                Icons.arrow_forward_ios,
+                size: 16,
+                color: Colors.grey,
+              ),
             ),
             Divider(
               height: 0,
@@ -197,7 +219,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 onTap: () {
                   saveLocation();
                 },
-                trailing: Icon(Icons.arrow_forward_ios,size: 16,color: Colors.grey,),
+                trailing: Icon(
+                  Icons.arrow_forward_ios,
+                  size: 16,
+                  color: Colors.grey,
+                ),
               ),
             ),
             Divider(
@@ -209,7 +235,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
               onTap: () {
                 showLogoutDialog(context);
               },
-              trailing: Icon(Icons.arrow_forward_ios,size: 16,color: Colors.grey,),
+              trailing: Icon(
+                Icons.arrow_forward_ios,
+                size: 16,
+                color: Colors.grey,
+              ),
             ),
             Spacer(), // Pushes the bottom section down
             Padding(

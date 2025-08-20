@@ -3,8 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:rajfed_qr/APIService/shared_preference_helper.dart';
 import 'package:rajfed_qr/Screens/Incharge/incharge_dashboard/incharge_dashboard_screen.dart';
-import 'package:rajfed_qr/Screens/Incharge/incharge_home/incharge_home.dart';
-import 'package:rajfed_qr/Screens/Operator/Home/HomeScreen.dart';
 import 'package:rajfed_qr/Screens/Operator/OperatorDashboard/operator_dashboard.dart';
 import 'package:rajfed_qr/Screens/Warehouse/warehouse_home.dart';
 import 'package:rajfed_qr/Screens/login/login_service.dart';
@@ -51,12 +49,14 @@ class _LoginPageState extends State<LoginPage> {
   onLoginPressed() async {
     var valid = _formKey.currentState?.validate();
     if (valid == true) {
+      if (!mounted) return;
       showLoadingDialog(context);
       try {
         var response = await LoginService.instance.loginUser(
             _usernameController.text, convertSHA256(_passwordController.text));
         if (response?.status == true) {
           var userType = await SharedPreferenceHelper.instance.getUserType();
+          if (!mounted) return;
           if (userType == 10) {
             Navigator.pushAndRemoveUntil(
                 context,
@@ -74,10 +74,12 @@ class _LoginPageState extends State<LoginPage> {
                 (route) => false);
           }
         } else {
+          if (!mounted) return;
           Navigator.pop(context);
           showErrorToast(response?.error ?? 'Something went wrong');
         }
       } catch (e) {
+        if (!mounted) return;
         Navigator.pop(context);
         showErrorToast("Something went wrong");
       }

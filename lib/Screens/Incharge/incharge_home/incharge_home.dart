@@ -1,18 +1,15 @@
+import 'dart:developer';
+
 import 'package:ai_barcode_scanner/ai_barcode_scanner.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:rajfed_qr/APIService/api_endpoint.dart';
 import 'package:rajfed_qr/APIService/api_service.dart';
 import 'package:rajfed_qr/APIService/shared_preference_helper.dart';
-import 'package:rajfed_qr/Screens/Incharge/Rejected/rejected_screen.dart';
-import 'package:rajfed_qr/Screens/Incharge/dispatched/dispatched_screen.dart';
 import 'package:rajfed_qr/Screens/Incharge/incharge_home/incharge_service.dart';
 import 'package:rajfed_qr/Screens/Incharge/upload_warehouse_screen/upload_warehouse_screen.dart';
 import 'package:rajfed_qr/Screens/Operator/Home/op_home_service.dart';
 import 'package:rajfed_qr/Screens/Operator/Home/views/Information_row.dart';
-import 'package:rajfed_qr/Screens/Operator/Home/views/custom_drawer.dart';
-import 'package:rajfed_qr/Screens/ChangePassword/change_password.dart';
 import 'package:rajfed_qr/Screens/login/login_screen.dart';
 import 'package:rajfed_qr/Screens/QRScannerScreen/qr_code_screen.dart';
 import 'package:rajfed_qr/common_views/common_button.dart';
@@ -79,10 +76,12 @@ class _InchargeHomeState extends State<InchargeHome> {
   }
 
   void logoutAPICall() async {
+    if (!mounted) return;
     showLoadingDialog(context);
     try {
       var data = await ApiService.instance
           .apiCall(APIEndPoint.logout, HttpRequestType.get, null);
+      if (!mounted) return;
       Navigator.pop(context);
       if (data.status == true) {
         SharedPreferenceHelper.instance.clearData();
@@ -94,6 +93,7 @@ class _InchargeHomeState extends State<InchargeHome> {
         showErrorToast(data.error);
       }
     } catch (e) {
+      if (!mounted) return;
       Navigator.pop(context);
       showErrorToast("Something went wrong");
     }
@@ -102,11 +102,13 @@ class _InchargeHomeState extends State<InchargeHome> {
   void getSavedQrCodes(int cropId) async {
     savedQrIds.clear();
     // scannedNumberList.clear();
+    if (!mounted) return;
     showLoadingDialog(context);
     try {
       var response = await OPHomeService.instance
-          .farmerSavedList(operatorDetails?.farmerRegID ?? '',cropId);
+          .farmerSavedList(operatorDetails?.farmerRegID ?? '', cropId);
       if (response?.status == true) {
+        if (!mounted) return;
         Navigator.pop(context);
         for (var item in response?.data) {
           if (item.status == 0) {
@@ -115,10 +117,12 @@ class _InchargeHomeState extends State<InchargeHome> {
         }
         setState(() {});
       } else {
+        if (!mounted) return;
         Navigator.pop(context);
         showErrorToast(response?.error ?? 'Something went wrong');
       }
     } catch (e) {
+      if (!mounted) return;
       Navigator.pop(context);
       showErrorToast("Something went wrong");
     }
@@ -131,7 +135,7 @@ class _InchargeHomeState extends State<InchargeHome> {
         builder: (context) => QRScannerScreen(),
       ),
     );
-    print("Scanned Barcode: $data");
+    log("Scanned Barcode: $data");
     if (data != null) {
       if (isBulk == false) {
         if (scannedNumberList.contains(data)) {
@@ -203,6 +207,7 @@ class _InchargeHomeState extends State<InchargeHome> {
           actions: [
             TextButton(
               onPressed: () {
+                if (!mounted) return;
                 Navigator.pop(context); // Close dialog
               },
               child: Text("Cancel"),
@@ -210,6 +215,7 @@ class _InchargeHomeState extends State<InchargeHome> {
             ElevatedButton(
               onPressed: () {
                 onConfirm(); // Perform delete action
+                if (!mounted) return;
                 Navigator.pop(context); // Close dialog
               },
               style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
@@ -228,47 +234,57 @@ class _InchargeHomeState extends State<InchargeHome> {
     _focusNode.unfocus();
     var valid = _formKey.currentState?.validate();
     if (valid == true) {
+      if (!mounted) return;
       showLoadingDialog(context);
       try {
         var response = await InchargeService.instance
             .inchargeDetails(_searchController.text);
         if (response?.status == true) {
+          if (!mounted) return;
           Navigator.pop(context);
           setState(() {
             inchargeDetails = response?.data;
           });
-          getOperatorDetails(inchargeDetails?.farmerRegId ?? '',inchargeDetails?.cropID ?? 0);
+          getOperatorDetails(
+              inchargeDetails?.farmerRegId ?? '', inchargeDetails?.cropID ?? 0);
         } else {
+          if (!mounted) return;
           Navigator.pop(context);
           Fluttertoast.showToast(
               msg: response?.error ?? 'Something went wrong');
         }
       } catch (e) {
+        if (!mounted) return;
         Navigator.pop(context);
         showErrorToast("Something went wrong");
       }
     }
   }
 
-  void getOperatorDetails(String farmerId,int cropId) async {
+  void getOperatorDetails(String farmerId, int cropId) async {
     _focusNode.unfocus();
     var valid = _formKey.currentState?.validate();
     if (valid == true) {
+      if (!mounted) return;
       showLoadingDialog(context);
       try {
-        var response = await OPHomeService.instance.operatorDetails(farmerId,cropId);
+        var response =
+            await OPHomeService.instance.operatorDetails(farmerId, cropId);
         if (response?.status == true) {
+          if (!mounted) return;
           Navigator.pop(context);
           setState(() {
             operatorDetails = response?.data;
           });
           getSavedQrCodes(cropId);
         } else {
+          if (!mounted) return;
           Navigator.pop(context);
           Fluttertoast.showToast(
               msg: response?.error ?? 'Something went wrong');
         }
       } catch (e) {
+        if (!mounted) return;
         Navigator.pop(context);
         showErrorToast("Something went wrong");
       }
@@ -332,7 +348,8 @@ class _InchargeHomeState extends State<InchargeHome> {
       // drawer: CustomDrawer(
       //   userName: userName,
       //   callback: (value) {
-      //     Navigator.pop(context);
+      //     if (!mounted) return;
+      // Navigator.pop(context);
       //     if (value == "Logout") {
       //       showLogoutDialog(context);
       //     } else if (value == "Change Password") {

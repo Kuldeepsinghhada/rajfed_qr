@@ -5,10 +5,10 @@ class WareHouseModel {
   String? districTCODE;
 
   WareHouseModel(
-      {this.wareHouseId,
-        this.wareHouseName,
-        this.districtId,
-        this.districTCODE});
+      {wareHouseId,
+        wareHouseName,
+        districtId,
+        districTCODE});
 
   WareHouseModel.fromJson(Map<String, dynamic> json) {
     wareHouseId = json['wareHouseId'];
@@ -18,11 +18,11 @@ class WareHouseModel {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['wareHouseId'] = this.wareHouseId;
-    data['wareHouseName'] = this.wareHouseName;
-    data['districtId'] = this.districtId;
-    data['districT_CODE'] = this.districTCODE;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['wareHouseId'] = wareHouseId;
+    data['wareHouseName'] = wareHouseName;
+    data['districtId'] = districtId;
+    data['districT_CODE'] = districTCODE;
     return data;
   }
 }

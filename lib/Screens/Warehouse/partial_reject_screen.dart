@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 import 'package:ai_barcode_scanner/ai_barcode_scanner.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
@@ -62,7 +63,7 @@ class _PartialRejectScreenState extends State<PartialRejectScreen> {
         builder: (context) => QRScannerScreen(),
       ),
     );
-    print("Scanned Barcode: $data");
+    log("Scanned Barcode: $data");
     if (data != null) {
       if (isBulk == false) {
         if (scannedNumberList.contains(data)) {
@@ -90,6 +91,7 @@ class _PartialRejectScreenState extends State<PartialRejectScreen> {
           actions: [
             TextButton(
               onPressed: () {
+                if (!mounted) return;
                 Navigator.pop(context); // Close dialog
               },
               child: Text("Cancel"),
@@ -97,6 +99,7 @@ class _PartialRejectScreenState extends State<PartialRejectScreen> {
             ElevatedButton(
               onPressed: () {
                 onConfirm(); // Perform delete action
+                if (!mounted) return;
                 Navigator.pop(context); // Close dialog
               },
               style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
@@ -140,6 +143,7 @@ class _PartialRejectScreenState extends State<PartialRejectScreen> {
           actions: [
             TextButton(
               onPressed: () {
+                if (!mounted) return;
                 Navigator.pop(context); // Close the dialog
               },
               child: Text(
@@ -153,6 +157,7 @@ class _PartialRejectScreenState extends State<PartialRejectScreen> {
                   Fluttertoast.showToast(msg: "Please enter rejection reason");
                   return;
                 }
+                if (!mounted) return;
                 Navigator.pop(context);
                 acceptOrRejectByWarehouse();
               },
@@ -167,6 +172,7 @@ class _PartialRejectScreenState extends State<PartialRejectScreen> {
 
   void acceptOrRejectByWarehouse() async {
     final dio = Dio();
+    if (!mounted) return;
     showLoadingDialog(context);
     List<dynamic> list = [];
     for (var item in scannedNumberList) {
@@ -177,9 +183,8 @@ class _PartialRejectScreenState extends State<PartialRejectScreen> {
         "qrCode": item.qrCode
       });
     }
-    print(
-        "URL: https://rajfed.rajasthan.gov.in/rajfed_API/QrScanner/ReceivedInWareHouseLotWise");
-    print("Body: $list");
+    log("URL: https://rajfed.rajasthan.gov.in/rajfed_API/QrScanner/ReceivedInWareHouseLotWise");
+    log("Body: $list");
     Response response;
     try {
       var token = await SharedPreferenceHelper.instance.getToken();
@@ -193,18 +198,21 @@ class _PartialRejectScreenState extends State<PartialRejectScreen> {
           },
         ),
       );
-      print("Response: $response");
+      log("Response: $response");
       if (response.statusCode! >= 200 && response.statusCode! < 300) {
         showSuccessToast("Rejected Successfully");
+        if (!mounted) return;
         Navigator.pop(context);
         Navigator.pop(context, true);
         setState(() {});
       } else {
+        if (!mounted) return;
         Navigator.pop(context);
         showErrorToast('Something wend wrong');
       }
     } catch (e) {
-      print("Error: ${e.toString()}");
+      log("Error: ${e.toString()}");
+      if (!mounted) return;
       Navigator.pop(context);
       showErrorToast('Something wend wrong');
     }
@@ -214,11 +222,13 @@ class _PartialRejectScreenState extends State<PartialRejectScreen> {
     _focusNode.unfocus();
     var valid = _formKey.currentState?.validate();
     if (valid == true) {
+      if (!mounted) return;
       showLoadingDialog(context);
       try {
         var response = await WarehouseService.instance
             .wareHouseDetails(_searchController.text);
         if (response?.status == true) {
+          if (!mounted) return;
           Navigator.pop(context);
           InchargeDetails? inchargeDetails =
               response?.data.isNotEmpty ? response?.data[0] : null;
@@ -234,11 +244,13 @@ class _PartialRejectScreenState extends State<PartialRejectScreen> {
             showErrorToast("Record not found");
           }
         } else {
+          if (!mounted) return;
           Navigator.pop(context);
           Fluttertoast.showToast(
               msg: response?.error ?? 'Something went wrong');
         }
       } catch (e) {
+        if (!mounted) return;
         Navigator.pop(context);
         showErrorToast("Something went wrong");
       }

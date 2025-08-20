@@ -1,0 +1,2 @@
+/Users/kuldeepsingh/Desktop/Kuldeep/rajfed_qr/android/app/.cxx/Debug/6b54f232/x86_64/CMakeFiles/edit_cache.dir
+/Users/kuldeepsingh/Desktop/Kuldeep/rajfed_qr/android/app/.cxx/Debug/6b54f232/x86_64/CMakeFiles/rebuild_cache.dir

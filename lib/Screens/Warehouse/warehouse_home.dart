@@ -1,9 +1,8 @@
 import 'dart:convert';
-
+import 'dart:developer';
 import 'package:ai_barcode_scanner/ai_barcode_scanner.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:rajfed_qr/APIService/api_endpoint.dart';
 import 'package:rajfed_qr/APIService/api_service.dart';
@@ -63,6 +62,7 @@ class _WarehouseHomeState extends State<WarehouseHome> {
 
   void acceptOrRejectByWarehouse(String status) async {
     final dio = Dio();
+    if (!mounted) return;
     showLoadingDialog(context);
     List<dynamic> list = [];
     for (var item in selectedList) {
@@ -73,9 +73,8 @@ class _WarehouseHomeState extends State<WarehouseHome> {
         "qrCode": "string"
       });
     }
-    print(
-        "URL: https://rajfed.rajasthan.gov.in/rajfed_API/QrScanner/ReceivedInWareHouseLotWise");
-    print("Body: $list");
+    log("URL: https://rajfed.rajasthan.gov.in/rajfed_API/QrScanner/ReceivedInWareHouseLotWise");
+    log("Body: $list");
     Response response;
     try {
       var token = await SharedPreferenceHelper.instance.getToken();
@@ -89,23 +88,26 @@ class _WarehouseHomeState extends State<WarehouseHome> {
           },
         ),
       );
-      print("Response: $response");
+      log("Response: $response");
       if (response.statusCode! >= 200 && response.statusCode! < 300) {
         showSuccessToast(
             status == "A" ? "Accepted Successfully" : "Rejected Successfully");
         //_searchController.text = "";
         _commentController.text = "";
+        if (!mounted) return;
         Navigator.pop(context);
         for (var item in selectedList) {
           wareHouseList.removeWhere((warehouse) => warehouse.lotNo == item);
         }
         setState(() {});
       } else {
+        if (!mounted) return;
         Navigator.pop(context);
         showErrorToast('Something wend wrong');
       }
     } catch (e) {
-      print("Error: ${e.toString()}");
+      log("Error: ${e.toString()}");
+      if (!mounted) return;
       Navigator.pop(context);
       showErrorToast('Something wend wrong');
     }
@@ -128,6 +130,7 @@ class _WarehouseHomeState extends State<WarehouseHome> {
           actions: [
             TextButton(
               onPressed: () {
+                if (!mounted) return;
                 Navigator.pop(context); // Close the dialog
               },
               child: Text(
@@ -141,6 +144,7 @@ class _WarehouseHomeState extends State<WarehouseHome> {
                   Fluttertoast.showToast(msg: "Please enter rejection reason");
                   return;
                 }
+                if (!mounted) return;
                 Navigator.pop(context);
                 acceptOrRejectByWarehouse("R");
               },
@@ -172,10 +176,12 @@ class _WarehouseHomeState extends State<WarehouseHome> {
   }
 
   void logoutAPICall() async {
+    if (!mounted) return;
     showLoadingDialog(context);
     try {
       var data = await ApiService.instance
           .apiCall(APIEndPoint.logout, HttpRequestType.get, null);
+      if (!mounted) return;
       Navigator.pop(context);
       if (data.status == true) {
         SharedPreferenceHelper.instance.clearData();
@@ -187,6 +193,7 @@ class _WarehouseHomeState extends State<WarehouseHome> {
         showErrorToast(data.error);
       }
     } catch (e) {
+      if (!mounted) return;
       Navigator.pop(context);
       showErrorToast("Something went wrong");
     }
@@ -233,10 +240,12 @@ class _WarehouseHomeState extends State<WarehouseHome> {
     _focusNode.unfocus();
     var valid = _formKey.currentState?.validate();
     if (valid == true) {
+      if (!mounted) return;
       showLoadingDialog(context);
       try {
         var response = await WarehouseService.instance
             .getListByVehicleNo(_searchController.text);
+        if (!mounted) return;
         Navigator.pop(context);
         if (response?.status == true) {
           if (response?.data.length > 0) {
@@ -266,6 +275,7 @@ class _WarehouseHomeState extends State<WarehouseHome> {
       drawer: CustomDrawer(
         userName: userName,
         callback: (value) {
+          if (!mounted) return;
           Navigator.pop(context);
           if (value == "Logout") {
             showLogoutDialog(context);
@@ -433,7 +443,7 @@ class _WarehouseHomeState extends State<WarehouseHome> {
                                 selectedList
                                     .add(wareHouseList[index].lotNo ?? 0);
                               }
-                              print(selectedList);
+                              log(selectedList.toString());
                               setState(() {});
                             },
                           );
@@ -472,7 +482,7 @@ class _WarehouseHomeState extends State<WarehouseHome> {
                                           onPressed: () {
                                             Navigator.pop(
                                                 context); // Close the dialog
-                                            print("Rejected");
+                                            log("Rejected");
                                           },
                                           child: Text(
                                             "Cancel",
@@ -483,6 +493,7 @@ class _WarehouseHomeState extends State<WarehouseHome> {
                                         ),
                                         TextButton(
                                           onPressed: () {
+                                            if (!mounted) return;
                                             Navigator.pop(context);
                                             acceptOrRejectByWarehouse("A");
                                           },
@@ -520,7 +531,7 @@ class _WarehouseHomeState extends State<WarehouseHome> {
                                 MaterialPageRoute(
                                     builder: (context) =>
                                         PartialRejectScreen()));
-                            if(status == true){
+                            if (status == true) {
                               getDetailsByQrCode();
                             }
                           },

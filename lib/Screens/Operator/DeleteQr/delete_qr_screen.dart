@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -28,10 +29,10 @@ class _DeleteQrScreenState extends State<DeleteQrScreen> {
 
   void deleteQrCodes() async {
     final dio = Dio();
+    if (!mounted) return;
     showLoadingDialog(context);
-    print(
-        "URL: https://rajfed.rajasthan.gov.in/rajfed_API/QrScanner/DeleteQRCodes/deleteqrcode");
-    print("Body: $selectedQr");
+    log("URL: https://rajfed.rajasthan.gov.in/rajfed_API/QrScanner/DeleteQRCodes/deleteqrcode");
+    log("Body: $selectedQr");
     Response response;
     try {
       var token = await SharedPreferenceHelper.instance.getToken();
@@ -45,20 +46,23 @@ class _DeleteQrScreenState extends State<DeleteQrScreen> {
           },
         ),
       );
-      print("Response: $response");
+      log("Response: $response");
       if (response.statusCode! >= 200 && response.statusCode! < 300) {
         showSuccessToast("Deleted Successfully");
+        if (!mounted) return;
         Navigator.pop(context);
         for (var item in selectedQr) {
           savedQrIds.removeWhere((obj) => obj.qrCode == item);
         }
         setState(() {});
       } else {
+        if (!mounted) return;
         Navigator.pop(context);
         showErrorToast('Something wend wrong');
       }
     } catch (e) {
-      print("Error: ${e.toString()}");
+      log("Error: ${e.toString()}");
+      if (!mounted) return;
       Navigator.pop(context);
       showErrorToast('Something wend wrong');
     }
@@ -175,6 +179,7 @@ class _DeleteQrScreenState extends State<DeleteQrScreen> {
           actions: [
             TextButton(
               onPressed: () {
+                if (!mounted) return;
                 Navigator.pop(context); // Close dialog
               },
               child: Text(
@@ -184,6 +189,7 @@ class _DeleteQrScreenState extends State<DeleteQrScreen> {
             ),
             ElevatedButton(
               onPressed: () {
+                if (!mounted) return;
                 Navigator.pop(context);
                 onConfirm(); // Perform delete action
               },

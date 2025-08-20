@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:rajfed_qr/APIService/shared_preference_helper.dart';
@@ -30,8 +31,7 @@ class ApiService {
       headers['Authorization'] = "Bearer $token";
     }
 
-    print("URL: $url\n APIType: $method\n Body: $body");
-
+    log("URL: $url\n APIType: $method\n Body: $body");
     try {
       http.Response response;
 
@@ -52,10 +52,10 @@ class ApiService {
           response = await http.delete(Uri.parse(url), headers: headers);
           break;
       }
-      print("Response: ${response.statusCode} ${response.body}");
+      log("Response: ${response.statusCode} ${response.body}");
       // Handle response
       if (response.statusCode >= 200 && response.statusCode < 300) {
-        print(jsonDecode(response.body));
+        log(jsonDecode(response.body).toString());
         var data = jsonDecode(response.body);
         return APIResponse(true, data, "error");
       } else if (response.statusCode == 401 || response.statusCode == 403) {
@@ -70,7 +70,7 @@ class ApiService {
             false, null, "Token has expired or is invalid");
       } else {
         var data = jsonDecode(response.body);
-        print(data['response']['error_message']);
+        log(data['response']['error_message']);
         return APIResponse(false, null, data['response']['error_message']);
       }
     } catch (e) {

@@ -3,10 +3,7 @@ import 'package:rajfed_qr/Screens/Incharge/Rejected/rejected_screen.dart';
 import 'package:rajfed_qr/Screens/Incharge/dispatched/dispatched_screen.dart';
 import 'package:rajfed_qr/Screens/Incharge/incharge_home/incharge_home.dart';
 import 'package:rajfed_qr/Screens/Admin/admin_home_screen.dart';
-import 'package:rajfed_qr/Screens/Operator/DataScreen/data_screen.dart';
-import 'package:rajfed_qr/Screens/Operator/Home/HomeScreen.dart';
 import 'package:rajfed_qr/Screens/Operator/Profile/profile_screen.dart';
-import 'package:rajfed_qr/Screens/Operator/rejected_screen/rejected_screen.dart';
 
 class InchargeDashboard extends StatefulWidget {
   const InchargeDashboard({super.key});

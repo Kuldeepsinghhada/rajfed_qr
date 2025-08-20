@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'package:ai_barcode_scanner/ai_barcode_scanner.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -10,9 +11,6 @@ import 'package:rajfed_qr/APIService/shared_preference_helper.dart';
 import 'package:rajfed_qr/Screens/Operator/DeleteQr/delete_qr_screen.dart';
 import 'package:rajfed_qr/Screens/Operator/Home/op_home_service.dart';
 import 'package:rajfed_qr/Screens/Operator/Home/views/Information_row.dart';
-import 'package:rajfed_qr/Screens/Operator/Home/views/custom_drawer.dart';
-import 'package:rajfed_qr/Screens/Operator/rejected_screen/rejected_screen.dart';
-import 'package:rajfed_qr/Screens/ChangePassword/change_password.dart';
 import 'package:rajfed_qr/Screens/login/login_screen.dart';
 import 'package:rajfed_qr/Screens/QRScannerScreen/qr_code_screen.dart';
 import 'package:rajfed_qr/common_views/common_button.dart';
@@ -71,9 +69,11 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void getCropAPICall() async {
     await Future.delayed(Duration(milliseconds: 100));
+    if (!mounted) return;
     showLoadingDialog(context);
     try {
       var response = await OPHomeService.instance.getCropList();
+      if (!mounted) return;
       Navigator.pop(context);
       if (response.status == true) {
         cropList = response.data;
@@ -90,6 +90,7 @@ class _MyHomePageState extends State<MyHomePage> {
         showErrorToast(response.error);
       }
     } catch (e) {
+      if (!mounted) return;
       Navigator.pop(context);
       showErrorToast("Something went wrong");
     }
@@ -102,10 +103,12 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void logoutAPICall() async {
+    if (!mounted) return;
     showLoadingDialog(context);
     try {
       var data = await ApiService.instance
           .apiCall(APIEndPoint.logout, HttpRequestType.get, null);
+      if (!mounted) return;
       Navigator.pop(context);
       if (data.status == true) {
         SharedPreferenceHelper.instance.clearData();
@@ -117,15 +120,18 @@ class _MyHomePageState extends State<MyHomePage> {
         showErrorToast(data.error);
       }
     } catch (e) {
+      if (!mounted) return;
       Navigator.pop(context);
       showErrorToast("Something went wrong");
     }
   }
 
   void saveQrAPICall() async {
+    if (!mounted) return;
     showLoadingDialog(context);
     Position? position = await LocationService.instance.getLocation(context);
     if (position == null) {
+      if (!mounted) return;
       Navigator.pop(context);
       return;
     }
@@ -140,6 +146,7 @@ class _MyHomePageState extends State<MyHomePage> {
           scannedNumberList,
           (operatorDetails?.lotId ?? "").toString(),
           cropList[index].cropID ?? 0);
+      if (!mounted) return;
       Navigator.pop(context);
       if (data?.status == true) {
         scannedNumberList.clear();
@@ -149,12 +156,14 @@ class _MyHomePageState extends State<MyHomePage> {
         showErrorToast(data?.error ?? 'Something Went wrong');
       }
     } catch (e) {
+      if (!mounted) return;
       Navigator.pop(context);
       showErrorToast("Something went wrong");
     }
   }
 
   void getSavedQrCodes() async {
+    if (!mounted) return;
     showLoadingDialog(context);
     var index = cropStringList.indexOf(selectedCropValue ?? '');
     if (index < 0) {
@@ -165,15 +174,18 @@ class _MyHomePageState extends State<MyHomePage> {
       var response = await OPHomeService.instance.farmerSavedList(
           operatorDetails?.farmerRegID ?? '', cropList[index].cropID ?? 0);
       if (response?.status == true) {
+        if (!mounted) return;
         Navigator.pop(context);
         setState(() {
           savedQrIds = response?.data;
         });
       } else {
+        if (!mounted) return;
         Navigator.pop(context);
         showErrorToast(response?.error ?? 'Something went wrong');
       }
     } catch (e) {
+      if (!mounted) return;
       Navigator.pop(context);
       showErrorToast("Something went wrong");
     }
@@ -193,7 +205,7 @@ class _MyHomePageState extends State<MyHomePage> {
         builder: (context) => QRScannerScreen(),
       ),
     );
-    print("Scanned Barcode: $data");
+    log("Scanned Barcode: $data");
     if (data != null) {
       if (isBulk == false) {
         if (scannedNumberList.contains(data)) {
@@ -247,6 +259,7 @@ class _MyHomePageState extends State<MyHomePage> {
             actions: [
               TextButton(
                 onPressed: () {
+                  if (!mounted) return;
                   Navigator.pop(context); // Close dialog
                 },
                 child: Text(
@@ -268,6 +281,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           msg: "You can upload max $remainingRecord onwards");
                     }
                     qrController.text = "";
+                    if (!mounted) return;
                     Navigator.pop(context);
                   }
                 },
@@ -418,6 +432,7 @@ class _MyHomePageState extends State<MyHomePage> {
                             msg:
                                 "You can upload max $remainingRecord records onwards");
                       }
+                      if (!mounted) return;
                       Navigator.pop(context);
                     } catch (e) {
                       showErrorToast("Invalid value");
@@ -495,6 +510,7 @@ class _MyHomePageState extends State<MyHomePage> {
           actions: [
             TextButton(
               onPressed: () {
+                if (!mounted) return;
                 Navigator.pop(context); // Close dialog
               },
               child: Text("Cancel"),
@@ -502,6 +518,7 @@ class _MyHomePageState extends State<MyHomePage> {
             ElevatedButton(
               onPressed: () {
                 onConfirm(); // Perform delete action
+                if (!mounted) return;
                 Navigator.pop(context); // Close dialog
               },
               style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
@@ -525,22 +542,26 @@ class _MyHomePageState extends State<MyHomePage> {
       return;
     }
     if (valid == true) {
+      if (!mounted) return;
       showLoadingDialog(context);
       try {
         var response = await OPHomeService.instance.operatorDetails(
             _searchController.text, cropList[index].cropID ?? 0);
         if (response?.status == true) {
+          if (!mounted) return;
           Navigator.pop(context);
           setState(() {
             operatorDetails = response?.data;
           });
           getSavedQrCodes();
         } else {
+          if (!mounted) return;
           Navigator.pop(context);
           Fluttertoast.showToast(
               msg: response?.error ?? 'Something went wrong');
         }
       } catch (e) {
+        if (!mounted) return;
         Navigator.pop(context);
         showErrorToast("Something went wrong");
       }
@@ -557,14 +578,16 @@ class _MyHomePageState extends State<MyHomePage> {
       // drawer: CustomDrawer(
       //   userName: userName,
       //   callback: (value) {
-      //     Navigator.pop(context);
+      //     if (!mounted) return;
+      // Navigator.pop(context);
       //     if (value == "Logout") {
       //       showLogoutDialog(context);
       //     } else if (value == "Change Password") {
       //       Navigator.push(context,
       //           MaterialPageRoute(builder: (_) => ChangePasswordScreen()));
       //     } else if (value == "Home") {
-      //       //Navigator.pop(context);
+      //       //if (!mounted) return;
+      //       Navigator.pop(context);
       //     } else {
       //       Navigator.push(
       //           context, MaterialPageRoute(builder: (_) => RejectedScreen()));
@@ -780,6 +803,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                       ),
                                       IconButton(
                                           onPressed: () {
+                                            if (!mounted) return;
                                             Navigator.pop(context);
                                           },
                                           icon: Icon(

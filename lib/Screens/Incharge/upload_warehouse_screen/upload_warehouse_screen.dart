@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -41,9 +42,11 @@ class _UploadWarehouseScreenState extends State<UploadWarehouseScreen> {
 
   void getDistrictAPICall() async {
     await Future.delayed(Duration(microseconds: 200));
+    if (!mounted) return;
     showLoadingDialog(context);
     try {
       var response = await InchargeService.instance.getDistrictList();
+      if (!mounted) return;
       Navigator.pop(context);
       if (response?.status == true) {
         districtList = response?.data ?? [];
@@ -57,6 +60,7 @@ class _UploadWarehouseScreenState extends State<UploadWarehouseScreen> {
         showErrorToast(response?.error ?? 'Something Went wrong');
       }
     } catch (e) {
+      if (!mounted) return;
       Navigator.pop(context);
       showErrorToast("Something went wrong");
     }
@@ -69,10 +73,12 @@ class _UploadWarehouseScreenState extends State<UploadWarehouseScreen> {
       return;
     }
     var index = districtStringList.indexOf(selectedDistrictValue!);
+    if (!mounted) return;
     showLoadingDialog(context);
     try {
       var response = await InchargeService.instance
           .getWareHouseList(districtList[index].district ?? '');
+      if (!mounted) return;
       Navigator.pop(context);
       if (response?.status == true) {
         wareHouseList = response?.data ?? [];
@@ -87,6 +93,7 @@ class _UploadWarehouseScreenState extends State<UploadWarehouseScreen> {
         showErrorToast(response?.error ?? 'Something Went wrong');
       }
     } catch (e) {
+      if (!mounted) return;
       Navigator.pop(context);
       showErrorToast("Something went wrong");
     }
@@ -94,6 +101,7 @@ class _UploadWarehouseScreenState extends State<UploadWarehouseScreen> {
 
   void dispatchedToWarehouse() async {
     final dio = Dio();
+    if (!mounted) return;
     showLoadingDialog(context);
     List<dynamic> list = [];
     for (var item in qrCodeList) {
@@ -122,6 +130,7 @@ class _UploadWarehouseScreenState extends State<UploadWarehouseScreen> {
           },
         ),
       );
+      if (!mounted) return;
       Navigator.pop(context);
       if (response.statusCode! >= 200 && response.statusCode! < 300) {
         showSuccessToast("Record sent to warehouse successfully");
@@ -130,7 +139,7 @@ class _UploadWarehouseScreenState extends State<UploadWarehouseScreen> {
         showErrorToast('Record Not updated');
       }
     } catch (e) {
-      print("Error: ${e.toString()}");
+      log("Error: ${e.toString()}");
     }
   }
 

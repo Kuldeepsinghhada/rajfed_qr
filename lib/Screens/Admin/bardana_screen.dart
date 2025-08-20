@@ -33,9 +33,11 @@ class _BardanaScreenState extends State<BardanaScreen> {
 
   void getCropAPICall() async {
     await Future.delayed(Duration(milliseconds: 100));
+    if (!mounted) return;
     showLoadingDialog(context);
     try {
       var response = await OPHomeService.instance.getCropList();
+      if (!mounted) return;
       Navigator.pop(context);
       if (response.status == true) {
         cropList = response.data;
@@ -52,6 +54,7 @@ class _BardanaScreenState extends State<BardanaScreen> {
         showErrorToast(response.error);
       }
     } catch (e) {
+      if (!mounted) return;
       Navigator.pop(context);
       showErrorToast("Something went wrong");
     }

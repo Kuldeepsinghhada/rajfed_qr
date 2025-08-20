@@ -1,5 +1,7 @@
+import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:rajfed_qr/APIService/shared_preference_helper.dart';
+import 'package:rajfed_qr/Screens/Admin/farmer_detail/farmer_detail_screen.dart';
 import 'package:rajfed_qr/Screens/Incharge/incharge_dashboard/incharge_dashboard_screen.dart';
 import 'package:rajfed_qr/Screens/Operator/OperatorDashboard/operator_dashboard.dart';
 import 'package:rajfed_qr/Screens/Warehouse/warehouse_home.dart';
@@ -9,12 +11,12 @@ import 'Screens/login/login_screen.dart';
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 void main() async {
-  Widget initialRoute = LoginPage();
+  Widget initialRoute = FarmerDetailScreen();
   WidgetsFlutterBinding.ensureInitialized();
   var token = await SharedPreferenceHelper.instance.getToken();
   var userType = await SharedPreferenceHelper.instance.getUserType();
-  print("Token: $token");
-  print("UserType: $userType");
+  log("Token: $token");
+  log("UserType: $userType");
   if (userType == 10) {
     initialRoute = OperatorDashboard();
   } else if (userType == 2) {

@@ -40,6 +40,7 @@ class _DiapatchInchargeScreenState extends State<DiapatchInchargeScreen> {
     if (valid == true) {
       diapatchInchargeList.clear();
       await Future.delayed(Duration(microseconds: 200));
+      if (!mounted) return;
       showLoadingDialog(context);
       try {
         dynamic response;
@@ -51,15 +52,18 @@ class _DiapatchInchargeScreenState extends State<DiapatchInchargeScreen> {
               .acceptedWarehouseList(vehicleController.text);
         }
         if (response?.status == true) {
+          if (!mounted) return;
           Navigator.pop(context);
           setState(() {
             diapatchInchargeList = response?.data;
           });
         } else {
+          if (!mounted) return;
           Navigator.pop(context);
           showErrorToast(response?.error ?? 'Something went wrong');
         }
       } catch (e) {
+        if (!mounted) return;
         Navigator.pop(context);
         showErrorToast("Something went wrong");
       }

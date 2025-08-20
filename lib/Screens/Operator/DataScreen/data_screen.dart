@@ -67,9 +67,11 @@ class _DataScreenState extends State<DataScreen> {
 
   void getCropAPICall() async {
     await Future.delayed(Duration(milliseconds: 100));
+    if (!mounted) return;
     showLoadingDialog(context);
     try {
       var response = await OPHomeService.instance.getCropList();
+      if (!mounted) return;
       Navigator.pop(context);
       if (response.status == true) {
         cropList = response.data;
@@ -86,6 +88,7 @@ class _DataScreenState extends State<DataScreen> {
         showErrorToast(response.error);
       }
     } catch (e) {
+      if (!mounted) return;
       Navigator.pop(context);
       showErrorToast("Something went wrong");
     }
@@ -93,6 +96,7 @@ class _DataScreenState extends State<DataScreen> {
 
   void getDashboardAPICall() async {
     await Future.delayed(Duration(milliseconds: 100));
+    if (!mounted) return;
     showLoadingDialog(context);
     try {
       int? cropId;
@@ -105,14 +109,16 @@ class _DataScreenState extends State<DataScreen> {
           startDate != null ? dateFormat.format(startDate!) : null,
           endDate != null ? dateFormat.format(endDate!) : null,
           cropId: cropId);
+      if (!mounted) return;
       Navigator.pop(context);
       if (response.status == true) {
-          dataModel = response.data;
+        dataModel = response.data;
         setState(() {});
       } else {
         showErrorToast(response.error);
       }
     } catch (e) {
+      if (!mounted) return;
       Navigator.pop(context);
       showErrorToast("Something went wrong");
     }
@@ -139,6 +145,7 @@ class _DataScreenState extends State<DataScreen> {
                             startDate = null;
                             endDate = null;
                           });
+                          if (!mounted) return;
                           Navigator.pop(context);
                           getDashboardAPICall();
                         },
@@ -212,6 +219,7 @@ class _DataScreenState extends State<DataScreen> {
                         Fluttertoast.showToast(msg: "Select Start & End Date");
                         return;
                       }
+                      if (!mounted) return;
                       Navigator.pop(context);
                       getDashboardAPICall();
                     },

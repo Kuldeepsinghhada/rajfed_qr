@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:rajfed_qr/APIService/data_manager.dart';
-import 'package:rajfed_qr/Screens/Admin/bardana_screen.dart';
+import 'package:rajfed_qr/Screens/Admin/farmer_detail/farmer_detail_screen.dart';
 import 'package:rajfed_qr/Screens/Operator/DataScreen/data_screen.dart';
 import 'package:rajfed_qr/Screens/Operator/DataScreen/data_services.dart';
 import 'package:rajfed_qr/common_views/loader_dialog.dart';
@@ -26,12 +25,16 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
 
   void getDashboardAPICall() async {
     await Future.delayed(Duration(milliseconds: 100));
+    if (!mounted) return;
+    if (!mounted) return;
     showLoadingDialog(context);
     try {
       int? cropId;
 
       var response = await DataService.instance
           .dashboardDataList(null, null, cropId: cropId);
+      if (!mounted) return;
+      if (!mounted) return;
       Navigator.pop(context);
       if (response.status == true) {
         dataModel = response.data;
@@ -40,6 +43,7 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
         showErrorToast(response.error);
       }
     } catch (e) {
+      if (!mounted) return;
       Navigator.pop(context);
       showErrorToast("Something went wrong");
     }
@@ -82,7 +86,7 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
         title: "Warehouse Receipt",
         image: Icons.receipt_outlined,
         color: Color(0xFFFFF3E0),
-        value: ("${dataModel?.wrdatAMT ?? 0}").toString(),
+        value: ("${dataModel?.wrdatAMT ?? 0} (MT)").toString(),
       ),
       GridModel(
         title: "Used Bardana",
@@ -128,70 +132,73 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
           "Dashboard",
         ),
       ),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.end,
-        children: [
-          SizedBox(
-            height: 2,
-          ),
-          GridView.builder(
-            padding: EdgeInsets.all(12),
-            itemCount: items.length,
-            shrinkWrap: true,
-            physics: NeverScrollableScrollPhysics(),
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: crossAxisCount,
-                crossAxisSpacing: 8.0,
-                mainAxisSpacing: 8.0,
-                childAspectRatio: 1.5),
-            //scrollDirection: Axis.horizontal,
-            itemBuilder: (context, index) {
-              return Card(
-                color: items[index].color,
-                child: InkWell(
-                  onTap: () {
-                    if (index == 0) {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => DataScreen()));
+      body: GridView.builder(
+        padding: EdgeInsets.all(12),
+        itemCount: items.length,
+        // shrinkWrap: true,
+        // physics: NeverScrollableScrollPhysics(),
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: crossAxisCount,
+            crossAxisSpacing: 8.0,
+            mainAxisSpacing: 8.0,
+            childAspectRatio: 1.5),
+        //scrollDirection: Axis.horizontal,
+        itemBuilder: (context, index) {
+          return Card(
+            color: items[index].color,
+            child: InkWell(
+              onTap: index == 0 || index == 8
+                  ? () {
+                      if (index == 0) {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => DataScreen()));
+                      } else if (index == 8) {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => FarmerDetailScreen()));
+                      }
+                      // else if (index == 1) {
+                      //   Navigator.push(
+                      //       context,
+                      //       MaterialPageRoute(
+                      //           builder: (context) => BardanaScreen()));
+                      // } else if (index == 2) {
+                      //   Navigator.push(
+                      //       context,
+                      //       MaterialPageRoute(
+                      //           builder: (context) => TotalPurchaseScreen()));
+                      //   showModernBardanaBottomSheet(context);
+                      // }
                     }
-                    // else if (index == 1) {
-                    //   Navigator.push(
-                    //       context,
-                    //       MaterialPageRoute(
-                    //           builder: (context) => BardanaScreen()));
-                    // } else if (index == 2) {
-                    //   Navigator.push(
-                    //       context,
-                    //       MaterialPageRoute(
-                    //           builder: (context) => TotalPurchaseScreen()));
-                    //   showModernBardanaBottomSheet(context);
-                    // }
-                  },
-                  child: Padding(
-                    padding: EdgeInsets.symmetric(vertical: 10, horizontal: 12),
-                    child: Column(
+                  : null,
+              child: Padding(
+                padding: EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  spacing: 4,
+                  children: [
+                    Expanded(
+                        child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      spacing: 4,
                       children: [
-                        Expanded(
-                            child: Column(
+                        Icon(items[index].image, size: 30, color: Colors.black),
+                        Text(
+                          items[index].title,
+                          textAlign: TextAlign.start,
+                          maxLines: 2,
+                          style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                              color: Colors.black,
+                              fontSize: 15),
+                        ),
+                        Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Icon(items[index].image,
-                                size: 30, color: Colors.black),
-                            Text(
-                              items[index].title,
-                              textAlign: TextAlign.start,
-                              maxLines: 2,
-                              style: TextStyle(
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.black,
-                                  fontSize: 15),
-                            ),
                             Text(
                               items[index].value,
                               textAlign: TextAlign.start,
@@ -201,20 +208,23 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
                                   color: Colors.green,
                                   fontSize: 16),
                             ),
+                            (items[index].title == "Total Registration" ||
+                                    items[index].title == "Search")
+                                ? Icon(
+                                    Icons.arrow_forward_ios,
+                                    size: 17,
+                                  )
+                                : SizedBox()
                           ],
-                        )),
+                        ),
                       ],
-                    ),
-                  ),
+                    )),
+                  ],
                 ),
-              );
-            },
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: Divider(color: Colors.grey.shade300),
-          )
-        ],
+              ),
+            ),
+          );
+        },
       ),
     );
   }

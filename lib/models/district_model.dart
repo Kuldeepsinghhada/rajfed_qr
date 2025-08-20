@@ -9,14 +9,14 @@ class DistrictModel {
   String? rto;
 
   DistrictModel(
-      {this.districTID,
-        this.district,
-        this.districtNameLL,
-        this.districtNameEN,
-        this.state,
-        this.status,
-        this.dateActiveInactive,
-        this.rto});
+      {districTID,
+        district,
+        districtNameLL,
+        districtNameEN,
+        state,
+        status,
+        dateActiveInactive,
+        rto});
 
   DistrictModel.fromJson(Map<String, dynamic> json) {
     districTID = json['districT_ID'];
@@ -30,15 +30,15 @@ class DistrictModel {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['districT_ID'] = this.districTID;
-    data['district'] = this.district;
-    data['district_Name_LL'] = this.districtNameLL;
-    data['district_Name_EN'] = this.districtNameEN;
-    data['state'] = this.state;
-    data['status'] = this.status;
-    data['date_Active_Inactive'] = this.dateActiveInactive;
-    data['rto'] = this.rto;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['districT_ID'] = districTID;
+    data['district'] = district;
+    data['district_Name_LL'] = districtNameLL;
+    data['district_Name_EN'] = districtNameEN;
+    data['state'] = state;
+    data['status'] = status;
+    data['date_Active_Inactive'] = dateActiveInactive;
+    data['rto'] = rto;
     return data;
   }
 }

@@ -40,21 +40,26 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
 
   void _changePassword() async {
     if (_formKey.currentState!.validate()) {
+      if (!mounted) return;
       showLoadingDialog(context);
       try {
         var response = await ChangePasswordService.instance.changePassword(
             convertSHA256(oldPasswordController.text),
             convertSHA256(newPasswordController.text));
         if (response?.status == true) {
+          if (!mounted) return;
           Navigator.pop(context);
           showSuccessToast("Password updated successfully");
+          if (!mounted) return;
           Navigator.pop(context);
         } else {
+          if (!mounted) return;
           Navigator.pop(context);
           Fluttertoast.showToast(
               msg: response?.error ?? 'Something went wrong');
         }
       } catch (e) {
+        if (!mounted) return;
         Navigator.pop(context);
         showErrorToast("Something went wrong");
       }

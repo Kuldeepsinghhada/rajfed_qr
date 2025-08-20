@@ -43,6 +43,7 @@ class _RejectedInchargeScreenState extends State<RejectedInchargeScreen> {
     var valid = _formKey.currentState?.validate();
     if (valid == true) {
       await Future.delayed(Duration(microseconds: 200));
+      if (!mounted) return;
       showLoadingDialog(context);
       try {
         dynamic response;
@@ -55,15 +56,18 @@ class _RejectedInchargeScreenState extends State<RejectedInchargeScreen> {
               .rejectedWareHouseList(vehicleController.text);
         }
         if (response?.status == true) {
+          if (!mounted) return;
           Navigator.pop(context);
           setState(() {
             rejectedInchargeList = response?.data;
           });
         } else {
+          if (!mounted) return;
           Navigator.pop(context);
           showErrorToast(response?.error ?? 'Something went wrong');
         }
       } catch (e) {
+        if (!mounted) return;
         Navigator.pop(context);
         showErrorToast("Something went wrong");
       }

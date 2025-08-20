@@ -17,21 +17,21 @@ class DispatchInchargeModel {
   String? crop_descEN;
 
   DispatchInchargeModel(
-      {this.lotNo,
-      this.farmerRegId,
-      this.purchaseCenterId,
-      this.cropID,
-      this.qtl,
-      this.noOfBardana,
-      this.cropEN,
-      this.purchaseCenterKendra,
-      this.transctionDate,
-      this.flagName,
-      this.warehouseName,
-      this.qrCode,
-      this.crop_descEN,
-      this.dispatchDateTime,
-      this.receivedDateTime
+      {lotNo,
+      farmerRegId,
+      purchaseCenterId,
+      cropID,
+      qtl,
+      noOfBardana,
+      cropEN,
+      purchaseCenterKendra,
+      transctionDate,
+      flagName,
+      warehouseName,
+      qrCode,
+      crop_descEN,
+      dispatchDateTime,
+      receivedDateTime
       });
 
   DispatchInchargeModel.fromJson(Map<String, dynamic> json) {
@@ -54,18 +54,18 @@ class DispatchInchargeModel {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
-    data['lotNo'] = this.lotNo;
-    data['farmerRegId'] = this.farmerRegId;
-    data['purchaseCenterId'] = this.purchaseCenterId;
-    data['crop_ID'] = this.cropID;
-    data['qtl'] = this.qtl;
-    data['noOfBardana'] = this.noOfBardana;
-    data['cropEN'] = this.cropEN;
-    data['purchaseCenter_Kendra'] = this.purchaseCenterKendra;
-    data['transction_Date'] = this.transctionDate;
-    data['flagName'] = this.flagName;
-    data['warehouseName'] = this.warehouseName;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['lotNo'] = lotNo;
+    data['farmerRegId'] = farmerRegId;
+    data['purchaseCenterId'] = purchaseCenterId;
+    data['crop_ID'] = cropID;
+    data['qtl'] = qtl;
+    data['noOfBardana'] = noOfBardana;
+    data['cropEN'] = cropEN;
+    data['purchaseCenter_Kendra'] = purchaseCenterKendra;
+    data['transction_Date'] = transctionDate;
+    data['flagName'] = flagName;
+    data['warehouseName'] = warehouseName;
     return data;
   }
 }

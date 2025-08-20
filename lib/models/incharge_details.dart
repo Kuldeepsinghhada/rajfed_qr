@@ -10,15 +10,15 @@ class InchargeDetails {
   String? transctionDate;
 
   InchargeDetails(
-      {this.lotNo,
-        this.farmerRegId,
-        this.purchaseCenterId,
-        this.cropID,
-        this.qtl,
-        this.noOfBardana,
-        this.cropEN,
-        this.purchaseCenterKendra,
-        this.transctionDate});
+      {lotNo,
+        farmerRegId,
+        purchaseCenterId,
+        cropID,
+        qtl,
+        noOfBardana,
+        cropEN,
+        purchaseCenterKendra,
+        transctionDate});
 
   InchargeDetails.fromJson(Map<String, dynamic> json) {
     lotNo = json['lotNo'];
@@ -33,16 +33,16 @@ class InchargeDetails {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['lotNo'] = this.lotNo;
-    data['farmerRegId'] = this.farmerRegId;
-    data['purchaseCenterId'] = this.purchaseCenterId;
-    data['crop_ID'] = this.cropID;
-    data['qtl'] = this.qtl;
-    data['noOfBardana'] = this.noOfBardana;
-    data['cropEN'] = this.cropEN;
-    data['purchaseCenter_Kendra'] = this.purchaseCenterKendra;
-    data['transction_Date'] = this.transctionDate;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['lotNo'] = lotNo;
+    data['farmerRegId'] = farmerRegId;
+    data['purchaseCenterId'] = purchaseCenterId;
+    data['crop_ID'] = cropID;
+    data['qtl'] = qtl;
+    data['noOfBardana'] = noOfBardana;
+    data['cropEN'] = cropEN;
+    data['purchaseCenter_Kendra'] = purchaseCenterKendra;
+    data['transction_Date'] = transctionDate;
     return data;
   }
 }

@@ -133,22 +133,26 @@ class _CustomDrawerState extends State<CustomDrawer> {
   }
 
   void saveLocation() async {
+    if (!mounted) return;
     showLoadingDialog(context);
     Position? position = await LocationService.instance.getLocation(context);
     if (position == null) {
-      Navigator.pop(context);
+      if (!mounted) return;
+    Navigator.pop(context);
       return;
     }
     try {
       var data = await OPHomeService.instance.operatorSaveLocation(position);
-      Navigator.pop(context);
+      if (!mounted) return;
+    Navigator.pop(context);
       if (data?.status == true) {
         showSuccessToast("Location updated successfully");
       } else {
         showErrorToast(data?.error ?? 'Something Went wrong');
       }
     } catch (e) {
-      Navigator.pop(context);
+      if (!mounted) return;
+    Navigator.pop(context);
       showErrorToast("Something went wrong");
     }
   }

@@ -6,11 +6,11 @@ class RejectedModel {
   String? purchaseCenterKendra;
 
   RejectedModel(
-      {this.lotNo,
-        this.farmerRegId,
-        this.qrCode,
-        this.rejectedDate,
-        this.purchaseCenterKendra});
+      {lotNo,
+        farmerRegId,
+        qrCode,
+        rejectedDate,
+        purchaseCenterKendra});
 
   RejectedModel.fromJson(Map<String, dynamic> json) {
     lotNo = json['lotNo'];
@@ -21,12 +21,12 @@ class RejectedModel {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['lotNo'] = this.lotNo;
-    data['farmerRegId'] = this.farmerRegId;
-    data['qrCode'] = this.qrCode;
-    data['rejected_Date'] = this.rejectedDate;
-    data['purchaseCenter_Kendra'] = this.purchaseCenterKendra;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['lotNo'] = lotNo;
+    data['farmerRegId'] = farmerRegId;
+    data['qrCode'] = qrCode;
+    data['rejected_Date'] = rejectedDate;
+    data['purchaseCenter_Kendra'] = purchaseCenterKendra;
     return data;
   }
 }

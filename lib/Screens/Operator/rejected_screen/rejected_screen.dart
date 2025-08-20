@@ -24,20 +24,24 @@ class _RejectedScreenState extends State<RejectedScreen> {
 
   void getOperatorDetails() async {
     await Future.delayed(Duration(microseconds: 200));
+    if (!mounted) return;
     showLoadingDialog(context);
     try {
       var response = await RejectedService.instance.operatorRejectedList();
       if (response?.status == true) {
-        Navigator.pop(context);
+        if (!mounted) return;
+    Navigator.pop(context);
         setState(() {
           rejectedList = response?.data;
         });
       } else {
-        Navigator.pop(context);
+        if (!mounted) return;
+    Navigator.pop(context);
         showErrorToast(response?.error ?? 'Something went wrong');
       }
     } catch (e) {
-      Navigator.pop(context);
+      if (!mounted) return;
+    Navigator.pop(context);
       showErrorToast("Something went wrong");
     }
   }

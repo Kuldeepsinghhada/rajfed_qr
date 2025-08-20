@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 import 'package:rajfed_qr/APIService/api_endpoint.dart';
 import 'package:rajfed_qr/APIService/api_service.dart';
 import 'package:rajfed_qr/APIService/shared_preference_helper.dart';
@@ -141,7 +142,7 @@ class InchargeService {
 
       String jsonString =
           jsonEncode(qrCodeList.map((lot) => lot.toJson()).toList());
-      print(jsonEncode(list));
+      log(jsonEncode(list));
       var response = await ApiService.instance.apiCall(
           APIEndPoint.dispatchToWareHouse, HttpRequestType.post, jsonString);
       if (response.status) {

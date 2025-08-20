@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:rajfed_qr/APIService/api_endpoint.dart';
@@ -68,7 +69,7 @@ class OPHomeService {
 
       DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
       AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
-      print('Running on ${androidInfo}');
+      log('Running on $androidInfo');
 
       Map<String, dynamic> body = {
         "farmerRegNo": farmerRegNo,
