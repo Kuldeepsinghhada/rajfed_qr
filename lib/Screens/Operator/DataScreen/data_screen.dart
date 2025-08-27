@@ -6,6 +6,7 @@ import 'package:rajfed_qr/Screens/Operator/DataScreen/data_services.dart';
 import 'package:rajfed_qr/Screens/Operator/DataScreen/views/data_gridview.dart';
 import 'package:rajfed_qr/Screens/Operator/Home/op_home_service.dart';
 import 'package:rajfed_qr/common_views/loader_dialog.dart';
+import 'package:rajfed_qr/models/APIModel/api_response.dart';
 import 'package:rajfed_qr/models/crop_list_model.dart';
 import 'package:rajfed_qr/models/dashboard_data_model.dart';
 import 'package:rajfed_qr/utils/toast_formatter.dart';
@@ -90,7 +91,7 @@ class _DataScreenState extends State<DataScreen> {
     } catch (e) {
       if (!mounted) return;
       Navigator.pop(context);
-      showErrorToast("Something went wrong");
+      showErrorToast(e is APIResponse ? e.error : e.toString());
     }
   }
 
@@ -120,7 +121,7 @@ class _DataScreenState extends State<DataScreen> {
     } catch (e) {
       if (!mounted) return;
       Navigator.pop(context);
-      showErrorToast("Something went wrong");
+      showErrorToast(e is APIResponse ? e.error : e.toString());
     }
   }
 

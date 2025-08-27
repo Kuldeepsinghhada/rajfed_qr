@@ -9,6 +9,7 @@ import 'package:rajfed_qr/Screens/ChangePassword/change_password.dart';
 import 'package:rajfed_qr/Screens/Operator/Home/op_home_service.dart';
 import 'package:rajfed_qr/Screens/login/login_screen.dart';
 import 'package:rajfed_qr/common_views/loader_dialog.dart';
+import 'package:rajfed_qr/models/APIModel/api_response.dart';
 import 'package:rajfed_qr/utils/enums.dart';
 import 'package:rajfed_qr/utils/location_service.dart';
 import 'package:rajfed_qr/utils/toast_formatter.dart';
@@ -118,7 +119,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     } catch (e) {
       if (!mounted) return;
       Navigator.pop(context);
-      showErrorToast("Something went wrong");
+      showErrorToast(e is APIResponse ? e.error : e.toString());
     }
   }
 
@@ -142,7 +143,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     } catch (e) {
       if (!mounted) return;
       Navigator.pop(context);
-      showErrorToast("Something went wrong");
+      showErrorToast(e is APIResponse ? e.error : e.toString());
     }
   }
 

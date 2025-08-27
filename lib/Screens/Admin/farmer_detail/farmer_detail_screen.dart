@@ -99,7 +99,7 @@ class _FarmerDetailScreenState extends State<FarmerDetailScreen> {
         } else {
           if (!mounted) return;
           Navigator.pop(context);
-          showErrorToast("Something went wrong");
+          showErrorToast(response?.error ?? 'Something Went wrong');
         }
       } catch (e) {
         if (!mounted) return;

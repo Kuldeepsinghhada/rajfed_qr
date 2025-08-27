@@ -6,6 +6,7 @@ import 'package:rajfed_qr/Screens/Operator/Home/op_home_service.dart';
 import 'package:rajfed_qr/common_views/loader_dialog.dart';
 import 'package:rajfed_qr/utils/location_service.dart';
 import 'package:rajfed_qr/utils/toast_formatter.dart';
+import 'package:rajfed_qr/models/APIModel/api_response.dart';
 
 class CustomDrawer extends StatefulWidget {
   const CustomDrawer(
@@ -138,13 +139,13 @@ class _CustomDrawerState extends State<CustomDrawer> {
     Position? position = await LocationService.instance.getLocation(context);
     if (position == null) {
       if (!mounted) return;
-    Navigator.pop(context);
+      Navigator.pop(context);
       return;
     }
     try {
       var data = await OPHomeService.instance.operatorSaveLocation(position);
       if (!mounted) return;
-    Navigator.pop(context);
+      Navigator.pop(context);
       if (data?.status == true) {
         showSuccessToast("Location updated successfully");
       } else {
@@ -152,8 +153,8 @@ class _CustomDrawerState extends State<CustomDrawer> {
       }
     } catch (e) {
       if (!mounted) return;
-    Navigator.pop(context);
-      showErrorToast("Something went wrong");
+      Navigator.pop(context);
+      showErrorToast(e is APIResponse ? e.error : e.toString());
     }
   }
 }

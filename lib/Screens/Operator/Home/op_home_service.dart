@@ -33,7 +33,7 @@ class OPHomeService {
       }
       return APIResponse(false, null, response.error);
     } catch (e) {
-      showErrorToast("Something went wrong");
+      showErrorToast(e is APIResponse ? e.error : e.toString());
       return null;
     }
   }

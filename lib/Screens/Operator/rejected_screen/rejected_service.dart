@@ -21,14 +21,15 @@ class RejectedService {
       var response = await ApiService.instance.apiCall(
           APIEndPoint.operatorRejected + query, HttpRequestType.get, null);
       if (response.status) {
-        List<RejectedModel> rejectedItems = (response.data['response']['data'] as List)
-            .map((item) => RejectedModel.fromJson(item))
-            .toList();
+        List<RejectedModel> rejectedItems =
+            (response.data['response']['data'] as List)
+                .map((item) => RejectedModel.fromJson(item))
+                .toList();
         return APIResponse(true, rejectedItems, "");
       }
       return APIResponse(false, null, response.error);
     } catch (e) {
-      showErrorToast("Something went wrong");
+      showErrorToast(e is APIResponse ? e.error : e.toString());
       return null;
     }
   }

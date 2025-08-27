@@ -15,6 +15,7 @@ import 'package:rajfed_qr/Screens/login/login_screen.dart';
 import 'package:rajfed_qr/Screens/QRScannerScreen/qr_code_screen.dart';
 import 'package:rajfed_qr/common_views/common_button.dart';
 import 'package:rajfed_qr/common_views/loader_dialog.dart';
+import 'package:rajfed_qr/models/APIModel/api_response.dart';
 import 'package:rajfed_qr/models/crop_list_model.dart';
 import 'package:rajfed_qr/models/operator_details.dart';
 import 'package:rajfed_qr/models/saved_qr_model.dart';
@@ -92,7 +93,7 @@ class _MyHomePageState extends State<MyHomePage> {
     } catch (e) {
       if (!mounted) return;
       Navigator.pop(context);
-      showErrorToast("Something went wrong");
+      showErrorToast(e is APIResponse ? e.error : e.toString());
     }
   }
 
@@ -122,7 +123,7 @@ class _MyHomePageState extends State<MyHomePage> {
     } catch (e) {
       if (!mounted) return;
       Navigator.pop(context);
-      showErrorToast("Something went wrong");
+      showErrorToast(e is APIResponse ? e.error : e.toString());
     }
   }
 
@@ -187,7 +188,7 @@ class _MyHomePageState extends State<MyHomePage> {
     } catch (e) {
       if (!mounted) return;
       Navigator.pop(context);
-      showErrorToast("Something went wrong");
+      showErrorToast(e is APIResponse ? e.error : e.toString());
     }
   }
 
