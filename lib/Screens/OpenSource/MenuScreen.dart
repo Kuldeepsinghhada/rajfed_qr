@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:rajfed_qr/Screens/Admin/farmer_detail/farmer_detail_screen.dart';
 import 'package:rajfed_qr/Screens/OpenSource/contact_us_screen.dart';
+import 'package:rajfed_qr/Screens/OpenSource/crop_calculater_screen.dart';
 import 'package:rajfed_qr/Screens/login/login_screen.dart';
 
 class MenuScreen extends StatefulWidget {
@@ -15,27 +16,28 @@ class _MenuScreenState extends State<MenuScreen> {
   final List<DeviceItem> items = const [
     DeviceItem(
       title: "Farmer Search",
-      subtitle: "",
       icon: Icons.search,
       color: Color(0xFF42A5F5), // Light Blue
     ),
     DeviceItem(
       title: "MSP Rate 2025",
-      subtitle: "",
       icon: Icons.price_change_outlined,
       color: Color(0xFF66BB6A), // Light Green
     ),
     DeviceItem(
+      title: "Crop Calculator",
+      icon: Icons.calculate,
+      color: Color(0xFFFFA726), // Orange
+    ),
+    DeviceItem(
       title: "Help",
-      subtitle: "Warm light",
       icon: Icons.help_outline,
-      color: Color(0xFFAB47BC), // Light Purple
+      color: Color(0xFFAB47BC), // Purple
     ),
     DeviceItem(
       title: "Login",
-      subtitle: "Warm light",
       icon: Icons.login,
-      color: Color(0xFFFFA726), // Light Orange
+      color: Color(0xFF26A69A), // Teal
     ),
   ];
 
@@ -75,8 +77,14 @@ class _MenuScreenState extends State<MenuScreen> {
                           Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) => ContactUsScreen()));
+                                  builder: (context) =>
+                                      CropCalculaterScreen()));
                         } else if (index == 3) {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => ContactUsScreen()));
+                        } else if (index == 4) {
                           Navigator.push(
                               context,
                               MaterialPageRoute(
@@ -128,13 +136,11 @@ class _MenuScreenState extends State<MenuScreen> {
 /// DeviceItem Model
 class DeviceItem {
   final String title;
-  final String subtitle;
   final IconData icon;
   final Color color;
 
   const DeviceItem({
     required this.title,
-    required this.subtitle,
     required this.icon,
     required this.color,
   });

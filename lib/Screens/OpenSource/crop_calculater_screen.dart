@@ -4,20 +4,22 @@ import 'package:intl/intl.dart';
 import 'package:rajfed_qr/APIService/data_manager.dart';
 import 'package:rajfed_qr/APIService/shared_preference_helper.dart';
 import 'package:rajfed_qr/Screens/Admin/farmer_detail/farmer_services.dart';
+import 'package:rajfed_qr/Screens/Incharge/incharge_home/incharge_service.dart';
 import 'package:rajfed_qr/Screens/Operator/Home/op_home_service.dart';
 import 'package:rajfed_qr/common_views/loader_dialog.dart';
 import 'package:rajfed_qr/models/crop_list_model.dart';
+import 'package:rajfed_qr/models/district_model.dart';
 import 'package:rajfed_qr/models/farmer_details_model.dart';
 import 'package:rajfed_qr/utils/toast_formatter.dart';
 
-class FarmerDetailScreen extends StatefulWidget {
-  const FarmerDetailScreen({super.key});
+class CropCalculaterScreen extends StatefulWidget {
+  const CropCalculaterScreen({super.key});
 
   @override
-  State<FarmerDetailScreen> createState() => _FarmerDetailScreenState();
+  State<CropCalculaterScreen> createState() => _CropCalculaterScreenState();
 }
 
-class _FarmerDetailScreenState extends State<FarmerDetailScreen> {
+class _CropCalculaterScreenState extends State<CropCalculaterScreen> {
   String? selectedCrop;
   List<String> cropItems = [];
   List<CropModel> cropList = [];
@@ -31,9 +33,14 @@ class _FarmerDetailScreenState extends State<FarmerDetailScreen> {
 
   int? purchaseCenterID;
 
+  String? selectedDistrictValue;
+  List<DistrictModel> districtList = [];
+  List<String> districtStringList = [];
+
   @override
   void initState() {
     getCropAPICall();
+    getDistrictAPICall();
     super.initState();
   }
 
@@ -67,6 +74,32 @@ class _FarmerDetailScreenState extends State<FarmerDetailScreen> {
         setState(() {});
       } else {
         showErrorToast(response.error);
+      }
+    } catch (e) {
+      if (!mounted) return;
+      Navigator.pop(context);
+      showErrorToast("Something went wrong");
+    }
+  }
+
+  void getDistrictAPICall() async {
+    await Future.delayed(Duration(microseconds: 200));
+    if (!mounted) return;
+    showLoadingDialog(context);
+    try {
+      var response = await InchargeService.instance.getDistrictList();
+      if (!mounted) return;
+      Navigator.pop(context);
+      if (response?.status == true) {
+        districtList = response?.data ?? [];
+        for (var item in districtList) {
+          if (item.districtNameEN != null) {
+            districtStringList.add(item.districtNameEN!);
+          }
+        }
+        setState(() {});
+      } else {
+        showErrorToast(response?.error ?? 'Something Went wrong');
       }
     } catch (e) {
       if (!mounted) return;
@@ -123,15 +156,7 @@ class _FarmerDetailScreenState extends State<FarmerDetailScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Farmer Details'),
-        // actions: [
-        //   purchaseCenterID == null ? IconButton(
-        //       onPressed: () {
-        //         Navigator.push(context,
-        //             MaterialPageRoute(builder: (context) => LoginPage()));
-        //       },
-        //       icon: Text('LOGIN',style: TextStyle(fontWeight: FontWeight.w700,fontSize: 16))) : SizedBox()
-        // ],
+        title: Text('Crop Calculator'),
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -144,6 +169,10 @@ class _FarmerDetailScreenState extends State<FarmerDetailScreen> {
                   visible: showFilter,
                   child: Column(
                     children: [
+                      districtDropdown(),
+                      SizedBox(
+                        height: 16,
+                      ),
                       cropDropDown(),
                       SizedBox(
                         height: 16,
@@ -277,6 +306,47 @@ class _FarmerDetailScreenState extends State<FarmerDetailScreen> {
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  Widget districtDropdown() {
+    return DropdownButtonFormField<String>(
+      value: selectedDistrictValue,
+      hint: Text("Select a District"),
+      items: districtStringList
+          .map((String value) => DropdownMenuItem(
+                value: value,
+                child: Text(value),
+              ))
+          .toList(),
+      onChanged: (newValue) {
+        setState(() {
+          selectedDistrictValue = newValue;
+        });
+      },
+      validator: (value) {
+        if (value == null) {
+          return 'Please select district';
+        }
+        return null;
+      },
+      decoration: InputDecoration(
+        labelText: "District",
+        labelStyle: TextStyle(color: Colors.green.shade400),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8), // Rounded border
+          borderSide: BorderSide(color: Colors.green.shade400, width: 2),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: BorderSide(color: Colors.grey, width: 1.5),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: BorderSide(color: Colors.green.shade400, width: 2),
+        ),
+        contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       ),
     );
   }
