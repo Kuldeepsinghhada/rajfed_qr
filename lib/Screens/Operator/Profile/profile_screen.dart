@@ -6,6 +6,7 @@ import 'package:rajfed_qr/APIService/api_endpoint.dart';
 import 'package:rajfed_qr/APIService/api_service.dart';
 import 'package:rajfed_qr/APIService/shared_preference_helper.dart';
 import 'package:rajfed_qr/Screens/ChangePassword/change_password.dart';
+import 'package:rajfed_qr/Screens/OpenSource/farmer_desk_screen.dart';
 import 'package:rajfed_qr/Screens/Operator/Home/op_home_service.dart';
 import 'package:rajfed_qr/Screens/login/login_screen.dart';
 import 'package:rajfed_qr/common_views/loader_dialog.dart';
@@ -135,7 +136,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         SharedPreferenceHelper.instance.clearData();
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => LoginPage()),
+          MaterialPageRoute(builder: (context) => FarmerDeskScreen()),
         );
       } else {
         showErrorToast(data.error);

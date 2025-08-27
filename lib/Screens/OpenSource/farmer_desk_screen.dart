@@ -4,14 +4,14 @@ import 'package:rajfed_qr/Screens/OpenSource/contact_us_screen.dart';
 import 'package:rajfed_qr/Screens/OpenSource/crop_calculater_screen.dart';
 import 'package:rajfed_qr/Screens/login/login_screen.dart';
 
-class MenuScreen extends StatefulWidget {
-  const MenuScreen({super.key});
+class FarmerDeskScreen extends StatefulWidget {
+  const FarmerDeskScreen({super.key});
 
   @override
-  State<MenuScreen> createState() => _MenuScreenState();
+  State<FarmerDeskScreen> createState() => _FarmerDeskScreenState();
 }
 
-class _MenuScreenState extends State<MenuScreen> {
+class _FarmerDeskScreenState extends State<FarmerDeskScreen> {
   /// List of devices
   final List<DeviceItem> items = const [
     DeviceItem(
@@ -88,7 +88,7 @@ class _MenuScreenState extends State<MenuScreen> {
                           Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) => LoginPage()));
+                                  builder: (context) => LoginScreen()));
                         }
                       },
                       child: Padding(

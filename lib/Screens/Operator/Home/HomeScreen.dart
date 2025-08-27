@@ -8,6 +8,7 @@ import 'package:rajfed_qr/APIService/api_endpoint.dart';
 import 'package:rajfed_qr/APIService/api_service.dart';
 import 'package:rajfed_qr/APIService/data_manager.dart';
 import 'package:rajfed_qr/APIService/shared_preference_helper.dart';
+import 'package:rajfed_qr/Screens/OpenSource/farmer_desk_screen.dart';
 import 'package:rajfed_qr/Screens/Operator/DeleteQr/delete_qr_screen.dart';
 import 'package:rajfed_qr/Screens/Operator/Home/op_home_service.dart';
 import 'package:rajfed_qr/Screens/Operator/Home/views/Information_row.dart';
@@ -115,7 +116,7 @@ class _MyHomePageState extends State<MyHomePage> {
         SharedPreferenceHelper.instance.clearData();
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => LoginPage()),
+          MaterialPageRoute(builder: (context) => FarmerDeskScreen()),
         );
       } else {
         showErrorToast(data.error);
