@@ -1,3 +1,4 @@
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'dart:convert';
 import 'dart:developer';
 import 'package:flutter/material.dart';
@@ -22,6 +23,13 @@ class ApiService {
     HttpRequestType method, // GET, POST, PUT, DELETE
     dynamic body,
   ) async {
+    // Check internet connectivity
+    final connectivityResult = await Connectivity().checkConnectivity();
+    if (connectivityResult.contains(ConnectivityResult.none)) {
+      log("[API ERROR] No internet connection");
+      return APIResponse(false, null, "No internet connection");
+    }
+
     final String url = "$baseUrl/$endpoint";
     final headers = await _buildHeaders();
     final encodedBody = _encodeBody(body);
