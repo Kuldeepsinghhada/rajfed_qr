@@ -253,11 +253,10 @@ class _WarehouseHomeState extends State<WarehouseHome> {
               wareHouseList = response?.data ?? [];
             });
           } else {
-            showErrorToast("No data fount");
+            showErrorToast("No data found");
           }
         } else {
-          Fluttertoast.showToast(
-              msg: response?.error ?? 'Something went wrong');
+          showErrorToast(response?.error ?? 'Something went wrong');
         }
       } catch (e) {
         showErrorToast("Something went wrong");

@@ -1,3 +1,4 @@
+import 'package:rajfed_qr/common_views/no_internet_dialog.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'dart:convert';
 import 'dart:developer';
@@ -27,6 +28,13 @@ class ApiService {
     final connectivityResult = await Connectivity().checkConnectivity();
     if (connectivityResult.contains(ConnectivityResult.none)) {
       log("[API ERROR] No internet connection");
+      final context = navigatorKey.currentContext;
+      if (context != null) {
+        await showNoInternetDialog(context, () async {
+          // Retry the last request
+          await apiCall(endpoint, method, body);
+        });
+      }
       return APIResponse(false, null, "No internet connection");
     }
 

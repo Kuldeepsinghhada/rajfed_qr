@@ -250,8 +250,7 @@ class _InchargeHomeState extends State<InchargeHome> {
         } else {
           if (!mounted) return;
           Navigator.pop(context);
-          Fluttertoast.showToast(
-              msg: response?.error ?? 'Something went wrong');
+          showErrorToast(response?.error ?? 'Something went wrong');
         }
       } catch (e) {
         if (!mounted) return;
