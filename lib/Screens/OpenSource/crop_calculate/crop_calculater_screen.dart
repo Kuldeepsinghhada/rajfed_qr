@@ -1,9 +1,7 @@
 import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
-import 'package:rajfed_qr/APIService/api_service.dart';
 import 'package:rajfed_qr/APIService/data_manager.dart';
 import 'package:rajfed_qr/APIService/shared_preference_helper.dart';
 import 'package:rajfed_qr/Screens/Admin/farmer_detail/farmer_services.dart';
@@ -15,7 +13,6 @@ import 'package:rajfed_qr/models/crop_list_model.dart';
 import 'package:rajfed_qr/models/district_model.dart';
 import 'package:rajfed_qr/models/farmer_details_model.dart';
 import 'package:rajfed_qr/models/yield_master.dart';
-import 'package:rajfed_qr/utils/enums.dart';
 import 'package:rajfed_qr/utils/toast_formatter.dart';
 
 class CropCalculaterScreen extends StatefulWidget {

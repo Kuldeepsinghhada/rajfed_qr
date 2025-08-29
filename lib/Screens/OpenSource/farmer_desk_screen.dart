@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:rajfed_qr/Screens/Admin/farmer_detail/farmer_detail_screen.dart';
 import 'package:rajfed_qr/Screens/OpenSource/contact_us_screen.dart';
 import 'package:rajfed_qr/Screens/OpenSource/crop_calculate/crop_calculater_screen.dart';
+import 'package:rajfed_qr/Screens/OpenSource/msp_rate_screen.dart';
 import 'package:rajfed_qr/Screens/login/login_screen.dart';
 
 class FarmerDeskScreen extends StatefulWidget {
@@ -73,6 +74,11 @@ class _FarmerDeskScreenState extends State<FarmerDeskScreen> {
                               context,
                               MaterialPageRoute(
                                   builder: (context) => FarmerDetailScreen()));
+                        } else if (index == 1) {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => MspRateScreen()));
                         } else if (index == 2) {
                           Navigator.push(
                               context,
