@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:rajfed_qr/Screens/Admin/farmer_detail/farmer_detail_screen.dart';
 import 'package:rajfed_qr/Screens/OpenSource/contact_us_screen.dart';
-import 'package:rajfed_qr/Screens/OpenSource/crop_calculater_screen.dart';
+import 'package:rajfed_qr/Screens/OpenSource/crop_calculate/crop_calculater_screen.dart';
 import 'package:rajfed_qr/Screens/login/login_screen.dart';
 
 class FarmerDeskScreen extends StatefulWidget {

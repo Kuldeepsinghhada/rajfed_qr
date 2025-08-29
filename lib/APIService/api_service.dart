@@ -85,6 +85,12 @@ class ApiService {
     }
   }
 
+  /// Calls the /Yield endpoint with District and CropID as query parameters (GET request)
+  Future<APIResponse> getYield({required String district, required int cropId}) async {
+    final endpoint = "Yield?District=${Uri.encodeComponent(district)}&CropID=$cropId";
+    return await apiCall(endpoint, HttpRequestType.get, null);
+  }
+
   // Helper to build headers
   Future<Map<String, String>> _buildHeaders() async {
     final headers = <String, String>{"Content-Type": "application/json"};
