@@ -45,15 +45,17 @@ class _QRScannerScreenState extends State<QRScannerScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: isPermissionGiven ? null : AppBar(
-        title: Text("Scan"),
-      ),
+      appBar: isPermissionGiven
+          ? null
+          : AppBar(
+              title: Text("Scan"),
+            ),
       body: isPermissionGiven
           ? AiBarcodeScanner(
               onDispose: () {
                 debugPrint("Barcode scanner disposed!");
               },
-              hideGalleryButton: true,
+              //galleryAccess: false,
               controller: qrController,
               onDetect: (BarcodeCapture capture) {
                 /// List of scanned barcodes if any
@@ -81,10 +83,10 @@ class _QRScannerScreenState extends State<QRScannerScreen> {
               onPressed: () {
                 openAppSettings();
               },
-        onRefresh: (){
-          checkCameraPermission();
-        },
-      ),
+              onRefresh: () {
+                checkCameraPermission();
+              },
+            ),
     );
   }
 }
@@ -94,13 +96,12 @@ class InfoColumn extends StatelessWidget {
   final String description;
   final VoidCallback onPressed;
   final VoidCallback onRefresh;
-  const InfoColumn({
-    super.key,
-    required this.title,
-    required this.description,
-    required this.onPressed,
-    required this.onRefresh
-  });
+  const InfoColumn(
+      {super.key,
+      required this.title,
+      required this.description,
+      required this.onPressed,
+      required this.onRefresh});
 
   @override
   Widget build(BuildContext context) {

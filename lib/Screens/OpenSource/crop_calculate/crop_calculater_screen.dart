@@ -178,26 +178,9 @@ class _CropCalculaterScreenState extends State<CropCalculaterScreen> {
         double? maxSell =
             (yieldMaster?.yieldRate ?? 0) * int.parse(_searchController.text);
         maxSell = (maxSell > 40 ? 40 : maxSell);
-        var hectare = int.parse(_searchController.text);
         showMaxSellDialog(context, maxSell);
-        // showDialog(
-        //   context: context,
-        //   builder: (context) => AlertDialog(
-        //     content: Text(
-        //       'आपकी अधिकतम तुलन क्षमता ${maxSell?.toInt()} QTL है',
-        //       style: TextStyle(fontSize: 18),
-        //       textAlign: TextAlign.center,
-        //     ),
-        //     actions: [
-        //       TextButton(
-        //         onPressed: () => Navigator.of(context).pop(),
-        //         child: Text('OK'),
-        //       ),
-        //     ],
-        //   ),
-        // );
       } else {
-        showErrorToast(response.error ?? "Failed to fetch yield");
+        showErrorToast(response.error);
       }
     } catch (e) {
       if (!mounted) return;
@@ -298,6 +281,14 @@ class _CropCalculaterScreenState extends State<CropCalculaterScreen> {
                             ),
                           ),
                         ],
+                      ),
+                      SizedBox(height: 24),
+                      Text(
+                        "अधिकतम खरीद = जिला उपज × हेक्टेयर\nयदि उपरोक्त सूत्र से प्राप्त मूल्य 40 से अधिक है, तो अधिकतम सीमा 40 निर्धारित की गई है। अन्य सभी मामलों में, गणना के अनुसार प्राप्त वास्तविक मान को ही मान्य माना गया है।",
+                        style: TextStyle(
+                            fontSize: 14,
+                            color: Colors.black54,
+                            fontWeight: FontWeight.w500),
                       ),
                     ],
                   ),
@@ -578,7 +569,8 @@ class _ModernDialogContent extends StatelessWidget {
                                   borderRadius: BorderRadius.circular(10)),
                             ),
                             onPressed: () => Navigator.of(context).pop(),
-                            child: const Text('OK', style: TextStyle(fontWeight: FontWeight.w600)),
+                            child: const Text('OK',
+                                style: TextStyle(fontWeight: FontWeight.w600)),
                           ),
                         ),
                       ],

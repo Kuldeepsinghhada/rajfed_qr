@@ -11,7 +11,6 @@ import 'package:rajfed_qr/Screens/Incharge/upload_warehouse_screen/upload_wareho
 import 'package:rajfed_qr/Screens/OpenSource/farmer_desk_screen.dart';
 import 'package:rajfed_qr/Screens/Operator/Home/op_home_service.dart';
 import 'package:rajfed_qr/Screens/Operator/Home/views/Information_row.dart';
-import 'package:rajfed_qr/Screens/login/login_screen.dart';
 import 'package:rajfed_qr/Screens/QRScannerScreen/qr_code_screen.dart';
 import 'package:rajfed_qr/common_views/common_button.dart';
 import 'package:rajfed_qr/common_views/loader_dialog.dart';

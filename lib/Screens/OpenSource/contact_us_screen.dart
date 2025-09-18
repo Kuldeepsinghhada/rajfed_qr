@@ -126,7 +126,7 @@ class HeadquartersSection extends StatelessWidget {
 
   final List<_HeadquartersBranch> branches = const [
     _HeadquartersBranch(
-      title: "चित्त एवं लेखा",
+      title: "वित्त एवं लेखा",
       contacts: [
         _HeadquartersContact(
           name: "डाॅ. भगवान सहाय लाडला",

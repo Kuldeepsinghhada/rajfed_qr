@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:rajfed_qr/Screens/Admin/farmer_detail/farmer_detail_screen.dart';
+import 'package:rajfed_qr/Screens/OpenSource/contact_us_screen.dart';
+import 'package:rajfed_qr/Screens/OpenSource/crop_calculate/crop_calculater_screen.dart';
+import 'package:rajfed_qr/Screens/OpenSource/msp_rate_screen.dart';
 import 'package:rajfed_qr/Screens/Operator/DataScreen/data_screen.dart';
 import 'package:rajfed_qr/Screens/Operator/DataScreen/data_services.dart';
 import 'package:rajfed_qr/common_views/loader_dialog.dart';
@@ -118,6 +121,24 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
         color: Color(0xFFF1F8E9),
         value: '',
       ),
+      GridModel(
+        title: "MSP Rate",
+        image: Icons.price_change_outlined,
+        color: Color(0xFFFFF3E0),
+        value: '',
+      ),
+      GridModel(
+        title: "Crop Calculater",
+        image: Icons.calculate,
+        color: Color(0xFFFFFDE7),
+        value: '',
+      ),
+      GridModel(
+        title: "Help",
+        image: Icons.help_outline,
+        color: Color(0xFFF3E5F5),
+        value: '',
+      ),
     ];
     setState(() {});
   }
@@ -147,7 +168,11 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
           return Card(
             color: items[index].color,
             child: InkWell(
-              onTap: index == 0 || index == 8
+              onTap: index == 0 ||
+                      index == 8 ||
+                      index == 9 ||
+                      index == 10 ||
+                      index == 11
                   ? () {
                       if (index == 0) {
                         Navigator.push(
@@ -159,19 +184,22 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
                             context,
                             MaterialPageRoute(
                                 builder: (context) => FarmerDetailScreen()));
+                      } else if (index == 9) {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => MspRateScreen()));
+                      } else if (index == 10) {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => CropCalculaterScreen()));
+                      } else if (index == 11) {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => ContactUsScreen()));
                       }
-                      // else if (index == 1) {
-                      //   Navigator.push(
-                      //       context,
-                      //       MaterialPageRoute(
-                      //           builder: (context) => BardanaScreen()));
-                      // } else if (index == 2) {
-                      //   Navigator.push(
-                      //       context,
-                      //       MaterialPageRoute(
-                      //           builder: (context) => TotalPurchaseScreen()));
-                      //   showModernBardanaBottomSheet(context);
-                      // }
                     }
                   : null,
               child: Padding(
@@ -209,7 +237,10 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
                                   fontSize: 16),
                             ),
                             (items[index].title == "Total Registration" ||
-                                    items[index].title == "Search")
+                                    items[index].title == "Search" ||
+                                    items[index].title == "MSP Rate" ||
+                                    items[index].title == "Crop Calculater" ||
+                                    items[index].title == "Help")
                                 ? Icon(
                                     Icons.arrow_forward_ios,
                                     size: 17,

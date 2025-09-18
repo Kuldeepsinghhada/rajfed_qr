@@ -1,12 +1,10 @@
 import 'package:rajfed_qr/Screens/OpenSource/farmer_desk_screen.dart';
-import 'package:rajfed_qr/common_views/no_internet_dialog.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'dart:convert';
 import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:rajfed_qr/APIService/shared_preference_helper.dart';
-import 'package:rajfed_qr/Screens/login/login_screen.dart';
 import 'package:rajfed_qr/main.dart';
 import 'package:rajfed_qr/models/APIModel/api_response.dart';
 import 'package:rajfed_qr/utils/enums.dart';
@@ -85,10 +83,14 @@ class ApiService {
     }
   }
 
-  /// Calls the /Yield endpoint with District and CropID as query parameters (GET request)
-  Future<APIResponse> getYield({required String district, required int cropId}) async {
-    final endpoint = "Yield?District=${Uri.encodeComponent(district)}&CropID=$cropId";
-    return await apiCall(endpoint, HttpRequestType.get, null);
+  /// Calls the /Yield endpoint with District and CropID as body parameters
+  Future<APIResponse> getYield(
+      {required String district, required int cropId}) async {
+    final body = {
+      "District": district,
+      "CropID": cropId,
+    };
+    return await apiCall("Yield", HttpRequestType.post, body);
   }
 
   // Helper to build headers

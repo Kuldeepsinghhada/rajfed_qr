@@ -7,10 +7,10 @@ class YieldMaster {
 
   YieldMaster(
       {this.yieldID,
-        this.yieldDistrict,
-        this.yieldCropID,
-        this.yieldRate,
-        this.yieldDistrictId});
+      this.yieldDistrict,
+      this.yieldCropID,
+      this.yieldRate,
+      this.yieldDistrictId});
 
   YieldMaster.fromJson(Map<String, dynamic> json) {
     yieldID = json['yield_ID'];
@@ -21,12 +21,12 @@ class YieldMaster {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['yield_ID'] = this.yieldID;
-    data['yield_District'] = this.yieldDistrict;
-    data['yield_CropID'] = this.yieldCropID;
-    data['yield_Rate'] = this.yieldRate;
-    data['yield_DistrictId'] = this.yieldDistrictId;
+    final Map<String, dynamic> data = Map<String, dynamic>();
+    data['yield_ID'] = yieldID;
+    data['yield_District'] = yieldDistrict;
+    data['yield_CropID'] = yieldCropID;
+    data['yield_Rate'] = yieldRate;
+    data['yield_DistrictId'] = yieldDistrictId;
     return data;
   }
 }
