@@ -10,6 +10,7 @@ class APIEndPoint {
   static String deleteQrCode = "DeleteQRCodes/deleteqrcode";
   static String operatorSaveLocation = "operatorSaveLocation";
   static String dashboardData = "Dashboard";
+  static String getUpdates = "GetUpdates";
 
   // Incharge Endpoint
   static String inchargeDetails = "InchargeDetails";

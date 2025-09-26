@@ -1,95 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-class OfficeInfo {
-  final String region;
-  final String name;
-  final String address;
-  final String phone;
-  final String mobile;
-
-  OfficeInfo({
-    required this.region,
-    required this.name,
-    required this.address,
-    required this.phone,
-    required this.mobile,
-  });
-}
-
-final List<OfficeInfo> offices = [
-  OfficeInfo(
-    region: "अजमेर",
-    name: "श्री गौरव सेन",
-    address: "बी-109, दांतानगर, जटिया हिल्स, लोहागल रोड, अजमेर",
-    phone: "0145-2433107",
-    mobile: "94625-50456",
-  ),
-  OfficeInfo(
-    region: "भरतपुर",
-    name: "श्री चन्द्र भान पाराशर",
-    address: "115, कृष्णा नगर, भरतपुर",
-    phone: "05644-222490",
-    mobile: "94605-06346",
-  ),
-  OfficeInfo(
-    region: "बीकानेर",
-    name: "श्री शिशुपाल सिंह",
-    address: "ए-97, सादुलगंज, बीकानेर",
-    phone: "0151-2545282",
-    mobile: "94145-02141",
-  ),
-  OfficeInfo(
-    region: "जयपुर",
-    name: "श्रीमती सुलक्षणा देवाना",
-    address: "4, भवानी सिंह रोड, जयपुर",
-    phone: "0141-2740753",
-    mobile: "94143-63867",
-  ),
-  OfficeInfo(
-    region: "जोधपुर",
-    name: "श्री दलपत दान",
-    address: "राजीव गांधी सहकार भवन, कमरा नं. 202, द्वितीय मंजिल, जोधपुर",
-    phone: "0291-2639544",
-    mobile: "94142-94245",
-  ),
-  OfficeInfo(
-    region: "कोटा",
-    name: "श्री विष्णु दत्त शर्मा",
-    address: "20-बी, न्यू कॉलोनी, गुमानपुरा, कोटा",
-    phone: "0744-2366242",
-    mobile: "86194-10225",
-  ),
-  OfficeInfo(
-    region: "श्रीगंगानगर",
-    name: "श्री हरी सिंह",
-    address: "101-ए, अशोक नगर, श्रीगंगानगर",
-    phone: "0154-2470783",
-    mobile: "93519-88106",
-  ),
-  OfficeInfo(
-    region: "उदयपुर",
-    name: "श्री वी.एन. सिंह",
-    address: "23, पद्मिनी मार्ग, रविन्द्र नगर, उदयपुर",
-    phone: "0294-2490302",
-    mobile: "94147-59184",
-  ),
-];
-
 class ContactUsScreen extends StatelessWidget {
   const ContactUsScreen({super.key});
-
-  Future<void> _dialNumber(String number) async {
-    final Uri url = Uri(scheme: "tel", path: number);
-    if (await canLaunchUrl(url)) {
-      await launchUrl(
-        url,
-        mode: LaunchMode.externalApplication,
-      );
-    } else {
-      throw 'Could not launch $url';
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -103,13 +16,92 @@ class ContactUsScreen extends StatelessWidget {
           child: Column(
             children: [
               Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    children: [
+                      Text(
+                        "Rajasthan State Co-operative\nMarketing Federation Ltd.\n4, Bhawani Singh Road,\nJAIPUR - 302001 (Raj.)\nPhone No:- 0141-2740231, 2740439, 2740537\nFax:- 0141-2740108,2740457\nWebsite: www.rajfed.in\nGram:- RAJFED, Jaipur",
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                            fontSize: 16, fontWeight: FontWeight.w500),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12),
+              Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    children: [
+                      Row(
+                        children: [
+                          Expanded(
+                              child: Text("टोल फ्री",
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 16))),
+                          GestureDetector(
+                            onTap: () => openDialer("18001806001"),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Icon(Icons.phone,
+                                    color: Colors.green, size: 20),
+                                const SizedBox(width: 6),
+                                Text(
+                                  "18001806001",
+                                  style: const TextStyle(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.w500),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 12),
+                      Row(
+                        children: [
+                          Expanded(
+                              child: Text("ई-मेल",
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 16))),
+                          GestureDetector(
+                            onTap: () => openEmail("rajfed.opr@yahoo.com"),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Icon(Icons.mail_outline,
+                                    color: Colors.green, size: 20),
+                                const SizedBox(width: 6),
+                                Text(
+                                  "rajfed.opr@yahoo.com",
+                                  style: const TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w500),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      )
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12),
+              Card(
                 child: HeadquartersSection(),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 12),
               Card(
                 child: RegionalOfficesSection(
                   offices: offices,
-                  onDial: _dialNumber,
+                  onDial: openDialer,
                 ),
               ),
             ],
@@ -289,21 +281,27 @@ class HeadquartersSection extends StatelessWidget {
                                         ),
                                         if (contact.phone != null &&
                                             contact.phone != "-")
-                                          Row(
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: [
-                                              const Icon(Icons.phone,
-                                                  color: Colors.green,
-                                                  size: 20),
-                                              const SizedBox(width: 6),
-                                              Text(
-                                                contact.phone!,
-                                                style: const TextStyle(
-                                                    fontSize: 15,
-                                                    fontWeight:
-                                                        FontWeight.w500),
-                                              ),
-                                            ],
+                                          GestureDetector(
+                                            onTap: () {
+                                              openDialer(
+                                                  contact.phone!.toString());
+                                            },
+                                            child: Row(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                const Icon(Icons.phone,
+                                                    color: Colors.green,
+                                                    size: 20),
+                                                const SizedBox(width: 6),
+                                                Text(
+                                                  contact.phone!,
+                                                  style: const TextStyle(
+                                                      fontSize: 15,
+                                                      fontWeight:
+                                                          FontWeight.w500),
+                                                ),
+                                              ],
+                                            ),
                                           ),
                                       ],
                                     ),
@@ -426,18 +424,23 @@ class OfficeInfoTile extends StatelessWidget {
                       ],
                     ),
                     const SizedBox(height: 12),
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Icon(Icons.phone_android,
-                            color: Colors.green, size: 20),
-                        const SizedBox(width: 6),
-                        Text(
-                          office.mobile,
-                          style: const TextStyle(
-                              fontSize: 15, fontWeight: FontWeight.w500),
-                        ),
-                      ],
+                    GestureDetector(
+                      onTap: () {
+                        openDialer(office.mobile);
+                      },
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(Icons.phone_android,
+                              color: Colors.green, size: 20),
+                          const SizedBox(width: 6),
+                          Text(
+                            office.mobile,
+                            style: const TextStyle(
+                                fontSize: 15, fontWeight: FontWeight.w500),
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 ),
@@ -450,3 +453,107 @@ class OfficeInfoTile extends StatelessWidget {
     );
   }
 }
+
+void openDialer(String phoneNumber) async {
+  final uri = Uri(scheme: 'tel', path: phoneNumber);
+  if (await canLaunchUrl(uri)) {
+    await launchUrl(uri);
+  } else {
+    throw 'Could not launch dialer';
+  }
+}
+
+void openEmail(String email) async {
+  final body = "Hello Support Team,\n\n"
+      "I am facing an issue with <briefly describe issue>.\n\n"
+      "Here are my details:\n\n"
+      "- Name:\n"
+      "- Registered Phone:\n\n"
+      "Thank you.";
+
+  final uri = Uri(
+    scheme: 'mailto',
+    path: email,
+    query: 'subject=Support&body=$body',
+  );
+  if (await canLaunchUrl(uri)) {
+    await launchUrl(uri);
+  } else {
+    throw 'Could not launch email client';
+  }
+}
+
+class OfficeInfo {
+  final String region;
+  final String name;
+  final String address;
+  final String phone;
+  final String mobile;
+
+  OfficeInfo({
+    required this.region,
+    required this.name,
+    required this.address,
+    required this.phone,
+    required this.mobile,
+  });
+}
+
+final List<OfficeInfo> offices = [
+  OfficeInfo(
+    region: "अजमेर",
+    name: "श्री गौरव सेन",
+    address: "बी-109, दांतानगर, जटिया हिल्स, लोहागल रोड, अजमेर",
+    phone: "0145-2433107",
+    mobile: "94625-50456",
+  ),
+  OfficeInfo(
+    region: "भरतपुर",
+    name: "श्री चन्द्र भान पाराशर",
+    address: "115, कृष्णा नगर, भरतपुर",
+    phone: "05644-222490",
+    mobile: "94605-06346",
+  ),
+  OfficeInfo(
+    region: "बीकानेर",
+    name: "श्री शिशुपाल सिंह",
+    address: "ए-97, सादुलगंज, बीकानेर",
+    phone: "0151-2545282",
+    mobile: "94145-02141",
+  ),
+  OfficeInfo(
+    region: "जयपुर",
+    name: "श्रीमती सुलक्षणा देवाना",
+    address: "4, भवानी सिंह रोड, जयपुर",
+    phone: "0141-2740753",
+    mobile: "94143-63867",
+  ),
+  OfficeInfo(
+    region: "जोधपुर",
+    name: "श्री दलपत दान",
+    address: "राजीव गांधी सहकार भवन, कमरा नं. 202, द्वितीय मंजिल, जोधपुर",
+    phone: "0291-2639544",
+    mobile: "94142-94245",
+  ),
+  OfficeInfo(
+    region: "कोटा",
+    name: "श्री विष्णु दत्त शर्मा",
+    address: "20-बी, न्यू कॉलोनी, गुमानपुरा, कोटा",
+    phone: "0744-2366242",
+    mobile: "86194-10225",
+  ),
+  OfficeInfo(
+    region: "श्रीगंगानगर",
+    name: "श्री हरी सिंह",
+    address: "101-ए, अशोक नगर, श्रीगंगानगर",
+    phone: "0154-2470783",
+    mobile: "93519-88106",
+  ),
+  OfficeInfo(
+    region: "उदयपुर",
+    name: "श्री वी.एन. सिंह",
+    address: "23, पद्मिनी मार्ग, रविन्द्र नगर, उदयपुर",
+    phone: "0294-2490302",
+    mobile: "94147-59184",
+  ),
+];

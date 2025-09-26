@@ -21,17 +21,17 @@
         <option name="modules">
           <set>
             <option value="$USER_HOME$/.pub-cache/hosted/pub.dev/connectivity_plus-6.1.5/android" />
-            <option value="$USER_HOME$/.pub-cache/hosted/pub.dev/device_info_plus-11.3.0/android" />
-            <option value="$USER_HOME$/.pub-cache/hosted/pub.dev/flutter_plugin_android_lifecycle-2.0.27/android" />
+            <option value="$USER_HOME$/.pub-cache/hosted/pub.dev/device_info_plus-11.5.0/android" />
+            <option value="$USER_HOME$/.pub-cache/hosted/pub.dev/flutter_plugin_android_lifecycle-2.0.30/android" />
             <option value="$USER_HOME$/.pub-cache/hosted/pub.dev/fluttertoast-8.2.12/android" />
             <option value="$USER_HOME$/.pub-cache/hosted/pub.dev/geolocator_android-4.6.2/android" />
-            <option value="$USER_HOME$/.pub-cache/hosted/pub.dev/image_picker_android-0.8.12+22/android" />
-            <option value="$USER_HOME$/.pub-cache/hosted/pub.dev/mobile_scanner-6.0.7/android" />
-            <option value="$USER_HOME$/.pub-cache/hosted/pub.dev/package_info_plus-8.3.0/android" />
-            <option value="$USER_HOME$/.pub-cache/hosted/pub.dev/path_provider_android-2.2.17/android" />
+            <option value="$USER_HOME$/.pub-cache/hosted/pub.dev/image_picker_android-0.8.13+1/android" />
+            <option value="$USER_HOME$/.pub-cache/hosted/pub.dev/mobile_scanner-6.0.10/android" />
+            <option value="$USER_HOME$/.pub-cache/hosted/pub.dev/package_info_plus-8.3.1/android" />
+            <option value="$USER_HOME$/.pub-cache/hosted/pub.dev/path_provider_android-2.2.18/android" />
             <option value="$USER_HOME$/.pub-cache/hosted/pub.dev/permission_handler_android-13.0.1/android" />
-            <option value="$USER_HOME$/.pub-cache/hosted/pub.dev/shared_preferences_android-2.4.8/android" />
-            <option value="$USER_HOME$/.pub-cache/hosted/pub.dev/url_launcher_android-6.3.16/android" />
+            <option value="$USER_HOME$/.pub-cache/hosted/pub.dev/shared_preferences_android-2.4.12/android" />
+            <option value="$USER_HOME$/.pub-cache/hosted/pub.dev/url_launcher_android-6.3.20/android" />
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/app" />
             <option value="$USER_HOME$/fvm/versions/3.29.0/packages/flutter_tools/gradle" />
