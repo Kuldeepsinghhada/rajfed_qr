@@ -6,6 +6,7 @@ import 'package:rajfed_qr/Screens/OpenSource/farmer_desk_screen/farmer_desk_scre
 import 'package:rajfed_qr/Screens/Operator/OperatorDashboard/operator_dashboard.dart';
 import 'package:rajfed_qr/Screens/Warehouse/warehouse_home.dart';
 import 'package:upgrader/upgrader.dart';
+import 'Screens/Admin/admin_home_screen.dart';
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
@@ -22,6 +23,8 @@ void main() async {
     initialRoute = InchargeDashboard();
   } else if (userType == 13) {
     initialRoute = WarehouseHome();
+  }else if (userType == 7) {
+    initialRoute = AdminHomeScreen();
   }
   runApp(MyApp(initialRoute: initialRoute));
 }
@@ -32,7 +35,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Rajfed Qr',
+      title: 'Rajfed Kishan',
       navigatorKey: navigatorKey,
       theme: ThemeData(
         primaryColor: Color(0xFFB7D77A), // Main color

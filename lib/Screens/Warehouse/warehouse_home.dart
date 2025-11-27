@@ -578,6 +578,9 @@ class LotView extends StatelessWidget {
             child: Column(
               children: [
                 InformationRow(
+                    title: "Dispatch ID",
+                    subtitle: (model?.dispatch_id ?? 'NA').toString()),
+                InformationRow(
                     title: "Lot No.",
                     subtitle:
                         (details?.lotId ?? model?.lotNo ?? 'NA').toString()),

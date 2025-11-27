@@ -15,7 +15,7 @@ class DataService {
     try {
       var purchaseCenterID =
           await SharedPreferenceHelper.instance.getPurchaseCenterId();
-      var query = "?PurchaseCenter_ID=$purchaseCenterID";
+      var query = "?PurchaseCenterID=$purchaseCenterID";
       if (cropId != null) {
         query = "$query&CropId=$cropId";
       }

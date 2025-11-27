@@ -107,6 +107,9 @@ class _DiapatchInchargeScreenState extends State<DiapatchInchargeScreen> {
                     child: Column(
                       children: [
                         InformationRow(
+                            title: "Dispatch ID",
+                            subtitle: "${details.dispatch_id ?? 'NA'}"),
+                        InformationRow(
                             title: "Lot no.",
                             subtitle: "${details.lotNo ?? 'NA'}"),
                         InformationRow(

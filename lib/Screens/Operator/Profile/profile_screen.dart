@@ -4,12 +4,15 @@ import 'package:image_picker/image_picker.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:rajfed_qr/APIService/api_endpoint.dart';
 import 'package:rajfed_qr/APIService/api_service.dart';
+import 'package:rajfed_qr/APIService/data_manager.dart';
 import 'package:rajfed_qr/APIService/shared_preference_helper.dart';
 import 'package:rajfed_qr/Screens/ChangePassword/change_password.dart';
 import 'package:rajfed_qr/Screens/OpenSource/farmer_desk_screen/farmer_desk_screen.dart';
 import 'package:rajfed_qr/Screens/Operator/Home/op_home_service.dart';
+import 'package:rajfed_qr/Screens/Operator/Profile/profile_service.dart';
 import 'package:rajfed_qr/common_views/loader_dialog.dart';
 import 'package:rajfed_qr/models/APIModel/api_response.dart';
+import 'package:rajfed_qr/models/profile_model.dart';
 import 'package:rajfed_qr/utils/enums.dart';
 import 'package:rajfed_qr/utils/location_service.dart';
 import 'package:rajfed_qr/utils/toast_formatter.dart';
@@ -25,14 +28,46 @@ class _ProfileScreenState extends State<ProfileScreen> {
   String? userType;
   String? userName;
   int? purchaseCenterId;
+  ProfileModel? profileModel;
   @override
   void initState() {
+    getProfileDetail();
     getUserType();
     getPackageDetail();
     super.initState();
   }
 
   String buildNumber = "";
+
+  void getProfileDetail() async {
+    if (DataManager.instance.profileDetail != null) {
+      setState(() {
+        profileModel = DataManager.instance.profileDetail;
+      });
+      return;
+    }
+    Future.delayed(const Duration(milliseconds: 200), () async {
+      if (!mounted) return;
+      showLoadingDialog(context);
+      try {
+        var data = await ProfileService.instance.getProfileDetails();
+        if (!mounted) return;
+        Navigator.pop(context);
+        if (data?.status == true) {
+          setState(() {
+            DataManager.instance.profileDetail = data?.data;
+            profileModel = data?.data;
+          });
+        } else {
+          showErrorToast(data?.error ?? 'Something Went Wrong');
+        }
+      } catch (e) {
+        if (!mounted) return;
+        Navigator.pop(context);
+        showErrorToast(e is APIResponse ? e.error : e.toString());
+      }
+    });
+  }
 
   getPackageDetail() async {
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
@@ -182,12 +217,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   style: TextStyle(
                       color: Colors.teal, fontWeight: FontWeight.w600),
                 ),
-                Text(
-                  "Purchase Center ID : ${purchaseCenterId ?? ''}",
-                  style: TextStyle(
-                      color: Colors.teal, fontWeight: FontWeight.w600),
-                )
               ],
+            ),
+            Divider(),
+            SizedBox(
+              height: 12,
+            ),
+            Text(
+              "Purchase Center ID : ${purchaseCenterId ?? ''}",
+              style: TextStyle(color: Colors.teal, fontWeight: FontWeight.w600),
+            ),
+            SizedBox(
+              height: 4,
+            ),
+            Text(
+              "Purchase Center Kendra : ${profileModel?.purchaseCenterKendra ?? ''}",
+              style: TextStyle(color: Colors.teal, fontWeight: FontWeight.w600),
             ),
             SizedBox(
               height: 20,

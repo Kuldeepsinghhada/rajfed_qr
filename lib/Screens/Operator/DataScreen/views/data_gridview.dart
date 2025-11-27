@@ -2,71 +2,54 @@ import 'package:flutter/material.dart';
 import 'package:rajfed_qr/models/dashboard_data_model.dart';
 import 'package:rajfed_qr/utils/utilities.dart';
 
-class DataGridView extends StatefulWidget {
+
+class DataGridView extends StatelessWidget {
   const DataGridView({required this.dataModel, super.key});
   final DashboardDataModel? dataModel;
-  @override
-  State<DataGridView> createState() => _DataGridViewState();
-}
 
-class _DataGridViewState extends State<DataGridView> {
-  List<Map<String, dynamic>> items = [];
   @override
-  void initState() {
-    super.initState();
-    updateList();
-  }
-
-  updateList() {
-    items = [
+  Widget build(BuildContext context) {
+    List<Map<String, dynamic>> items = [
       {
         "title": "Total Registration",
         "image": Icons.app_registration,
         'color': Color(0xFFAB47BC),
-        'amount': widget.dataModel?.totalRegisteredFarmers
+        'amount': dataModel?.totalRegisteredFarmers
       },
       {
         "title": "Total Purchase",
         "image": Icons.shopping_cart_outlined,
         'color': Color(0xFF1CC88A),
-        'amount': widget.dataModel?.purchaseTransactionsFarmers
+        'amount': dataModel?.purchaseTransactionsFarmers
         //widget.dataModel?.purchaseTransactions ??
       },
       {
         "title": "Total Payment",
         "image": Icons.payment,
         'color': Color(0xFFFFC107),
-        'amount': widget.dataModel?.paymentDoneFarmers
+        'amount': dataModel?.paymentDoneFarmers
       },
       {
         "title": "QR Attached",
         "image": Icons.qr_code_2,
         'color': Color(0xFFFFC107),
-        'amount': widget.dataModel?.qRGeneratedFarmers
+        'amount': dataModel?.qRGeneratedFarmers
       },
       {
         "title": "Dispatched",
         "image": Icons.local_shipping_outlined,
         'color': Color(0xFF36B9CC),
-        'amount': widget.dataModel?.dispatchedFarmers
+        'amount': dataModel?.dispatchedFarmers
       },
       {
         "title": "Used Bardana",
         "image": Icons.shopping_bag_outlined,
         'color': Color(0xFFF65A5B),
-        'amount': (widget.dataModel?.totalRegisteredFarmers ?? 0) -
-            (widget.dataModel?.purchaseBardana ?? 0)
+        'amount': (dataModel?.purchaseBardana ?? 0)
       },
     ];
-    setState(() {});
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    // Determine screen width to set column count
     final width = MediaQuery.of(context).size.width;
     final crossAxisCount = width < 600 ? 2 : 4;
-
     return GridView.builder(
       padding: EdgeInsets.all(12),
       itemCount: items.length,
@@ -114,17 +97,17 @@ class _DataGridViewState extends State<DataGridView> {
                 children: [
                   Expanded(
                       child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Icon(items[index]["image"]!,
-                          size: 30, color: Colors.black),
-                      // Icon(
-                      //   Icons.arrow_forward_ios,
-                      //   color: Colors.black,
-                      //   size: 16,
-                      // )
-                    ],
-                  )),
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Icon(items[index]["image"]!,
+                              size: 30, color: Colors.black),
+                          // Icon(
+                          //   Icons.arrow_forward_ios,
+                          //   color: Colors.black,
+                          //   size: 16,
+                          // )
+                        ],
+                      )),
                   Text(
                     items[index]["title"]!,
                     textAlign: TextAlign.start,

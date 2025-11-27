@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:rajfed_qr/APIService/shared_preference_helper.dart';
+import 'package:rajfed_qr/Screens/Admin/admin_home_screen.dart';
 import 'package:rajfed_qr/Screens/Incharge/incharge_dashboard/incharge_dashboard_screen.dart';
 import 'package:rajfed_qr/Screens/Operator/OperatorDashboard/operator_dashboard.dart';
 import 'package:rajfed_qr/Screens/Warehouse/warehouse_home.dart';
@@ -72,6 +73,11 @@ class _LoginScreenState extends State<LoginScreen> {
                 context,
                 MaterialPageRoute(builder: (_) => WarehouseHome()),
                 (route) => false);
+          } else if (userType == 7) {
+            Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(builder: (_) => AdminHomeScreen()),
+                (route) => false);
           }
         } else {
           if (!mounted) return;
@@ -86,10 +92,12 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
-  String convertSHA256(String password) {
-    var bytes = utf8.encode(password); // Convert password to bytes
-    var digest = sha256.convert(bytes); // Hash using SHA-256
-    return digest.toString(); // Return hashed password
+  String convertSHA256(String input) {
+    final bytes = utf8.encode(input);
+    final digest = sha256.convert(bytes);
+    final pass =
+        digest.bytes.map((b) => b.toRadixString(16).padLeft(2, '0')).join();
+    return pass;
   }
 
   @override

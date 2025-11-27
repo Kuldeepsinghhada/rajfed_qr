@@ -11,6 +11,7 @@ class APIEndPoint {
   static String operatorSaveLocation = "operatorSaveLocation";
   static String dashboardData = "Dashboard";
   static String getUpdates = "GetUpdates";
+  static String getProfile = "ProfileDetails";
 
   // Incharge Endpoint
   static String inchargeDetails = "InchargeDetails";

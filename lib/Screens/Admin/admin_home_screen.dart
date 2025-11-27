@@ -1,12 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:rajfed_qr/APIService/api_endpoint.dart';
+import 'package:rajfed_qr/APIService/api_service.dart';
+import 'package:rajfed_qr/APIService/shared_preference_helper.dart';
 import 'package:rajfed_qr/Screens/Admin/farmer_detail/farmer_detail_screen.dart';
 import 'package:rajfed_qr/Screens/OpenSource/contact_us_screen.dart';
 import 'package:rajfed_qr/Screens/OpenSource/crop_calculate/crop_calculater_screen.dart';
+import 'package:rajfed_qr/Screens/OpenSource/farmer_desk_screen/farmer_desk_screen.dart';
 import 'package:rajfed_qr/Screens/OpenSource/msp_rate_screen.dart';
 import 'package:rajfed_qr/Screens/Operator/DataScreen/data_screen.dart';
 import 'package:rajfed_qr/Screens/Operator/DataScreen/data_services.dart';
 import 'package:rajfed_qr/common_views/loader_dialog.dart';
 import 'package:rajfed_qr/models/dashboard_data_model.dart';
+import 'package:rajfed_qr/utils/enums.dart';
 import 'package:rajfed_qr/utils/toast_formatter.dart';
 
 class AdminHomeScreen extends StatefulWidget {
@@ -143,6 +148,67 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
     setState(() {});
   }
 
+  void showLogoutDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+          title: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.logout, color: Colors.red, size: 60), // Warning icon
+              SizedBox(width: 10)
+            ],
+          ),
+          content: Text("Are you sure you want to logout?"),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(), // Close dialog
+              child: Text("Cancel", style: TextStyle(color: Colors.grey)),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                Navigator.of(context).pop();
+                logoutAPICall();
+              },
+              style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+              child: Text(
+                "Logout",
+                style: TextStyle(color: Colors.white),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void logoutAPICall() async {
+    if (!mounted) return;
+    showLoadingDialog(context);
+    try {
+      var data = await ApiService.instance
+          .apiCall(APIEndPoint.logout, HttpRequestType.get, null);
+      if (!mounted) return;
+      Navigator.pop(context);
+      if (data.status == true) {
+        SharedPreferenceHelper.instance.clearData();
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => FarmerDeskScreen()),
+        );
+      } else {
+        showErrorToast(data.error);
+      }
+    } catch (e) {
+      if (!mounted) return;
+      Navigator.pop(context);
+      showErrorToast("Something went wrong");
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
@@ -152,110 +218,122 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
         title: Text(
           "Dashboard",
         ),
+        actions: [
+          IconButton(
+              onPressed: () {
+                showLogoutDialog(context);
+              },
+              icon: Icon(Icons.logout))
+        ],
       ),
-      body: GridView.builder(
-        padding: EdgeInsets.all(12),
-        itemCount: items.length,
-        // shrinkWrap: true,
-        // physics: NeverScrollableScrollPhysics(),
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: crossAxisCount,
-            crossAxisSpacing: 8.0,
-            mainAxisSpacing: 8.0,
-            childAspectRatio: 1.5),
-        //scrollDirection: Axis.horizontal,
-        itemBuilder: (context, index) {
-          return Card(
-            color: items[index].color,
-            child: InkWell(
-              onTap: index == 0 ||
-                      index == 8 ||
-                      index == 9 ||
-                      index == 10 ||
-                      index == 11
-                  ? () {
-                      if (index == 0) {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => DataScreen()));
-                      } else if (index == 8) {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => FarmerDetailScreen()));
-                      } else if (index == 9) {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => MspRateScreen()));
-                      } else if (index == 10) {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => CropCalculaterScreen()));
-                      } else if (index == 11) {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => ContactUsScreen()));
+      body: RefreshIndicator(
+        onRefresh: () async {
+          getDashboardAPICall();
+        },
+        child: GridView.builder(
+          padding: EdgeInsets.all(12),
+          itemCount: items.length,
+          // shrinkWrap: true,
+          // physics: NeverScrollableScrollPhysics(),
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: crossAxisCount,
+              crossAxisSpacing: 8.0,
+              mainAxisSpacing: 8.0,
+              childAspectRatio: 1.5),
+          //scrollDirection: Axis.horizontal,
+          itemBuilder: (context, index) {
+            return Card(
+              color: items[index].color,
+              child: InkWell(
+                onTap: index == 0 ||
+                        index == 8 ||
+                        index == 9 ||
+                        index == 10 ||
+                        index == 11
+                    ? () {
+                        if (index == 0) {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => DataScreen()));
+                        } else if (index == 8) {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => FarmerDetailScreen()));
+                        } else if (index == 9) {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => MspRateScreen()));
+                        } else if (index == 10) {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => CropCalculaterScreen()));
+                        } else if (index == 11) {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => ContactUsScreen()));
+                        }
                       }
-                    }
-                  : null,
-              child: Padding(
-                padding: EdgeInsets.symmetric(vertical: 10, horizontal: 12),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  spacing: 4,
-                  children: [
-                    Expanded(
-                        child: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Icon(items[index].image, size: 30, color: Colors.black),
-                        Text(
-                          items[index].title,
-                          textAlign: TextAlign.start,
-                          maxLines: 2,
-                          style: TextStyle(
-                              fontWeight: FontWeight.w600,
-                              color: Colors.black,
-                              fontSize: 15),
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              items[index].value,
-                              textAlign: TextAlign.start,
-                              maxLines: 1,
-                              style: TextStyle(
-                                  fontWeight: FontWeight.w700,
-                                  color: Colors.green,
-                                  fontSize: 16),
-                            ),
-                            (items[index].title == "Total Registration" ||
-                                    items[index].title == "Search" ||
-                                    items[index].title == "MSP Rate" ||
-                                    items[index].title == "Crop Calculater" ||
-                                    items[index].title == "Help")
-                                ? Icon(
-                                    Icons.arrow_forward_ios,
-                                    size: 17,
-                                  )
-                                : SizedBox()
-                          ],
-                        ),
-                      ],
-                    )),
-                  ],
+                    : null,
+                child: Padding(
+                  padding: EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    spacing: 4,
+                    children: [
+                      Expanded(
+                          child: Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Icon(items[index].image, size: 30, color: Colors.black),
+                          Text(
+                            items[index].title,
+                            textAlign: TextAlign.start,
+                            maxLines: 2,
+                            style: TextStyle(
+                                fontWeight: FontWeight.w600,
+                                color: Colors.black,
+                                fontSize: 15),
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                items[index].value,
+                                textAlign: TextAlign.start,
+                                maxLines: 1,
+                                style: TextStyle(
+                                    fontWeight: FontWeight.w700,
+                                    color: Colors.green,
+                                    fontSize: 16),
+                              ),
+                              (items[index].title == "Total Registration" ||
+                                      items[index].title == "Search" ||
+                                      items[index].title == "MSP Rate" ||
+                                      items[index].title == "Crop Calculater" ||
+                                      items[index].title == "Help")
+                                  ? Icon(
+                                      Icons.arrow_forward_ios,
+                                      size: 17,
+                                    )
+                                  : SizedBox()
+                            ],
+                          ),
+                        ],
+                      )),
+                    ],
+                  ),
                 ),
               ),
-            ),
-          );
-        },
+            );
+          },
+        ),
       ),
     );
   }

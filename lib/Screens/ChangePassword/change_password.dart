@@ -64,10 +64,12 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
     }
   }
 
-  String convertSHA256(String password) {
-    var bytes = utf8.encode(password); // Convert password to bytes
-    var digest = sha256.convert(bytes); // Hash using SHA-256
-    return digest.toString(); // Return hashed password
+  String convertSHA256(String input) {
+    final bytes = utf8.encode(input);
+    final digest = sha256.convert(bytes);
+    final pass =
+    digest.bytes.map((b) => b.toRadixString(16).padLeft(2, '0')).join();
+    return pass;
   }
 
   @override

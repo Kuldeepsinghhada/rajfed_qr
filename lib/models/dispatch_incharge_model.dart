@@ -15,6 +15,7 @@ class DispatchInchargeModel {
   String? message;
   String? qrCode;
   String? crop_descEN;
+  int? dispatch_id;
 
   DispatchInchargeModel(
       {lotNo,
@@ -31,8 +32,8 @@ class DispatchInchargeModel {
       qrCode,
       crop_descEN,
       dispatchDateTime,
-      receivedDateTime
-      });
+      receivedDateTime,
+      dispatch_id});
 
   DispatchInchargeModel.fromJson(Map<String, dynamic> json) {
     lotNo = json['lotNo'];
@@ -51,6 +52,7 @@ class DispatchInchargeModel {
     crop_descEN = json['crop_descEN'];
     dispatchDateTime = json['dispatchDateTime'];
     receivedDateTime = json['receivedDateTime'];
+    dispatch_id = json['dispatch_id'];
   }
 
   Map<String, dynamic> toJson() {
@@ -66,6 +68,7 @@ class DispatchInchargeModel {
     data['transction_Date'] = transctionDate;
     data['flagName'] = flagName;
     data['warehouseName'] = warehouseName;
+    data['dispatch_id'] = dispatch_id;
     return data;
   }
 }
