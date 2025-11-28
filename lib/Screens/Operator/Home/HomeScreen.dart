@@ -130,12 +130,12 @@ class _MyHomePageState extends State<MyHomePage> {
   void saveQrAPICall() async {
     if (!mounted) return;
     showLoadingDialog(context);
-    Position? position = await LocationService.instance.getLocation(context);
-    if (position == null) {
-      if (!mounted) return;
-      Navigator.pop(context);
-      return;
-    }
+    // Position? position = await LocationService.instance.getLocation(context);
+    // if (position == null) {
+    //   if (!mounted) return;
+    //   Navigator.pop(context);
+    //   return;
+    // }
     try {
       var index = cropStringList.indexOf(selectedCropValue ?? '');
       if (index < 0) {

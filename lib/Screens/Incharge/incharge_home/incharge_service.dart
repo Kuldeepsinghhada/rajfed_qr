@@ -8,6 +8,7 @@ import 'package:rajfed_qr/models/dispatch_incharge_model.dart';
 import 'package:rajfed_qr/models/district_model.dart';
 import 'package:rajfed_qr/models/incharge_details.dart';
 import 'package:rajfed_qr/models/saved_qr_model.dart';
+import 'package:rajfed_qr/models/vehicle_model.dart';
 import 'package:rajfed_qr/models/warehouse_model.dart';
 import 'package:rajfed_qr/utils/enums.dart';
 import 'package:rajfed_qr/utils/toast_formatter.dart';
@@ -191,6 +192,29 @@ class InchargeService {
                 .map((item) => DispatchInchargeModel.fromJson(item))
                 .toList();
         return APIResponse(true, dispatchList, "");
+      }
+      return APIResponse(false, null, response.error);
+    } catch (e) {
+      showErrorToast("Something went wrong");
+      return null;
+    }
+  }
+
+  Future<APIResponse?> getVehicleDetail() async {
+    try {
+      var purchaseCenterID =
+          await SharedPreferenceHelper.instance.getPurchaseCenterId();
+
+      var query = "?PurchaseCenterID=$purchaseCenterID";
+
+      var response = await ApiService.instance.apiCall(
+          APIEndPoint.vehicleDetails + query, HttpRequestType.get, null);
+      if (response.status) {
+        List<VehicleModel> vehicleList =
+            (response.data['response']['data'] as List)
+                .map((item) => VehicleModel.fromJson(item))
+                .toList();
+        return APIResponse(true, vehicleList, "");
       }
       return APIResponse(false, null, response.error);
     } catch (e) {

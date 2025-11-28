@@ -11,34 +11,46 @@ import 'Screens/Admin/admin_home_screen.dart';
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 void main() async {
-  Widget initialRoute = FarmerDeskScreen();
   WidgetsFlutterBinding.ensureInitialized();
+
+  Widget initialRoute = FarmerDeskScreen();
+
   var token = await SharedPreferenceHelper.instance.getToken();
   var userType = await SharedPreferenceHelper.instance.getUserType();
-  log("Token: $token");
-  log("UserType: $userType");
+
   if (userType == 10) {
     initialRoute = OperatorDashboard();
   } else if (userType == 2) {
     initialRoute = InchargeDashboard();
   } else if (userType == 13) {
     initialRoute = WarehouseHome();
-  }else if (userType == 7) {
+  } else if (userType == 7) {
     initialRoute = AdminHomeScreen();
   }
-  runApp(MyApp(initialRoute: initialRoute));
+
+  runApp(
+    UpgradeAlert(
+      upgrader: Upgrader(
+        debugDisplayAlways: true,
+        durationUntilAlertAgain: Duration.zero,
+      ),
+      child: MyApp(initialRoute: initialRoute),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({this.initialRoute, super.key});
   final Widget? initialRoute;
+
+  const MyApp({super.key, this.initialRoute});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Rajfed Kishan',
       navigatorKey: navigatorKey,
       theme: ThemeData(
-        primaryColor: Color(0xFFB7D77A), // Main color
+        primaryColor: Color(0xFFB7D77A),
         colorScheme: ColorScheme.fromSeed(
           seedColor: Color(0xFFB7D77A),
           primary: Color(0xFFB7D77A),
@@ -53,14 +65,9 @@ class MyApp extends StatelessWidget {
           iconTheme: IconThemeData(color: Colors.black),
           elevation: 10,
         ),
-        buttonTheme: ButtonThemeData(
-          buttonColor: Colors.green[400],
-          textTheme: ButtonTextTheme.primary,
-        ),
         useMaterial3: true,
       ),
-      home: UpgradeAlert(
-          child: initialRoute),
+      home: initialRoute,
     );
   }
 }

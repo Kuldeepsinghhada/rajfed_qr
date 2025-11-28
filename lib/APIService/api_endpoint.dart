@@ -20,6 +20,7 @@ class APIEndPoint {
   static String dispatchToWareHouse = "DispatchedToWareHouse";
   static String rejectedInchargeDashboard = "Rejected_Incharge";
   static String sentInchargeDashboard = "Sent_Incharge_Dashboard";
+  static String vehicleDetails = "vehicle_details";
 
   // WareHouse Detail
   static String wareHouseDetails = "WarehouseDetailsQrCodeWise";

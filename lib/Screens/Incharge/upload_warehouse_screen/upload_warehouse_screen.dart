@@ -10,6 +10,7 @@ import 'package:rajfed_qr/common_views/common_button.dart';
 import 'package:rajfed_qr/common_views/loader_dialog.dart';
 import 'package:rajfed_qr/models/district_model.dart';
 import 'package:rajfed_qr/models/saved_qr_model.dart';
+import 'package:rajfed_qr/models/vehicle_model.dart';
 import 'package:rajfed_qr/models/warehouse_model.dart';
 import 'package:rajfed_qr/utils/toast_formatter.dart';
 import 'package:dio/dio.dart';
@@ -30,13 +31,17 @@ class _UploadWarehouseScreenState extends State<UploadWarehouseScreen> {
   List<WareHouseModel> wareHouseList = [];
   List<String> warehouseStringList = [];
 
+  String? selectedVehicle;
+  List<VehicleModel> vehicleList = [];
+  List<String> vehicleStringList = [];
+
   final List<SavedQrModel> qrCodeList = [];
-  var truckController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
 
   @override
   void initState() {
     getDistrictAPICall();
+    getVehicleAPICall();
     super.initState();
   }
 
@@ -86,6 +91,32 @@ class _UploadWarehouseScreenState extends State<UploadWarehouseScreen> {
         for (var item in wareHouseList) {
           if (item.wareHouseName != null) {
             warehouseStringList.add(item.wareHouseName!);
+          }
+        }
+        setState(() {});
+      } else {
+        showErrorToast(response?.error ?? 'Something Went wrong');
+      }
+    } catch (e) {
+      if (!mounted) return;
+      Navigator.pop(context);
+      showErrorToast("Something went wrong");
+    }
+  }
+
+  void getVehicleAPICall() async {
+    await Future.delayed(Duration(microseconds: 200));
+    if (!mounted) return;
+    showLoadingDialog(context);
+    try {
+      var response = await InchargeService.instance.getVehicleDetail();
+      if (!mounted) return;
+      Navigator.pop(context);
+      if (response?.status == true) {
+        vehicleList = response?.data ?? [];
+        for (var item in vehicleList) {
+          if (item.truckNo != null) {
+            vehicleStringList.add(item.truckNo!);
           }
         }
         setState(() {});
@@ -156,7 +187,7 @@ class _UploadWarehouseScreenState extends State<UploadWarehouseScreen> {
             children: [
               districtDropdown(),
               wareHouseDropdown(),
-              truckNumberField(),
+              vehicleDropdown(),
               CommonButton(
                   text: "Send To Warehouse",
                   onPressed: () {
@@ -167,7 +198,7 @@ class _UploadWarehouseScreenState extends State<UploadWarehouseScreen> {
                           warehouseStringList.indexOf(selectedWarehouse ?? '');
                       for (var item in widget.qrCodeList) {
                         item.wareHouseId = wareHouseList[index].wareHouseId;
-                        item.vehicleNo = truckController.text;
+                        item.vehicleNo = selectedVehicle;
                         qrCodeList.add(item);
                       }
                       dispatchedToWarehouse();
@@ -223,6 +254,47 @@ class _UploadWarehouseScreenState extends State<UploadWarehouseScreen> {
     );
   }
 
+  Widget vehicleDropdown() {
+    return DropdownButtonFormField<String>(
+      value: selectedVehicle,
+      hint: Text("Select Vehicle"),
+      items: vehicleStringList
+          .map((String value) => DropdownMenuItem(
+                value: value,
+                child: Text(value),
+              ))
+          .toList(),
+      onChanged: (newValue) {
+        setState(() {
+          selectedVehicle = newValue;
+        });
+      },
+      validator: (value) {
+        if (value == null) {
+          return 'Please select vehicle';
+        }
+        return null;
+      },
+      decoration: InputDecoration(
+        labelText: "Vehicle",
+        labelStyle: TextStyle(color: Colors.green.shade400),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8), // Rounded border
+          borderSide: BorderSide(color: Colors.green.shade400, width: 2),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: BorderSide(color: Colors.grey, width: 1.5),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: BorderSide(color: Colors.green.shade400, width: 2),
+        ),
+        contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      ),
+    );
+  }
+
   Widget wareHouseDropdown() {
     return DropdownButtonFormField<String>(
       value: selectedWarehouse,
@@ -249,38 +321,6 @@ class _UploadWarehouseScreenState extends State<UploadWarehouseScreen> {
         labelStyle: TextStyle(color: Colors.green.shade400),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8), // Rounded border
-          borderSide: BorderSide(color: Colors.green.shade400, width: 2),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide(color: Colors.grey, width: 1.5),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide(color: Colors.green.shade400, width: 2),
-        ),
-        contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      ),
-    );
-  }
-
-  Widget truckNumberField() {
-    return TextFormField(
-      controller: truckController,
-      validator: (value) {
-        if (value != null && value.trim().isEmpty) {
-          return 'Please enter vehicle number';
-        } else if ((value ?? '').trim().length < 10) {
-          return 'Please enter correct number';
-        }
-        return null;
-      },
-      inputFormatters: [UpperCaseTextFormatter()],
-      decoration: InputDecoration(
-        labelText: "Vehicle Number",
-        labelStyle: TextStyle(color: Colors.green.shade400),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8), // Rounded corners
           borderSide: BorderSide(color: Colors.green.shade400, width: 2),
         ),
         enabledBorder: OutlineInputBorder(

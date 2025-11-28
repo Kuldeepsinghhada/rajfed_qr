@@ -315,11 +315,11 @@ class _WarehouseHomeState extends State<WarehouseHome> {
           child: TextFormField(
             focusNode: _focusNode,
             controller: _searchController,
-            maxLength: 10,
+            //maxLength: 10,
             inputFormatters: [UpperCaseTextFormatter()],
             style: TextStyle(fontWeight: FontWeight.w600),
             decoration: InputDecoration(
-              hintText: "Vehicle number",
+              hintText: "Vehicle / Dispatch ID",
               hintStyle: TextStyle(fontWeight: FontWeight.w500),
               filled: true,
               fillColor: Colors.grey[100],
@@ -332,8 +332,6 @@ class _WarehouseHomeState extends State<WarehouseHome> {
             ),
             validator: (value) {
               if (value != null && value.trim().isEmpty) {
-                return "Please enter correct number";
-              } else if ((value ?? '').trim().length != 10) {
                 return "Please enter correct number";
               }
               return null;
