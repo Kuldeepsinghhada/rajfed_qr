@@ -41,6 +41,8 @@ class _InchargeHomeState extends State<InchargeHome> {
   OperatorDetails? operatorDetails;
 
   List<SavedQrModel> scannedNumberList = [];
+  List<SavedQrModel> selectedNumberList = [];
+
   List<SavedQrModel> savedQrIds = [];
 
   @override
@@ -303,6 +305,7 @@ class _InchargeHomeState extends State<InchargeHome> {
           object.cropId = inchargeDetails?.cropID;
           object.purchaseCenterId = purchaseCenterId;
           scannedNumberList.add(object);
+          selectedNumberList.add(object);
         }
       }
     } else {
@@ -315,6 +318,7 @@ class _InchargeHomeState extends State<InchargeHome> {
         object.cropId = inchargeDetails?.cropID;
         object.purchaseCenterId = purchaseCenterId;
         scannedNumberList.add(object);
+        selectedNumberList.add(object);
       }
     }
     showSuccessToast("Added Successfully");
@@ -322,11 +326,15 @@ class _InchargeHomeState extends State<InchargeHome> {
   }
 
   void navigateToUploadWareHouseScreen() async {
+    if (selectedNumberList.isEmpty) {
+      showErrorToast("Please select QR code");
+      return;
+    }
     var status = await Navigator.push(
         context,
         MaterialPageRoute(
             builder: (context) =>
-                UploadWarehouseScreen(qrCodeList: scannedNumberList)));
+                UploadWarehouseScreen(qrCodeList: selectedNumberList)));
     if (status == true) {
       savedQrIds.clear();
       operatorDetails = null;
@@ -518,67 +526,85 @@ class _InchargeHomeState extends State<InchargeHome> {
                               ),
                             ),
                           ),
-                          IconButton(
-                              onPressed: () {
-                                showDeleteQRDialog(context, true, () {
-                                  setState(() {
-                                    scannedNumberList.clear();
-                                  });
-                                });
-                              },
-                              icon: Icon(
-                                Icons.delete,
-                                color: Colors.red,
-                              ))
+                          Checkbox(
+                            value: selectedNumberList.length ==
+                                    scannedNumberList.length &&
+                                scannedNumberList.isNotEmpty,
+                            checkColor: Colors.green,
+                            activeColor: Colors.white,
+                            onChanged: (value) {
+                              setState(() {
+                                if (value == true) {
+                                  selectedNumberList =
+                                      List.from(scannedNumberList);
+                                } else {
+                                  selectedNumberList.clear();
+                                }
+                              });
+                            },
+                          ),
                         ],
                       ),
                     ),
                     ListView.builder(
-                        itemCount: scannedNumberList.length,
-                        physics: NeverScrollableScrollPhysics(),
-                        shrinkWrap: true,
-                        padding: EdgeInsets.all(0),
-                        itemBuilder: (context, index) {
-                          return Padding(
-                            padding: const EdgeInsets.only(left: 16.0),
-                            child: Row(
-                              children: [
-                                SizedBox(
-                                  width: 35,
-                                  child: Center(
-                                    child: Text((index + 1).toString(),
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.w600,
-                                            fontSize: 16)),
-                                  ),
-                                ),
-                                Expanded(
-                                  child: Padding(
-                                    padding: const EdgeInsets.only(left: 20.0),
-                                    child: Text(
-                                      scannedNumberList[index].qrCode ?? '',
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.w600,
-                                          fontSize: 16),
+                      itemCount: scannedNumberList.length,
+                      physics: NeverScrollableScrollPhysics(),
+                      shrinkWrap: true,
+                      padding: EdgeInsets.all(0),
+                      itemBuilder: (context, index) {
+                        final currentItem = scannedNumberList[index];
+                        bool isContain = selectedNumberList
+                            .any((item) => item.qrCode == currentItem.qrCode);
+                        return Padding(
+                          padding: const EdgeInsets.only(left: 16.0),
+                          child: Row(
+                            children: [
+                              SizedBox(
+                                width: 35,
+                                child: Center(
+                                  child: Text(
+                                    (index + 1).toString(),
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 16,
                                     ),
                                   ),
                                 ),
-                                IconButton(
-                                    onPressed: () {
-                                      showDeleteQRDialog(context, false, () {
-                                        setState(() {
-                                          scannedNumberList.removeAt(index);
-                                        });
-                                      });
-                                    },
-                                    icon: Icon(
-                                      Icons.delete,
-                                      color: Colors.red,
-                                    ))
-                              ],
-                            ),
-                          );
-                        }),
+                              ),
+                              // QR Text
+                              Expanded(
+                                child: Padding(
+                                  padding: const EdgeInsets.only(left: 20.0),
+                                  child: Text(
+                                    scannedNumberList[index].qrCode ?? '',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 16,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              // Serial Number
+                              Checkbox(
+                                value: isContain,
+                                onChanged: (value) {
+                                  setState(() {
+                                    if (value == true) {
+                                      selectedNumberList.add(currentItem);
+                                    } else {
+                                      selectedNumberList.removeWhere(
+                                        (item) =>
+                                            item.qrCode == currentItem.qrCode,
+                                      );
+                                    }
+                                  });
+                                },
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    )
                   ],
                 ),
               ),

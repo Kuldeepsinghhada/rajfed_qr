@@ -148,6 +148,7 @@ class _MyHomePageState extends State<MyHomePage> {
           (operatorDetails?.lotId ?? "").toString(),
           cropList[index].cropID ?? 0);
       if (!mounted) return;
+
       Navigator.pop(context);
       if (data?.status == true) {
         scannedNumberList.clear();

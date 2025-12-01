@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:marquee/marquee.dart';
 import 'package:rajfed_qr/Screens/Admin/farmer_detail/farmer_detail_screen.dart';
+import 'package:rajfed_qr/Screens/Admin/farmer_detail/farmer_search_qr_screen.dart';
 import 'package:rajfed_qr/Screens/OpenSource/contact_us_screen.dart';
 import 'package:rajfed_qr/Screens/OpenSource/crop_calculate/crop_calculater_screen.dart';
 import 'package:rajfed_qr/Screens/OpenSource/farmer_desk_screen/farmer_desk_service.dart';
@@ -21,9 +22,14 @@ class _FarmerDeskScreenState extends State<FarmerDeskScreen> {
   /// List of Item
   final List<DeviceItem> items = const [
     DeviceItem(
-      title: "Farmer Search",
+      title: "Search Farmer",
       icon: Icons.search,
       color: Color(0xFF42A5F5), // Light Blue
+    ),
+    DeviceItem(
+      title: "Search QR",
+      icon: Icons.search,
+      color: Color(0xFFAB47BC), // Light Blue
     ),
     DeviceItem(
       title: "MSP Rate 2025",
@@ -38,7 +44,7 @@ class _FarmerDeskScreenState extends State<FarmerDeskScreen> {
     DeviceItem(
       title: "Help",
       icon: Icons.help_outline,
-      color: Color(0xFFAB47BC), // Purple
+      color: Color(0xFF5C6BC0), // Purple
     ),
     DeviceItem(
       title: "Login",
@@ -139,19 +145,24 @@ class _FarmerDeskScreenState extends State<FarmerDeskScreen> {
                           Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) => MspRateScreen()));
+                                  builder: (context) => FarmerSearchByQR()));
                         } else if (index == 2) {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => MspRateScreen()));
+                        } else if (index == 3) {
                           Navigator.push(
                               context,
                               MaterialPageRoute(
                                   builder: (context) =>
                                       CropCalculaterScreen()));
-                        } else if (index == 3) {
+                        } else if (index == 4) {
                           Navigator.push(
                               context,
                               MaterialPageRoute(
                                   builder: (context) => ContactUsScreen()));
-                        } else if (index == 4) {
+                        } else if (index == 5) {
                           Navigator.push(
                               context,
                               MaterialPageRoute(
