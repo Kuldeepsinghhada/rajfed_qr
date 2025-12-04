@@ -4,9 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:rajfed_qr/APIService/api_endpoint.dart';
 import 'package:rajfed_qr/APIService/api_service.dart';
+import 'package:rajfed_qr/APIService/data_manager.dart';
 import 'package:rajfed_qr/APIService/shared_preference_helper.dart';
+import 'package:rajfed_qr/Screens/Incharge/DispatchConfirm/dispatch_confirm_screen.dart';
 import 'package:rajfed_qr/Screens/Incharge/incharge_home/incharge_service.dart';
-import 'package:rajfed_qr/Screens/Incharge/upload_warehouse_screen/upload_warehouse_screen.dart';
 import 'package:rajfed_qr/Screens/OpenSource/farmer_desk_screen/farmer_desk_screen.dart';
 import 'package:rajfed_qr/Screens/Operator/Home/op_home_service.dart';
 import 'package:rajfed_qr/Screens/Operator/Home/views/Information_row.dart';
@@ -113,7 +114,11 @@ class _InchargeHomeState extends State<InchargeHome> {
         Navigator.pop(context);
         for (var item in response?.data) {
           if (item.status == 0) {
-            savedQrIds.add(item);
+            var index =
+                savedQrIds.indexWhere((obj) => obj.qrCode == item.qrCode);
+            if (index == -1) {
+              savedQrIds.add(item);
+            }
           }
         }
         setState(() {});
@@ -330,18 +335,11 @@ class _InchargeHomeState extends State<InchargeHome> {
       showErrorToast("Please select QR code");
       return;
     }
-    var status = await Navigator.push(
-        context,
-        MaterialPageRoute(
-            builder: (context) =>
-                UploadWarehouseScreen(qrCodeList: selectedNumberList)));
-    if (status == true) {
-      savedQrIds.clear();
-      operatorDetails = null;
-      inchargeDetails = null;
-      _searchController.text = "";
-      setState(() {});
-    }
+    DataManager.instance.savedGadiItems = selectedNumberList;
+    await Navigator.push(context,
+        MaterialPageRoute(builder: (context) => VerifyVehicleLoadScreen()));
+    selectedNumberList = DataManager.instance.savedGadiItems;
+    setState(() {});
   }
 
   @override
@@ -526,6 +524,14 @@ class _InchargeHomeState extends State<InchargeHome> {
                               ),
                             ),
                           ),
+                          IconButton(
+                              onPressed: () {
+                                showDeleteEntryDialog(context,
+                                    title: 'Delete',
+                                    message:
+                                        'Are you sure want to remove all entries');
+                              },
+                              icon: Icon(Icons.remove, color: Colors.red)),
                           Checkbox(
                             value: selectedNumberList.length ==
                                     scannedNumberList.length &&
@@ -618,5 +624,61 @@ class _InchargeHomeState extends State<InchargeHome> {
             ],
           )
         : SizedBox();
+  }
+
+  Future<bool?> showDeleteEntryDialog(
+    BuildContext context, {
+    required String title,
+    required String message,
+  }) {
+    return showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          title: Text(
+            title,
+            style: const TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          content: Text(
+            message,
+            style: const TextStyle(fontSize: 15),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: const Text(
+                "नहीं",
+                style: TextStyle(color: Colors.grey, fontSize: 16),
+              ),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              onPressed: () {
+                Navigator.pop(context, true);
+                scannedNumberList.clear();
+                selectedNumberList.clear();
+                setState(() {});
+              },
+              child: const Text(
+                "हाँ, हटाएँ",
+                style: TextStyle(color: Colors.white, fontSize: 16),
+              ),
+            )
+          ],
+        );
+      },
+    );
   }
 }

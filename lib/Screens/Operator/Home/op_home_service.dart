@@ -1,4 +1,5 @@
 import 'dart:developer';
+import 'dart:io';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:rajfed_qr/APIService/api_endpoint.dart';
@@ -67,14 +68,17 @@ class OPHomeService {
       var purchaseCenterID =
           await SharedPreferenceHelper.instance.getPurchaseCenterId();
 
-      DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
-      AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
-      log('Running on $androidInfo');
+      AndroidDeviceInfo? androidInfo;
+      if (Platform.isAndroid) {
+        DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+        androidInfo = await deviceInfo.androidInfo;
+        log('Running on $androidInfo');
+      }
 
       Map<String, dynamic> body = {
         "farmerRegNo": farmerRegNo,
         "qr_code": qrCode,
-        "device_info": androidInfo.model.toString(),
+        "device_info": androidInfo != null ? androidInfo.model : "iOS-D",
         "purchaseCenter_ID": purchaseCenterID,
         "lotNo": lotNo,
         "cropId": cropId

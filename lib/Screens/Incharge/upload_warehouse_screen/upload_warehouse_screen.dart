@@ -4,7 +4,9 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:rajfed_qr/APIService/data_manager.dart';
 import 'package:rajfed_qr/APIService/shared_preference_helper.dart';
+import 'package:rajfed_qr/Screens/Incharge/incharge_dashboard/incharge_dashboard_screen.dart';
 import 'package:rajfed_qr/Screens/Incharge/incharge_home/incharge_service.dart';
 import 'package:rajfed_qr/common_views/common_button.dart';
 import 'package:rajfed_qr/common_views/loader_dialog.dart';
@@ -164,8 +166,12 @@ class _UploadWarehouseScreenState extends State<UploadWarehouseScreen> {
       if (!mounted) return;
       Navigator.pop(context);
       if (response.statusCode! >= 200 && response.statusCode! < 300) {
+        DataManager.instance.savedGadiItems = [];
         showSuccessToast("Record sent to warehouse successfully");
-        Navigator.pop(context, true);
+        Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: (_) => InchargeDashboard()),
+            (route) => false);
       } else {
         showErrorToast('Record Not updated');
       }

@@ -1,6 +1,6 @@
-
 import 'package:rajfed_qr/models/crop_list_model.dart';
 import 'package:rajfed_qr/models/profile_model.dart';
+import 'package:rajfed_qr/models/saved_qr_model.dart';
 
 class DataManager {
   DataManager._();
@@ -9,4 +9,5 @@ class DataManager {
   List<CropModel> cropList = [];
   List<String> cropStringList = [];
   ProfileModel? profileDetail;
+  List<SavedQrModel> savedGadiItems = [];
 }
