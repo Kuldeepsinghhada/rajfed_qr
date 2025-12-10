@@ -196,7 +196,7 @@ class _MyHomePageState extends State<MyHomePage> {
   /// Action and Dialog
   void scanQrCode(BuildContext context, bool isBulk) async {
     int remainingRecord =
-        (operatorDetails?.transctionBardana ?? 0) - (savedQrIds.length);
+        (operatorDetails?.remainingBardana ?? 0) - (savedQrIds.length);
     if (scannedNumberList.length <= remainingRecord - 1) {
     } else {
       Fluttertoast.showToast(msg: "You have already uploaded maximum records");
@@ -215,7 +215,7 @@ class _MyHomePageState extends State<MyHomePage> {
           return;
         }
         int remainingRecord =
-            (operatorDetails?.transctionBardana ?? 0) - (savedQrIds.length);
+            (operatorDetails?.remainingBardana ?? 0) - (savedQrIds.length);
         if (scannedNumberList.length <= remainingRecord) {
           scannedNumberList.add(data);
         } else {
@@ -274,7 +274,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   var status = _formQrCodeKey.currentState?.validate();
                   if (status == true) {
                     int remainingRecord =
-                        (operatorDetails?.transctionBardana ?? 0) -
+                        (operatorDetails?.remainingBardana ?? 0) -
                             (savedQrIds.length);
                     if (scannedNumberList.length <= remainingRecord - 1) {
                       scannedNumberList.add(qrController.text);
@@ -420,11 +420,9 @@ class _MyHomePageState extends State<MyHomePage> {
 
                       int baseNumber = int.parse(numericStr);
                       int count = int.parse(countController.text);
-
                       int remainingRecord =
-                          (operatorDetails?.transctionBardana ?? 0) -
+                          (operatorDetails?.remainingBardana ?? 0) -
                               (savedQrIds.length);
-
                       if (scannedNumberList.length <= remainingRecord - 1) {
                         for (int i = 0; i < count; i++) {
                           if (scannedNumberList.length <= remainingRecord - 1) {
@@ -750,7 +748,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         text: 'Manual',
                         onPressed: () {
                           int remainingRecord =
-                              (operatorDetails?.transctionBardana ?? 0) -
+                              (operatorDetails?.remainingBardana ?? 0) -
                                   (savedQrIds.length);
                           if (scannedNumberList.length <= remainingRecord - 1) {
                             showQRCodeDialog(context);
@@ -769,7 +767,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   text: 'Bulk Entry',
                   onPressed: () {
                     int remainingRecord =
-                        (operatorDetails?.transctionBardana ?? 0) -
+                        (operatorDetails?.remainingBardana ?? 0) -
                             (savedQrIds.length);
                     if (scannedNumberList.length <= remainingRecord - 1) {
                       showBulkQRCodeDialog(context);

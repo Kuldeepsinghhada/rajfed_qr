@@ -4,7 +4,7 @@ import 'package:rajfed_qr/models/operator_details.dart';
 import 'package:rajfed_qr/utils/date_formatter.dart';
 
 class InformationView extends StatelessWidget {
-  const InformationView({required this.details,this.model, super.key});
+  const InformationView({required this.details, this.model, super.key});
   final OperatorDetails? details;
   final DispatchInchargeModel? model;
   @override
@@ -26,21 +26,27 @@ class InformationView extends StatelessWidget {
       child: Column(
         children: [
           InformationRow(
-              title: "Lot No.", subtitle: (details?.lotId ?? model?.lotNo ?? 'NA').toString()),
+              title: "Lot No.",
+              subtitle: (details?.lotId ?? model?.lotNo ?? 'NA').toString()),
           InformationRow(
-              title: "Registration no.", subtitle: details?.farmerRegID ?? model?.farmerRegId ?? ''),
+              title: "Registration no.",
+              subtitle: details?.farmerRegID ?? model?.farmerRegId ?? ''),
           Visibility(
               visible: details != null,
-              child: InformationRow(title: "Name", subtitle: details?.farmerName ?? '')),
+              child: InformationRow(
+                  title: "Name", subtitle: details?.farmerName ?? '')),
           InformationRow(
               title: "Purchase Center",
-              subtitle: details?.purchaseCenterKendra ?? model?.purchaseCenterKendra ?? ''),
+              subtitle: details?.purchaseCenterKendra ??
+                  model?.purchaseCenterKendra ??
+                  ''),
           Visibility(
             visible: details != null,
             child: InformationRow(
-              title: "Purchase Date",
-              subtitle:
-                  DateFormatter.formatDateToDDMMMYYYY(details?.regDate ?? '')),),
+                title: "Purchase Date",
+                subtitle: DateFormatter.formatDateToDDMMMYYYY(
+                    details?.regDate ?? '')),
+          ),
           Visibility(
               visible: model?.dispatchDateTime != null,
               child: InformationRow(
@@ -55,12 +61,31 @@ class InformationView extends StatelessWidget {
                       model?.receivedDateTime ?? 'NA'))),
           InformationRow(
               title: "Quantity(Qt)",
-              subtitle: "${details?.transctionQty ?? model?.qtl.toString() ?? 'NA'}"),
-          details != null ? InformationRow(
-              title: "No. of Bardana",
-              subtitle: "${details?.transctionBardana ?? 'NA'}"): SizedBox(),
+              subtitle:
+                  "${details?.transctionQty ?? model?.qtl.toString() ?? 'NA'}"),
+          details != null
+              ? InformationRow(
+                  title: "No. of Bardana",
+                  subtitle: "${details?.transctionBardana ?? 'NA'}")
+              : SizedBox(),
+          details != null
+              ? InformationRow(
+                  title: "Rejected Bardana",
+                  subtitle: "${details?.rejectedBardana ?? 'NA'}")
+              : SizedBox(),
+          details != null
+              ? InformationRow(
+                  title: "Accepted Bardana",
+                  subtitle: "${details?.acceptedBardana ?? 'NA'}")
+              : SizedBox(),
+          details != null
+              ? InformationRow(
+                  title: "Remaining Bardana",
+                  subtitle: "${details?.remainingBardana ?? 'NA'}")
+              : SizedBox(),
           InformationRow(
-              title: "Copy Type", subtitle: details?.cropTypeEN ?? model?.cropEN ?? 'NA')
+              title: "Copy Type",
+              subtitle: details?.cropTypeEN ?? model?.cropEN ?? 'NA')
         ],
       ),
     );
@@ -77,7 +102,7 @@ class InformationRow extends StatelessWidget {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        SizedBox(width: 145, child: CommonText(text: title)),
+        SizedBox(width: 155, child: CommonText(text: title)),
         CommonText(text: ' :  '),
         Expanded(child: CommonText(text: subtitle))
       ],

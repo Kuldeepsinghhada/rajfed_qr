@@ -15,94 +15,123 @@ class RejectedScreen extends StatefulWidget {
 
 class _RejectedScreenState extends State<RejectedScreen> {
   List<RejectedModel> rejectedList = [];
+  Map<String, List<RejectedModel>> groupedData = {};
 
   @override
   void initState() {
-    getOperatorDetails();
     super.initState();
+    getOperatorDetails();
   }
 
   void getOperatorDetails() async {
-    await Future.delayed(Duration(microseconds: 200));
+    await Future.delayed(const Duration(microseconds: 200));
     if (!mounted) return;
+
     showLoadingDialog(context);
     try {
       var response = await RejectedService.instance.operatorRejectedList();
+
+      Navigator.pop(context);
+      if (!mounted) return;
+
       if (response?.status == true) {
-        if (!mounted) return;
-    Navigator.pop(context);
         setState(() {
-          rejectedList = response?.data;
+          rejectedList = response?.data ?? [];
+          groupByFarmer();
         });
       } else {
-        if (!mounted) return;
-    Navigator.pop(context);
         showErrorToast(response?.error ?? 'Something went wrong');
       }
     } catch (e) {
       if (!mounted) return;
-    Navigator.pop(context);
+      Navigator.pop(context);
       showErrorToast("Something went wrong");
+    }
+  }
+
+  /// 🔹 GROUPING
+  void groupByFarmer() {
+    groupedData = {};
+    for (var item in rejectedList) {
+      final key = item.farmerRegId ?? 'Unknown';
+      groupedData.putIfAbsent(key, () => []);
+      groupedData[key]!.add(item);
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final farmerKeys = groupedData.keys.toList();
+
     return Scaffold(
       appBar: AppBar(
-        title: Text("Rejected Records"),
+        title: const Text("Rejected Records"),
       ),
       body: ListView.builder(
-          itemCount: rejectedList.length,
-          padding: EdgeInsets.all(16),
-          itemBuilder: (context, index) {
-            var details = rejectedList[index];
-            return Container(
-              decoration: BoxDecoration(
-                color: Colors.white, // Background color
-                borderRadius: BorderRadius.circular(4), // Rounded corners
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.grey.withOpacity(0.3), // Shadow color
-                    spreadRadius: 2, // Spread of shadow
-                    blurRadius: 10, // Blur effect
-                    offset: Offset(2, 2), // Shadow position
+        padding: const EdgeInsets.all(16),
+        itemCount: farmerKeys.length,
+        itemBuilder: (context, index) {
+          final farmerId = farmerKeys[index];
+          final items = groupedData[farmerId]!;
+
+          return Card(
+            margin: const EdgeInsets.only(bottom: 8),
+            elevation: 3,
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            child: ExpansionTile(
+              tilePadding:
+                  const EdgeInsets.symmetric(horizontal: 16, vertical: 0),
+              childrenPadding:
+                  const EdgeInsets.symmetric(horizontal: 16, vertical: 0),
+              title: Text(
+                "Farmer Reg ID: $farmerId",
+                style:
+                    const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+              ),
+              subtitle: Text(
+                "Rejected Items: ${items.length}",
+                style: const TextStyle(fontSize: 13, color: Colors.black54),
+              ),
+              children: items.map((details) {
+                return Container(
+                  margin: const EdgeInsets.only(bottom: 12),
+                  padding: const EdgeInsets.all(14),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(6),
+                    border: Border.all(color: Colors.black12),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.grey.withOpacity(0.15),
+                        blurRadius: 6,
+                        offset: const Offset(2, 2),
+                      ),
+                    ],
                   ),
-                ],
-              ),
-              padding: EdgeInsets.all(16),
-              child: Column(
-                children: [
-                  InformationRow(
-                      title: "Lot no.", subtitle: "${details.lotNo ?? 'NA'}"),
-                  InformationRow(
-                      title: "Registration no.",
-                      subtitle: details.farmerRegId ?? 'NA'),
-                  InformationRow(
-                      title: "QR Code", subtitle: details.qrCode ?? 'NA'),
-                  InformationRow(
-                      title: "Purchase Center",
-                      subtitle: details.purchaseCenterKendra ?? 'NA'),
-                  InformationRow(
-                      title: "Rejected Date",
-                      subtitle: DateFormatter.formatDateToDDMMMYYYY(
-                          details.rejectedDate ?? 'NA')),
-                  // InformationRow(
-                  //     title: "Quantity(Qtl)",
-                  //     subtitle: (details. ?? 'NA').toString()),
-                  // InformationRow(
-                  //     title: "No. of Bardana",
-                  //     subtitle: (details. ?? 'NA').toString()),
-                  // InformationRow(
-                  //     title: "Crop Type",
-                  //     subtitle: (details.cropEN ?? 'NA')),
-                  // InformationRow(
-                  //     title: "Warehouse Name",
-                  //     subtitle: (details.warehouseName ?? 'NA')),
-                ],
-              ),
-            );
-          }),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      InformationRow(
+                          title: "Lot No.",
+                          subtitle: "${details.lotNo ?? 'NA'}"),
+                      InformationRow(
+                          title: "QR Code", subtitle: details.qrCode ?? 'NA'),
+                      InformationRow(
+                          title: "Purchase Center",
+                          subtitle: details.purchaseCenterKendra ?? 'NA'),
+                      InformationRow(
+                          title: "Rejected Date",
+                          subtitle: DateFormatter.formatDateToDDMMMYYYY(
+                              details.rejectedDate ?? 'NA')),
+                    ],
+                  ),
+                );
+              }).toList(),
+            ),
+          );
+        },
+      ),
     );
   }
 }
