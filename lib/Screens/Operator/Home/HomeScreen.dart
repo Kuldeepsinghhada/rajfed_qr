@@ -244,13 +244,13 @@ class _MyHomePageState extends State<MyHomePage> {
               //   FilteringTextInputFormatter
               //       .digitsOnly, // Restricts to numbers only
               // ],
-              maxLength: 12,
+              maxLength: 16,
               decoration: InputDecoration(
                   hintText: "Enter QR Code",
                   border: OutlineInputBorder(),
                   counter: null),
               validator: (value) {
-                if (value != null && value.trim().length != 12) {
+                if (value != null && value.trim().length < 12) {
                   return "Please enter code";
                 } else if (scannedNumberList.contains(value)) {
                   return "Duplicate entry not allowed";
@@ -326,7 +326,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     child: TextFormField(
                       controller: qrController,
                       //keyboardType: TextInputType.number,
-                      maxLength: 12,
+                      maxLength: 16,
                       // inputFormatters: [
                       //   FilteringTextInputFormatter
                       //       .digitsOnly, // Restricts to numbers only
@@ -336,7 +336,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         border: OutlineInputBorder(),
                       ),
                       validator: (value) {
-                        if (value != null && value.trim().length != 12) {
+                        if (value != null && value.trim().length < 12) {
                           return "Please enter correct code";
                         } else if (scannedNumberList.contains(value)) {
                           return "Duplicate entry not allowed";
@@ -400,26 +400,50 @@ class _MyHomePageState extends State<MyHomePage> {
                   var status = _formMultiQrCodeKey.currentState?.validate();
                   if (status == true) {
                     try {
-                      var code = qrController.text.contains("RJ")
-                          ? int.parse(qrController.text.replaceAll("RJ", ""))
-                          : int.parse(qrController.text);
-                      var count = int.parse(countController.text);
+                      String raw = qrController.text.trim();
+
+                      // Extract prefix (letters) e.g. "RJ", "NCRJ"
+                      String prefix =
+                          RegExp(r'^[A-Za-z]+').stringMatch(raw) ?? "";
+
+                      // Extract numeric part at the end e.g. "00050001"
+                      String numericStr =
+                          RegExp(r'(\d+)$').stringMatch(raw) ?? "";
+
+                      if (numericStr.isEmpty) {
+                        showErrorToast("Invalid value");
+                        return;
+                      }
+
+                      // Keep original zero padding
+                      int originalLength = numericStr.length;
+
+                      int baseNumber = int.parse(numericStr);
+                      int count = int.parse(countController.text);
+
                       int remainingRecord =
                           (operatorDetails?.transctionBardana ?? 0) -
                               (savedQrIds.length);
+
                       if (scannedNumberList.length <= remainingRecord - 1) {
-                        for (var i = 0; i < count; i++) {
+                        for (int i = 0; i < count; i++) {
                           if (scannedNumberList.length <= remainingRecord - 1) {
-                            String? leadingZeros = RegExp(r'^0+').stringMatch(
-                                qrController.text
-                                    .replaceAll("RJ", "")
-                                    .toString());
-                            var number =
-                                "${qrController.text.contains('RJ') ? "RJ" : ""}${leadingZeros ?? ''}${code + i}";
-                            if (number.length > 12) {
-                              number = number.replaceFirst("0", "");
+                            int newNumber = baseNumber + i;
+
+                            // Convert back to padded string
+                            String finalNumeric = newNumber
+                                .toString()
+                                .padLeft(originalLength, '0');
+
+                            String finalCode = "$prefix$finalNumeric";
+
+                            // Safety: avoid overflow
+                            if (finalCode.length > 20) {
+                              finalCode =
+                                  finalCode.substring(finalCode.length - 20);
                             }
-                            scannedNumberList.add(number);
+
+                            scannedNumberList.add(finalCode);
                           } else {
                             Fluttertoast.showToast(
                                 msg:
@@ -427,6 +451,7 @@ class _MyHomePageState extends State<MyHomePage> {
                             break;
                           }
                         }
+
                         qrController.text = "";
                         countController.text = "";
                       } else {
@@ -434,6 +459,7 @@ class _MyHomePageState extends State<MyHomePage> {
                             msg:
                                 "You can upload max $remainingRecord records onwards");
                       }
+
                       if (!mounted) return;
                       Navigator.pop(context);
                     } catch (e) {

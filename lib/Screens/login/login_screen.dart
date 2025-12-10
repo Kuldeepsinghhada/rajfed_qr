@@ -5,6 +5,7 @@ import 'package:rajfed_qr/APIService/shared_preference_helper.dart';
 import 'package:rajfed_qr/Screens/Admin/admin_home_screen.dart';
 import 'package:rajfed_qr/Screens/Incharge/incharge_dashboard/incharge_dashboard_screen.dart';
 import 'package:rajfed_qr/Screens/Operator/OperatorDashboard/operator_dashboard.dart';
+import 'package:rajfed_qr/Screens/Warehouse/warehouse_dashboard.dart';
 import 'package:rajfed_qr/Screens/Warehouse/warehouse_home.dart';
 import 'package:rajfed_qr/Screens/login/login_service.dart';
 import 'package:crypto/crypto.dart';
@@ -71,7 +72,7 @@ class _LoginScreenState extends State<LoginScreen> {
           } else if (userType == 13) {
             Navigator.pushAndRemoveUntil(
                 context,
-                MaterialPageRoute(builder: (_) => WarehouseHome()),
+                MaterialPageRoute(builder: (_) => WareHouseDashboard()),
                 (route) => false);
           } else if (userType == 7) {
             Navigator.pushAndRemoveUntil(

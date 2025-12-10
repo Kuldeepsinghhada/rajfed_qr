@@ -272,28 +272,28 @@ class _WarehouseHomeState extends State<WarehouseHome> {
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: Text('Home'),
       ),
-      drawer: CustomDrawer(
-        userName: userName,
-        callback: (value) {
-          if (!mounted) return;
-          Navigator.pop(context);
-          if (value == "Logout") {
-            showLogoutDialog(context);
-          } else if (value == "Change Password") {
-            Navigator.push(context,
-                MaterialPageRoute(builder: (_) => ChangePasswordScreen()));
-          } else if (value == "Dispatched") {
-            Navigator.push(context,
-                MaterialPageRoute(builder: (_) => DiapatchInchargeScreen()));
-          } else if (value == "Rejected") {
-            Navigator.push(context,
-                MaterialPageRoute(builder: (_) => RejectedInchargeScreen()));
-          }
-        },
-      ),
+      // drawer: CustomDrawer(
+      //   userName: userName,
+      //   callback: (value) {
+      //     if (!mounted) return;
+      //     Navigator.pop(context);
+      //     if (value == "Logout") {
+      //       showLogoutDialog(context);
+      //     } else if (value == "Change Password") {
+      //       Navigator.push(context,
+      //           MaterialPageRoute(builder: (_) => ChangePasswordScreen()));
+      //     } else if (value == "Dispatched") {
+      //       Navigator.push(context,
+      //           MaterialPageRoute(builder: (_) => DiapatchInchargeScreen()));
+      //     } else if (value == "Rejected") {
+      //       Navigator.push(context,
+      //           MaterialPageRoute(builder: (_) => RejectedInchargeScreen()));
+      //     }
+      //   },
+      // ),
       body: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 30),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
           child: Form(
             key: _formKey,
             child: Column(

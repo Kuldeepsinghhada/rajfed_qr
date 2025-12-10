@@ -166,7 +166,7 @@ class _FarmerSearchByQRState extends State<FarmerSearchByQR> {
       showLoadingDialog(context);
       try {
         var response =
-        await OPHomeService.instance.operatorDetails(farmerId, cropId);
+            await OPHomeService.instance.operatorDetails(farmerId, cropId);
         if (response?.status == true) {
           if (!mounted) return;
           Navigator.pop(context);
@@ -190,7 +190,7 @@ class _FarmerSearchByQRState extends State<FarmerSearchByQR> {
 
   void addQrCode(bool isAll) async {
     var purchaseCenterId =
-    await SharedPreferenceHelper.instance.getPurchaseCenterId();
+        await SharedPreferenceHelper.instance.getPurchaseCenterId();
     if (isAll) {
       for (var item in savedQrIds) {
         if (item.qrCode != null &&
@@ -290,7 +290,7 @@ class _FarmerSearchByQRState extends State<FarmerSearchByQR> {
             //   FilteringTextInputFormatter
             //       .digitsOnly, // Restricts to numbers only
             // ],
-            maxLength: 12,
+            maxLength: 16,
             style: TextStyle(fontWeight: FontWeight.w600),
             decoration: InputDecoration(
                 hintText: "Enter QR Code",
@@ -302,14 +302,14 @@ class _FarmerSearchByQRState extends State<FarmerSearchByQR> {
                   borderSide: BorderSide.none,
                 ),
                 contentPadding:
-                EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+                    EdgeInsets.symmetric(vertical: 14, horizontal: 16),
                 suffixIcon: IconButton(
                     onPressed: () {
                       getQrCodeByScan();
                     },
                     icon: Icon(Icons.qr_code_scanner))),
             validator: (value) {
-              if (value != null && value.trim().length != 12) {
+              if (value != null && value.trim().length < 12) {
                 return "Please enter QR code";
               }
               return null;
@@ -347,125 +347,125 @@ class _FarmerSearchByQRState extends State<FarmerSearchByQR> {
   Widget informationView() {
     return operatorDetails != null
         ? Padding(
-      padding: const EdgeInsets.only(top: 30.0),
-      child: Column(
-        spacing: 10,
-        children: [
-          InformationView(details: operatorDetails),
-          SizedBox(
-            height: operatorDetails != null ? 10 : 0,
-          ),
-          Row(
-            spacing: 10,
-            children: [
-              Expanded(
-                child: CommonButton(
-                  text: 'Add All',
-                  onPressed: () {
-                    addQrCode(true);
-                  },
+            padding: const EdgeInsets.only(top: 30.0),
+            child: Column(
+              spacing: 10,
+              children: [
+                InformationView(details: operatorDetails),
+                SizedBox(
+                  height: operatorDetails != null ? 10 : 0,
                 ),
-              ),
-              Expanded(
-                child: CommonButton(
-                  text: 'Add This',
-                  onPressed: () {
-                    addQrCode(false);
-                  },
+                Row(
+                  spacing: 10,
+                  children: [
+                    Expanded(
+                      child: CommonButton(
+                        text: 'Add All',
+                        onPressed: () {
+                          addQrCode(true);
+                        },
+                      ),
+                    ),
+                    Expanded(
+                      child: CommonButton(
+                        text: 'Add This',
+                        onPressed: () {
+                          addQrCode(false);
+                        },
+                      ),
+                    )
+                  ],
                 ),
-              )
-            ],
-          ),
-          qrCodeList(),
-        ],
-      ),
-    )
+                qrCodeList(),
+              ],
+            ),
+          )
         : SizedBox();
   }
 
   Widget qrCodeList() {
     return scannedNumberList.isNotEmpty
         ? Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Container(
-          decoration: BoxDecoration(
-              border: Border.all(color: Colors.green.shade400)),
-          child: Column(
+            mainAxisSize: MainAxisSize.min,
             children: [
               Container(
-                height: 50,
-                color: Colors.green.shade400,
-                child: Row(
+                decoration: BoxDecoration(
+                    border: Border.all(color: Colors.green.shade400)),
+                child: Column(
                   children: [
-                    SizedBox(
-                      width: 10,
-                    ),
-                    Icon(
-                      Icons.qr_code_scanner,
-                      color: Colors.white,
-                    ),
-                    Expanded(
-                      child: Padding(
-                        padding: const EdgeInsets.only(left: 12.0),
-                        child: Text(
-                          "QR Codes",
-                          style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.white),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              ListView.builder(
-                  itemCount: scannedNumberList.length,
-                  physics: NeverScrollableScrollPhysics(),
-                  shrinkWrap: true,
-                  padding: EdgeInsets.all(0),
-                  itemBuilder: (context, index) {
-                    return Padding(
-                      padding: const EdgeInsets.only(left: 16.0),
+                    Container(
+                      height: 50,
+                      color: Colors.green.shade400,
                       child: Row(
                         children: [
                           SizedBox(
-                            width: 35,
-                            child: Center(
-                              child: Text((index + 1).toString(),
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.w600,
-                                      fontSize: 16)),
-                            ),
+                            width: 10,
+                          ),
+                          Icon(
+                            Icons.qr_code_scanner,
+                            color: Colors.white,
                           ),
                           Expanded(
                             child: Padding(
-                              padding: const EdgeInsets.only(left: 20.0),
+                              padding: const EdgeInsets.only(left: 12.0),
                               child: Text(
-                                scannedNumberList[index].qrCode ?? '',
+                                "QR Codes",
                                 style: TextStyle(
+                                    fontSize: 18,
                                     fontWeight: FontWeight.w600,
-                                    fontSize: 16),
+                                    color: Colors.white),
                               ),
                             ),
                           ),
                         ],
                       ),
-                    );
-                  }),
+                    ),
+                    ListView.builder(
+                        itemCount: scannedNumberList.length,
+                        physics: NeverScrollableScrollPhysics(),
+                        shrinkWrap: true,
+                        padding: EdgeInsets.all(0),
+                        itemBuilder: (context, index) {
+                          return Padding(
+                            padding: const EdgeInsets.only(left: 16.0),
+                            child: Row(
+                              children: [
+                                SizedBox(
+                                  width: 35,
+                                  child: Center(
+                                    child: Text((index + 1).toString(),
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.w600,
+                                            fontSize: 16)),
+                                  ),
+                                ),
+                                Expanded(
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(left: 20.0),
+                                    child: Text(
+                                      scannedNumberList[index].qrCode ?? '',
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.w600,
+                                          fontSize: 16),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        }),
+                  ],
+                ),
+              ),
+              SizedBox(height: 10),
+              CommonButton(
+                text: 'Proceed',
+                onPressed: () {
+                  navigateToUploadWareHouseScreen();
+                },
+              )
             ],
-          ),
-        ),
-        SizedBox(height: 10),
-        CommonButton(
-          text: 'Proceed',
-          onPressed: () {
-            navigateToUploadWareHouseScreen();
-          },
-        )
-      ],
-    )
+          )
         : SizedBox();
   }
 }

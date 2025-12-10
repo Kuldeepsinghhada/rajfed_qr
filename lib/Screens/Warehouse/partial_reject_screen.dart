@@ -286,7 +286,7 @@ class _PartialRejectScreenState extends State<PartialRejectScreen> {
           child: TextFormField(
             focusNode: _focusNode,
             controller: _searchController,
-            maxLength: 12,
+            maxLength: 16,
             keyboardType: TextInputType.number, // Numeric keyboard
             inputFormatters: [
               FilteringTextInputFormatter
