@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:rajfed_qr/APIService/shared_preference_helper.dart';
 import 'package:rajfed_qr/Screens/Incharge/incharge_home/incharge_service.dart';
 import 'package:rajfed_qr/Screens/Incharge/upload_warehouse_screen/upload_warehouse_screen.dart';
-import 'package:rajfed_qr/Screens/Operator/Home/views/Information_row.dart';
 import 'package:rajfed_qr/Screens/Warehouse/warehouse_service.dart';
+import 'package:rajfed_qr/Screens/Operator/Home/views/Information_row.dart';
 import 'package:rajfed_qr/common_views/loader_dialog.dart';
 import 'package:rajfed_qr/models/dispatch_incharge_model.dart';
 import 'package:rajfed_qr/utils/date_formatter.dart';
@@ -22,11 +22,14 @@ class _DiapatchInchargeScreenState extends State<DiapatchInchargeScreen> {
   final _formKey = GlobalKey<FormState>();
 
   List<DispatchInchargeModel> diapatchInchargeList = [];
+  Map<String, List<DispatchInchargeModel>> groupedData = {};
+
   int? userType;
+
   @override
   void initState() {
-    getUserType();
     super.initState();
+    getUserType();
   }
 
   getUserType() async {
@@ -40,8 +43,10 @@ class _DiapatchInchargeScreenState extends State<DiapatchInchargeScreen> {
     if (valid == true) {
       diapatchInchargeList.clear();
       await Future.delayed(Duration(microseconds: 200));
+
       if (!mounted) return;
       showLoadingDialog(context);
+
       try {
         dynamic response;
         if (userType == 2) {
@@ -51,15 +56,16 @@ class _DiapatchInchargeScreenState extends State<DiapatchInchargeScreen> {
           response = await WarehouseService.instance
               .acceptedWarehouseList(vehicleController.text);
         }
+
+        Navigator.pop(context);
+        if (!mounted) return;
+
         if (response?.status == true) {
-          if (!mounted) return;
-          Navigator.pop(context);
           setState(() {
-            diapatchInchargeList = response?.data;
+            diapatchInchargeList = response?.data ?? [];
+            groupData(); // 🚀 Grouping call
           });
         } else {
-          if (!mounted) return;
-          Navigator.pop(context);
           showErrorToast(response?.error ?? 'Something went wrong');
         }
       } catch (e) {
@@ -67,12 +73,23 @@ class _DiapatchInchargeScreenState extends State<DiapatchInchargeScreen> {
         Navigator.pop(context);
         showErrorToast("Something went wrong");
       }
-      setState(() {});
+    }
+  }
+
+  /// 🚀 GROUPING FUNCTION
+  void groupData() {
+    groupedData = {};
+    for (var item in diapatchInchargeList) {
+      final key = item.dispatch_id?.toString() ?? 'Unknown';
+      groupedData.putIfAbsent(key, () => []);
+      groupedData[key]!.add(item);
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final keys = groupedData.keys.toList();
+
     return Scaffold(
       appBar: AppBar(
         title: Text(userType == 13 ? "Accepted Records" : "Dispatch Records"),
@@ -83,92 +100,119 @@ class _DiapatchInchargeScreenState extends State<DiapatchInchargeScreen> {
             padding: const EdgeInsets.all(16),
             child: searchBar(),
           ),
+
+          /// 📌 GROUPED LIST
           Expanded(
-            child: ListView.builder(
-                itemCount: diapatchInchargeList.length,
-                padding: EdgeInsets.all(16),
-                itemBuilder: (context, index) {
-                  var details = diapatchInchargeList[index];
-                  return Container(
-                    decoration: BoxDecoration(
-                      color: Colors.white, // Background color
-                      borderRadius: BorderRadius.circular(4), // Rounded corners
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.grey.withOpacity(0.3), // Shadow color
-                          spreadRadius: 2, // Spread of shadow
-                          blurRadius: 5, // Blur effect
-                          offset: Offset(2, 2), // Shadow position
-                        ),
-                      ],
-                    ),
+            child: groupedData.isEmpty
+                ? Center(child: Text("No Records Found"))
+                : ListView.builder(
                     padding: EdgeInsets.all(12),
-                    margin: EdgeInsets.only(bottom: 16),
-                    child: Column(
-                      children: [
-                        InformationRow(
-                            title: "Dispatch ID",
-                            subtitle: "${details.dispatch_id ?? 'NA'}"),
-                        InformationRow(
-                            title: "Lot no.",
-                            subtitle: "${details.lotNo ?? 'NA'}"),
-                        InformationRow(
-                            title: "Registration no.",
-                            subtitle: details.farmerRegId ?? 'NA'),
-                        // InformationRow(
-                        //     title: "QR Code", subtitle: details.qrCode ?? 'NA'),
-                        InformationRow(
-                            title: "Purchase Center",
-                            subtitle: details.purchaseCenterKendra ?? 'NA'),
-                        Visibility(
-                            visible: details.transctionDate != null,
-                            child: InformationRow(
-                                title: "Purchase Date",
-                                subtitle: DateFormatter.formatDateToDDMMMYYYY(
-                                    details.transctionDate ?? 'NA'))),
-                        Visibility(
-                            visible: details.dispatchDateTime != null,
-                            child: InformationRow(
-                                title: "Dispatch Date",
-                                subtitle: DateFormatter.formatDateToDDMMMYYYY(
-                                    details.dispatchDateTime ?? 'NA'))),
-                        Visibility(
-                            visible: details.receivedDateTime != null,
-                            child: InformationRow(
-                                title: "Received Date",
-                                subtitle: DateFormatter.formatDateToDDMMMYYYY(
-                                    details.receivedDateTime ?? 'NA'))),
-                        InformationRow(
-                            title: "Quantity(Qtl)",
-                            subtitle: (details.qtl ?? 'NA').toString()),
-                        InformationRow(
-                            title: "No. of Bardana",
-                            subtitle: (details.noOfBardana ?? 'NA').toString()),
-                        InformationRow(
-                            title: "Crop Type",
-                            subtitle: (details.cropEN ??
-                                details.crop_descEN ??
-                                'NA')),
-                        InformationRow(
-                            title: "Warehouse Name",
-                            subtitle: (details.warehouseName ?? 'NA')),
-                      ],
-                    ),
-                  );
-                }),
+                    itemCount: keys.length,
+                    itemBuilder: (context, index) {
+                      final groupKey = keys[index];
+                      final items = groupedData[groupKey]!;
+
+                      return Card(
+                        margin: EdgeInsets.only(bottom: 16),
+                        elevation: 3,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: ExpansionTile(
+                          title: Text(
+                            "Dispatch ID: $groupKey",
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold, fontSize: 16),
+                          ),
+                          subtitle: Text(
+                            "Items: ${items.length}",
+                            style: TextStyle(fontSize: 13),
+                          ),
+                          tilePadding:
+                              EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                          childrenPadding: EdgeInsets.all(16),
+
+                          /// 🔽 Expanded list items
+                          children: items.map((details) {
+                            return Container(
+                              margin: EdgeInsets.only(bottom: 12),
+                              padding: EdgeInsets.all(14),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(6),
+                                border: Border.all(color: Colors.black12),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.grey.withOpacity(0.15),
+                                    blurRadius: 5,
+                                    offset: Offset(2, 2),
+                                  ),
+                                ],
+                              ),
+                              child: Column(
+                                children: [
+                                  InformationRow(
+                                      title: "Lot no.",
+                                      subtitle: "${details.lotNo ?? 'NA'}"),
+                                  InformationRow(
+                                      title: "Registration no.",
+                                      subtitle: details.farmerRegId ?? 'NA'),
+                                  InformationRow(
+                                      title: "Purchase Center",
+                                      subtitle:
+                                          details.purchaseCenterKendra ?? 'NA'),
+                                  if (details.transctionDate != null)
+                                    InformationRow(
+                                        title: "Purchase Date",
+                                        subtitle:
+                                            DateFormatter.formatDateToDDMMMYYYY(
+                                                details.transctionDate ?? '')),
+                                  if (details.dispatchDateTime != null)
+                                    InformationRow(
+                                        title: "Dispatch Date",
+                                        subtitle:
+                                            DateFormatter.formatDateToDDMMMYYYY(
+                                                details.dispatchDateTime ??
+                                                    '')),
+                                  if (details.receivedDateTime != null)
+                                    InformationRow(
+                                        title: "Received Date",
+                                        subtitle:
+                                            DateFormatter.formatDateToDDMMMYYYY(
+                                                details.receivedDateTime ??
+                                                    '')),
+                                  InformationRow(
+                                      title: "No. of Bardana",
+                                      subtitle:
+                                          "${details.noOfBardana ?? 'NA'}"),
+                                  InformationRow(
+                                      title: "Crop Type",
+                                      subtitle: (details.cropEN ??
+                                          details.crop_descEN ??
+                                          'NA')),
+                                  InformationRow(
+                                      title: "Warehouse",
+                                      subtitle: details.warehouseName ?? 'NA'),
+                                ],
+                              ),
+                            );
+                          }).toList(),
+                        ),
+                      );
+                    }),
           ),
         ],
       ),
     );
   }
 
+  /// 🔍 SEARCH BAR
   Widget searchBar() {
     return Form(
       key: _formKey,
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Search Field
           Expanded(
             child: TextFormField(
               focusNode: _focusNode,
@@ -178,47 +222,33 @@ class _DiapatchInchargeScreenState extends State<DiapatchInchargeScreen> {
               maxLength: 12,
               decoration: InputDecoration(
                 hintText: "Vehicle number",
-                hintStyle: TextStyle(fontWeight: FontWeight.w500),
                 filled: true,
                 fillColor: Colors.grey[100],
                 border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(30),
-                  borderSide: BorderSide.none,
-                ),
+                    borderRadius: BorderRadius.circular(30),
+                    borderSide: BorderSide.none),
                 contentPadding:
                     EdgeInsets.symmetric(vertical: 14, horizontal: 16),
               ),
               validator: (value) {
-                if (value != null && value.trim().isEmpty) {
+                if (value == null || value.trim().isEmpty) {
                   return "Please enter correct number";
-                } else if ((value ?? '').trim().length < 8 ||
-                    (value ?? '').trim().length > 12) {
+                }
+                if (value.trim().length < 8 || value.trim().length > 12) {
                   return "Please enter correct number";
                 }
                 return null;
               },
             ),
           ),
-
-          SizedBox(width: 10), // Space between
-
-          // Search Button
+          SizedBox(width: 10),
           GestureDetector(
-            onTap: () {
-              getDispatchedList();
-            },
+            onTap: getDispatchedList,
             child: Container(
               padding: EdgeInsets.all(14),
               decoration: BoxDecoration(
                 color: Colors.green.shade400,
                 borderRadius: BorderRadius.circular(30),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.blue.shade50,
-                    blurRadius: 8,
-                    offset: Offset(2, 2),
-                  ),
-                ],
               ),
               child: Icon(Icons.search, color: Colors.white),
             ),

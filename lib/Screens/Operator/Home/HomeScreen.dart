@@ -3,7 +3,6 @@ import 'package:ai_barcode_scanner/ai_barcode_scanner.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:rajfed_qr/APIService/api_endpoint.dart';
 import 'package:rajfed_qr/APIService/api_service.dart';
 import 'package:rajfed_qr/APIService/data_manager.dart';
@@ -20,7 +19,6 @@ import 'package:rajfed_qr/models/crop_list_model.dart';
 import 'package:rajfed_qr/models/operator_details.dart';
 import 'package:rajfed_qr/models/saved_qr_model.dart';
 import 'package:rajfed_qr/utils/enums.dart';
-import 'package:rajfed_qr/utils/location_service.dart';
 import 'package:rajfed_qr/utils/toast_formatter.dart';
 
 class MyHomePage extends StatefulWidget {
@@ -128,6 +126,11 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void saveQrAPICall() async {
+    if (scannedNumberList.length != operatorDetails?.remainingBardana) {
+      showErrorToast(
+          "Please add ${operatorDetails?.transctionBardana} QR codes.");
+      return;
+    }
     if (!mounted) return;
     showLoadingDialog(context);
     // Position? position = await LocationService.instance.getLocation(context);
@@ -578,6 +581,7 @@ class _MyHomePageState extends State<MyHomePage> {
           Navigator.pop(context);
           setState(() {
             operatorDetails = response?.data;
+            scannedNumberList.clear();
           });
           getSavedQrCodes();
         } else {

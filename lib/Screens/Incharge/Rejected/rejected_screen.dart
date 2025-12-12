@@ -159,9 +159,6 @@ class _RejectedInchargeScreenState extends State<RejectedInchargeScreen> {
                                 subtitle: DateFormatter.formatDateToDDMMMYYYY(
                                     details.receivedDateTime ?? 'NA'))),
                         InformationRow(
-                            title: "Quantity(Qtl)",
-                            subtitle: (details.qtl ?? 'NA').toString()),
-                        InformationRow(
                             title: "No. of Bardana",
                             subtitle: (details.noOfBardana ?? 'NA').toString()),
                         InformationRow(

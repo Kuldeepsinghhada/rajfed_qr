@@ -59,10 +59,6 @@ class InformationView extends StatelessWidget {
                   title: "Received Date",
                   subtitle: DateFormatter.formatDateToDDMMMYYYY(
                       model?.receivedDateTime ?? 'NA'))),
-          InformationRow(
-              title: "Quantity(Qt)",
-              subtitle:
-                  "${details?.transctionQty ?? model?.qtl.toString() ?? 'NA'}"),
           details != null
               ? InformationRow(
                   title: "No. of Bardana",
