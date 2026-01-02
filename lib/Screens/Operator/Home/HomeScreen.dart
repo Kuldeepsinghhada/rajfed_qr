@@ -154,6 +154,13 @@ class _MyHomePageState extends State<MyHomePage> {
 
       Navigator.pop(context);
       if (data?.status == true) {
+        try {
+          var list = data?.data['response']['data']['qrExists'] as List?;
+          if (list != null && list.isNotEmpty) {
+            List<String> stringList = List<String>.from(list);
+            showDuplicateEntryDialog(context, stringList);
+          }
+        } catch (e) {}
         scannedNumberList.clear();
         showSuccessToast('Record Saved Successfully');
         getSavedQrCodes();
@@ -165,6 +172,58 @@ class _MyHomePageState extends State<MyHomePage> {
       Navigator.pop(context);
       showErrorToast("Something went wrong");
     }
+  }
+
+  void showDuplicateEntryDialog(
+    BuildContext context,
+    List<String> duplicateQrCodes,
+  ) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text(
+            'Duplicate Entry',
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+          content: SizedBox(
+            width: double.maxFinite,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'We found duplicate entry of these QR code, which will be not added.',
+                ),
+                const SizedBox(height: 12),
+                Flexible(
+                  child: ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: duplicateQrCodes.length,
+                    itemBuilder: (context, index) {
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 4),
+                        child: Text(
+                          '• ${duplicateQrCodes[index]}',
+                          style: const TextStyle(fontSize: 14),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   void getSavedQrCodes() async {
@@ -424,8 +483,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       int baseNumber = int.parse(numericStr);
                       int count = int.parse(countController.text);
                       int remainingRecord =
-                          (operatorDetails?.remainingBardana ?? 0) -
-                              (savedQrIds.length);
+                          (operatorDetails?.remainingBardana ?? 0);
                       if (scannedNumberList.length <= remainingRecord - 1) {
                         for (int i = 0; i < count; i++) {
                           if (scannedNumberList.length <= remainingRecord - 1) {
@@ -771,9 +829,8 @@ class _MyHomePageState extends State<MyHomePage> {
                   text: 'Bulk Entry',
                   onPressed: () {
                     int remainingRecord =
-                        (operatorDetails?.remainingBardana ?? 0) -
-                            (savedQrIds.length);
-                    if (scannedNumberList.length <= remainingRecord - 1) {
+                        (operatorDetails?.remainingBardana ?? 0);
+                    if (remainingRecord != 0) {
                       showBulkQRCodeDialog(context);
                     } else {
                       Fluttertoast.showToast(

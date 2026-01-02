@@ -87,7 +87,7 @@ class OPHomeService {
       var response = await ApiService.instance
           .apiCall(APIEndPoint.operatorSaveQr, HttpRequestType.post, body);
       if (response.status) {
-        return APIResponse(true, null, "");
+        return APIResponse(true, response.data, "");
       }
       return APIResponse(false, null, response.error);
     } catch (e) {

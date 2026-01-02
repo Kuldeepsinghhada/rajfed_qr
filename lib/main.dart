@@ -1,11 +1,9 @@
-import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:rajfed_qr/APIService/shared_preference_helper.dart';
 import 'package:rajfed_qr/Screens/Incharge/incharge_dashboard/incharge_dashboard_screen.dart';
 import 'package:rajfed_qr/Screens/OpenSource/farmer_desk_screen/farmer_desk_screen.dart';
 import 'package:rajfed_qr/Screens/Operator/OperatorDashboard/operator_dashboard.dart';
 import 'package:rajfed_qr/Screens/Warehouse/warehouse_dashboard.dart';
-import 'package:rajfed_qr/Screens/Warehouse/warehouse_home.dart';
 import 'package:upgrader/upgrader.dart';
 import 'Screens/Admin/admin_home_screen.dart';
 
@@ -29,15 +27,7 @@ void main() async {
     initialRoute = AdminHomeScreen();
   }
 
-  runApp(
-    UpgradeAlert(
-      upgrader: Upgrader(
-        debugDisplayAlways: true,
-        durationUntilAlertAgain: Duration.zero,
-      ),
-      child: MyApp(initialRoute: initialRoute),
-    ),
-  );
+  runApp(MyApp(initialRoute: initialRoute));
 }
 
 class MyApp extends StatelessWidget {
@@ -51,24 +41,21 @@ class MyApp extends StatelessWidget {
       title: 'Rajfed Kishan',
       navigatorKey: navigatorKey,
       theme: ThemeData(
-        primaryColor: Color(0xFFB7D77A),
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: Color(0xFFB7D77A),
-          primary: Color(0xFFB7D77A),
-          secondary: Colors.green[700]!,
-        ),
-        scaffoldBackgroundColor: Colors.white,
-        appBarTheme: AppBarTheme(
-          centerTitle: true,
-          backgroundColor: Color(0xFFB7D77A),
-          titleTextStyle: TextStyle(
-              color: Colors.black, fontSize: 20, fontWeight: FontWeight.w600),
-          iconTheme: IconThemeData(color: Colors.black),
-          elevation: 10,
-        ),
         useMaterial3: true,
+        primaryColor: const Color(0xFFB7D77A),
+        appBarTheme: const AppBarTheme(
+          backgroundColor: Color(0xFFB7D77A),
+          foregroundColor: Colors.black,
+          centerTitle: true,
+          elevation: 0,
+          surfaceTintColor: Colors.transparent, // ⭐ IMPORTANT
+        ),
       ),
-      home: initialRoute,
+      home: UpgradeAlert(
+        upgrader: Upgrader(
+            durationUntilAlertAgain: Duration.zero),
+        child: initialRoute!,
+      ),
     );
   }
 }

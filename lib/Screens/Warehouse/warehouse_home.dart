@@ -7,16 +7,11 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:rajfed_qr/APIService/api_endpoint.dart';
 import 'package:rajfed_qr/APIService/api_service.dart';
 import 'package:rajfed_qr/APIService/shared_preference_helper.dart';
-import 'package:rajfed_qr/Screens/Incharge/Rejected/rejected_screen.dart';
-import 'package:rajfed_qr/Screens/Incharge/dispatched/dispatched_screen.dart';
 import 'package:rajfed_qr/Screens/Incharge/upload_warehouse_screen/upload_warehouse_screen.dart';
 import 'package:rajfed_qr/Screens/OpenSource/farmer_desk_screen/farmer_desk_screen.dart';
 import 'package:rajfed_qr/Screens/Operator/Home/views/Information_row.dart';
-import 'package:rajfed_qr/Screens/Operator/Home/views/custom_drawer.dart';
 import 'package:rajfed_qr/Screens/Warehouse/partial_reject_screen.dart';
 import 'package:rajfed_qr/Screens/Warehouse/warehouse_service.dart';
-import 'package:rajfed_qr/Screens/ChangePassword/change_password.dart';
-import 'package:rajfed_qr/Screens/login/login_screen.dart';
 import 'package:rajfed_qr/Screens/QRScannerScreen/qr_code_screen.dart';
 import 'package:rajfed_qr/common_views/common_button.dart';
 import 'package:rajfed_qr/common_views/loader_dialog.dart';
@@ -269,7 +264,6 @@ class _WarehouseHomeState extends State<WarehouseHome> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: Text('Home'),
       ),
       // drawer: CustomDrawer(
@@ -613,10 +607,14 @@ class LotView extends StatelessWidget {
                         title: "Received Date",
                         subtitle: DateFormatter.formatDateToDDMMMYYYY(
                             model?.receivedDateTime ?? 'NA'))),
-                details != null
+                InformationRow(
+                    title: "No. of Bardana",
+                    subtitle:
+                        "${details?.transctionBardana ?? model?.noOfBardana ?? 'NA'}"),
+                model != null
                     ? InformationRow(
-                        title: "No. of Bardana",
-                        subtitle: "${details?.transctionBardana ?? 'NA'}")
+                        title: "Quantity (Qtl)",
+                        subtitle: "${model?.qtl ?? 'NA'}")
                     : SizedBox(),
                 InformationRow(
                     title: "Copy Type",

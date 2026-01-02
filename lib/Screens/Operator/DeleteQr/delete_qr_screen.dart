@@ -149,19 +149,21 @@ class _DeleteQrScreenState extends State<DeleteQrScreen> {
           ),
           Padding(
             padding: const EdgeInsets.all(12.0),
-            child: CommonButton(
-                text: "DELETE SELECTED QR",
-                bgColor: Colors.red.shade400,
-                onPressed: () {
-                  if (selectedQr.isEmpty) {
-                    Fluttertoast.showToast(
-                        msg: "Please select QR code to delete");
-                    return;
-                  }
-                  showDeleteQRDialog(context, () {
-                    deleteQrCodes();
-                  });
-                }),
+            child: SafeArea(
+              child: CommonButton(
+                  text: "DELETE SELECTED QR",
+                  bgColor: Colors.red.shade400,
+                  onPressed: () {
+                    if (selectedQr.isEmpty) {
+                      Fluttertoast.showToast(
+                          msg: "Please select QR code to delete");
+                      return;
+                    }
+                    showDeleteQRDialog(context, () {
+                      deleteQrCodes();
+                    });
+                  }),
+            ),
           )
         ],
       ),
