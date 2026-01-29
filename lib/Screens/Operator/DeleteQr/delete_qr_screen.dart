@@ -23,7 +23,7 @@ class _DeleteQrScreenState extends State<DeleteQrScreen> {
 
   @override
   void initState() {
-    savedQrIds = widget.savedQrIds;
+    savedQrIds = widget.savedQrIds.where((item) => item.status == 0).toList();
     super.initState();
   }
 
@@ -103,49 +103,56 @@ class _DeleteQrScreenState extends State<DeleteQrScreen> {
             ),
           ),
           Expanded(
-            child: ListView.builder(
-                itemCount: savedQrIds.length,
-                padding: EdgeInsets.all(0),
-                itemBuilder: (context, index) {
-                  var isCheck = selectedQr.contains(savedQrIds[index].qrCode);
-                  return Padding(
-                    padding: const EdgeInsets.only(left: 16.0),
-                    child: Row(
-                      children: [
-                        SizedBox(
-                          width: 35,
-                          child: Center(
-                            child: Text((index + 1).toString(),
-                                style: TextStyle(
-                                    fontWeight: FontWeight.w600, fontSize: 16)),
-                          ),
-                        ),
-                        Expanded(
-                          child: Padding(
-                            padding: const EdgeInsets.only(left: 20.0),
-                            child: Text(
-                              savedQrIds[index].qrCode ?? '',
-                              style: TextStyle(
-                                  fontWeight: FontWeight.w600, fontSize: 16),
+            child: savedQrIds.isEmpty
+                ? Center(child: Text("No data Available for Delete"))
+                : ListView.builder(
+                    itemCount: savedQrIds.length,
+                    padding: EdgeInsets.all(0),
+                    itemBuilder: (context, index) {
+                      var isCheck =
+                          selectedQr.contains(savedQrIds[index].qrCode);
+                      return Padding(
+                        padding: const EdgeInsets.only(left: 16.0),
+                        child: Row(
+                          children: [
+                            SizedBox(
+                              width: 35,
+                              child: Center(
+                                child: Text((index + 1).toString(),
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 16)),
+                              ),
                             ),
-                          ),
+                            Expanded(
+                              child: Padding(
+                                padding: const EdgeInsets.only(left: 20.0),
+                                child: Text(
+                                  savedQrIds[index].qrCode ?? '',
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 16),
+                                ),
+                              ),
+                            ),
+                            Checkbox(
+                                value: isCheck,
+                                checkColor:
+                                    isCheck ? Colors.white : Colors.black,
+                                activeColor: Colors.green.shade400,
+                                onChanged: (value) {
+                                  if (isCheck) {
+                                    selectedQr.remove(savedQrIds[index].qrCode);
+                                  } else {
+                                    selectedQr
+                                        .add(savedQrIds[index].qrCode ?? '');
+                                  }
+                                  setState(() {});
+                                })
+                          ],
                         ),
-                        Checkbox(
-                            value: isCheck,
-                            checkColor: isCheck ? Colors.white : Colors.black,
-                            activeColor: Colors.green.shade400,
-                            onChanged: (value) {
-                              if (isCheck) {
-                                selectedQr.remove(savedQrIds[index].qrCode);
-                              } else {
-                                selectedQr.add(savedQrIds[index].qrCode ?? '');
-                              }
-                              setState(() {});
-                            })
-                      ],
-                    ),
-                  );
-                }),
+                      );
+                    }),
           ),
           Padding(
             padding: const EdgeInsets.all(12.0),

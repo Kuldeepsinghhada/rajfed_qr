@@ -126,11 +126,11 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void saveQrAPICall() async {
-    if (scannedNumberList.length != operatorDetails?.remainingBardana) {
-      showErrorToast(
-          "Please add ${operatorDetails?.transctionBardana} QR codes.");
-      return;
-    }
+    // if (scannedNumberList.length != operatorDetails?.remainingBardana) {
+    //   showErrorToast(
+    //       "Please add ${operatorDetails?.transctionBardana} QR codes.");
+    //   return;
+    // }
     if (!mounted) return;
     showLoadingDialog(context);
     // Position? position = await LocationService.instance.getLocation(context);
@@ -926,13 +926,31 @@ class _MyHomePageState extends State<MyHomePage> {
                                                       .symmetric(
                                                       vertical: 12.0,
                                                       horizontal: 20),
-                                                  child: Text(
-                                                    savedQrIds[index].qrCode ??
-                                                        '',
-                                                    style: TextStyle(
-                                                        fontWeight:
-                                                            FontWeight.w600,
-                                                        fontSize: 16),
+                                                  child: Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceBetween,
+                                                    children: [
+                                                      Text(
+                                                        savedQrIds[index]
+                                                                .qrCode ??
+                                                            '',
+                                                        style: TextStyle(
+                                                            fontWeight:
+                                                                FontWeight.w600,
+                                                            fontSize: 16),
+                                                      ),
+                                                      savedQrIds[index]
+                                                                  .status ==
+                                                              1
+                                                          ? Text(
+                                                              "Processed",
+                                                              style: TextStyle(
+                                                                  color: Colors
+                                                                      .grey),
+                                                            )
+                                                          : Text('')
+                                                    ],
                                                   ),
                                                 ),
                                               ),

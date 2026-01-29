@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 void showLoadingDialog(BuildContext context) {
   showDialog(
     context: context,
-    barrierDismissible: false, // Prevent closing by tapping outside
+    barrierDismissible: true, // Prevent closing by tapping outside
     builder: (context) {
       return Dialog(
         backgroundColor: Colors.transparent,

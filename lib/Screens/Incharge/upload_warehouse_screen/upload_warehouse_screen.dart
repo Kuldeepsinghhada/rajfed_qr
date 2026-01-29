@@ -176,6 +176,8 @@ class _UploadWarehouseScreenState extends State<UploadWarehouseScreen> {
         showErrorToast('Record Not updated');
       }
     } catch (e) {
+      print(e.toString());
+      Navigator.pop(context);
       log("Error: ${e.toString()}");
     }
   }
