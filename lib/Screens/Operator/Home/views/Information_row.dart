@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:rajfed_qr/APIService/data_manager.dart';
 import 'package:rajfed_qr/Screens/QA/quality_assesment_screen.dart';
 import 'package:rajfed_qr/models/dispatch_incharge_model.dart';
 import 'package:rajfed_qr/models/operator_details.dart';
@@ -91,10 +92,23 @@ class InformationView extends StatelessWidget {
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
               IconButton(
                   onPressed: () {
+                    var index = DataManager.instance.cropList.indexWhere((item) => item.cropDescEN == details?.cropTypeEN);
+                    if(index == -1) {
+                      return;
+                    }
                     Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (_) => QualityAssessmentReport()));
+                            builder: (_) => QualityAssessmentReport(
+                                  registrationNumber: details?.farmerRegID ??
+                                      model?.farmerRegId ??
+                                      '',
+                                  farmerName: details?.farmerName ?? '',
+                                  mobileNo: '',
+                                  purchaseCenterID:
+                                      model?.purchaseCenterId?.toString() ?? '',
+                                  cropID: DataManager.instance.cropList[index].cropID.toString(),
+                                )));
                   },
                   icon: Icon(Icons.add))
             ],

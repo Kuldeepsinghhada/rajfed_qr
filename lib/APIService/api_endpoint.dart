@@ -15,6 +15,7 @@ class APIEndPoint {
 
   static String inchargeDetails = "InchargeDetails";
   static String machineDetails = "MachineDetails";
+  static String uploadFarmerRemark = "UploadFarmerRemark";
   static String getDistrict = "DistrictMaster";
   static String getWareHouse = "WarehouseMaster";
   static String dispatchToWareHouse = "DispatchedToWareHouse";

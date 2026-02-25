@@ -1,14 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:rajfed_qr/APIService/shared_preference_helper.dart';
 import 'dart:io';
+import 'dart:convert';
 
 import 'package:rajfed_qr/common_views/common_button.dart';
 import 'package:rajfed_qr/Screens/QA/qa_service.dart';
 import 'package:rajfed_qr/models/machine_model.dart';
 
 class QualityAssessmentReport extends StatefulWidget {
-  const QualityAssessmentReport({super.key});
+  final String registrationNumber;
+  final String farmerName;
+  final String mobileNo;
+  final String purchaseCenterID;
+  final String cropID;
+
+  const QualityAssessmentReport({
+    super.key,
+    required this.registrationNumber,
+    required this.farmerName,
+    required this.mobileNo,
+    required this.purchaseCenterID,
+    required this.cropID,
+  });
 
   @override
   State<QualityAssessmentReport> createState() =>
@@ -74,7 +89,7 @@ class _QualityAssessmentReportState extends State<QualityAssessmentReport> {
     RegExp(r'^\d*\.?\d*'),
   );
 
-  void _submitForm() {
+  void _submitForm() async {
     if (_formKey.currentState!.validate()) {
       if (qualityType == null) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -82,10 +97,65 @@ class _QualityAssessmentReportState extends State<QualityAssessmentReport> {
         );
         return;
       }
+      if (_pickedImage == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Please attach an image")),
+        );
+        return;
+      }
+      if (selectedMachine == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Please select a machine")),
+        );
+        return;
+      }
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Form Submitted Successfully")),
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => const Center(child: CircularProgressIndicator()),
       );
+
+      try {
+        String imageBase64 = base64Encode(File(_pickedImage!.path).readAsBytesSync());
+        int year = DateTime.now().year;
+        String fy = year.toString();
+
+        var purchaseCenterId = await SharedPreferenceHelper.instance.getPurchaseCenterId();
+
+        var response = await QaService.instance.uploadFarmerRemark(
+          registrationNumber: widget.registrationNumber,
+          farmerName: widget.farmerName,
+          mobileNo: widget.mobileNo,
+          purchaseCenterID: purchaseCenterId.toString(),
+          cropID: widget.cropID,
+          fy: fy,
+          foreignMatter: _foreignMatterController.text,
+          type: qualityType!,
+          qualityAnalystName: _analystNameController.text,
+          fileSource: "Mobile",
+          imageBase64: imageBase64,
+          machineName: selectedMachine!,
+        );
+
+        Navigator.pop(context); // close loader
+
+        if (response != null && response.status) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("Form Submitted Successfully")),
+          );
+          Navigator.pop(context); // go back
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(response?.error ?? "Something went wrong")),
+          );
+        }
+      } catch (e) {
+        Navigator.pop(context);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Error: $e")),
+        );
+      }
     }
   }
 

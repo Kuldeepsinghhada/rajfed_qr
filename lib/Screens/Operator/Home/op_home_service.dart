@@ -4,6 +4,7 @@ import 'package:device_info_plus/device_info_plus.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:rajfed_qr/APIService/api_endpoint.dart';
 import 'package:rajfed_qr/APIService/api_service.dart';
+import 'package:rajfed_qr/APIService/data_manager.dart';
 import 'package:rajfed_qr/APIService/shared_preference_helper.dart';
 import 'package:rajfed_qr/models/APIModel/api_response.dart';
 import 'package:rajfed_qr/models/crop_list_model.dart';
@@ -104,6 +105,7 @@ class OPHomeService {
         List<CropModel> cropList = (response.data['crops'] as List)
             .map((item) => CropModel.fromJson(item))
             .toList();
+        DataManager.instance.cropList = cropList;
         return APIResponse(true, cropList, "");
       }
       return APIResponse(false, null, response.error);
