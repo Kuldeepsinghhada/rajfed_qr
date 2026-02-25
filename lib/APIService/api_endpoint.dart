@@ -13,8 +13,8 @@ class APIEndPoint {
   static String getUpdates = "GetUpdates";
   static String getProfile = "ProfileDetails";
 
-  // Incharge Endpoint
   static String inchargeDetails = "InchargeDetails";
+  static String machineDetails = "MachineDetails";
   static String getDistrict = "DistrictMaster";
   static String getWareHouse = "WarehouseMaster";
   static String dispatchToWareHouse = "DispatchedToWareHouse";

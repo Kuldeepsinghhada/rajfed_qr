@@ -4,6 +4,8 @@ import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 
 import 'package:rajfed_qr/common_views/common_button.dart';
+import 'package:rajfed_qr/Screens/QA/qa_service.dart';
+import 'package:rajfed_qr/models/machine_model.dart';
 
 class QualityAssessmentReport extends StatefulWidget {
   const QualityAssessmentReport({super.key});
@@ -16,7 +18,6 @@ class QualityAssessmentReport extends StatefulWidget {
 class _QualityAssessmentReportState extends State<QualityAssessmentReport> {
   final _formKey = GlobalKey<FormState>();
 
-  final TextEditingController _brokenController = TextEditingController();
   final TextEditingController _foreignMatterController =
       TextEditingController();
   final TextEditingController _analystNameController = TextEditingController();
@@ -26,21 +27,42 @@ class _QualityAssessmentReportState extends State<QualityAssessmentReport> {
   String? selectedMachine;
   String? qualityType;
 
-  List<String> machineList = [
-    "Machine 1",
-    "Machine 2",
-    "Machine 3",
-    "Machine 4",
-    "Machine 5"
-  ];
+  List<MachineModel> machineDataList = [];
+  List<String> machineList = [];
 
   // Image picker
   final ImagePicker _picker = ImagePicker();
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchMachines();
+  }
+
+  Future<void> _fetchMachines() async {
+    var response = await QaService.instance.getMachineDetails();
+    if (response != null && response.status) {
+      if (mounted) {
+        setState(() {
+          machineList.clear();
+          machineDataList.clear();
+
+          if (response.data != null && response.data is List<MachineModel>) {
+            machineDataList = response.data as List<MachineModel>;
+            for (var machine in machineDataList) {
+              if (machine.machineName != null) {
+                machineList.add(machine.machineName!);
+              }
+            }
+          }
+        });
+      }
+    }
+  }
   XFile? _pickedImage;
 
   @override
   void dispose() {
-    _brokenController.dispose();
     _foreignMatterController.dispose();
     _analystNameController.dispose();
     _moistureController.dispose();
@@ -191,20 +213,6 @@ class _QualityAssessmentReportState extends State<QualityAssessmentReport> {
               /// Quality Parameters
               Column(
                 children: [
-                  labeled(
-                    "Broken, Damaged, Discolored, Chalky, Grains (Upto 8%)",
-                    TextFormField(
-                      controller: _brokenController,
-                      keyboardType:
-                          const TextInputType.numberWithOptions(decimal: true),
-                      inputFormatters: [_decimalFormatter],
-                      decoration: modernDecoration('',
-                          labelInside: false, hintText: "Enter percentage"),
-                      validator: (value) =>
-                          _validatePercentage(value, 8, "Broken Grains"),
-                    ),
-                  ),
-                  const SizedBox(height: 16),
                   labeled(
                     'Foreign Matter (Max 4%)',
                     TextFormField(
