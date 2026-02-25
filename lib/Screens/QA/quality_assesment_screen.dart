@@ -37,6 +37,7 @@ class _QualityAssessmentReportState extends State<QualityAssessmentReport> {
       TextEditingController();
   final TextEditingController _analystNameController = TextEditingController();
   final TextEditingController _moistureController = TextEditingController();
+  final TextEditingController _remarkController = TextEditingController();
 
 
   String? selectedMachine;
@@ -81,6 +82,7 @@ class _QualityAssessmentReportState extends State<QualityAssessmentReport> {
     _foreignMatterController.dispose();
     _analystNameController.dispose();
     _moistureController.dispose();
+    _remarkController.dispose();
     super.dispose();
   }
 
@@ -119,7 +121,6 @@ class _QualityAssessmentReportState extends State<QualityAssessmentReport> {
       try {
         String imageBase64 = base64Encode(File(_pickedImage!.path).readAsBytesSync());
         int year = DateTime.now().year;
-        String fy = year.toString();
 
         var purchaseCenterId = await SharedPreferenceHelper.instance.getPurchaseCenterId();
 
@@ -129,13 +130,14 @@ class _QualityAssessmentReportState extends State<QualityAssessmentReport> {
           mobileNo: widget.mobileNo,
           purchaseCenterID: purchaseCenterId.toString(),
           cropID: widget.cropID,
-          fy: fy,
+          fy: year,
           foreignMatter: _foreignMatterController.text,
           type: qualityType!,
           qualityAnalystName: _analystNameController.text,
           fileSource: "Mobile",
           imageBase64: imageBase64,
-          machineName: selectedMachine!,
+          machineName: selectedMachine!, moisture: _moistureController.text,
+          remark: _remarkController.text,
         );
 
         Navigator.pop(context); // close loader
@@ -308,7 +310,7 @@ class _QualityAssessmentReportState extends State<QualityAssessmentReport> {
                   const TextInputType.numberWithOptions(decimal: true),
                   inputFormatters: [_decimalFormatter],
                   decoration: modernDecoration('',
-                      labelInside: false, hintText: "Enter percentage"),
+                      labelInside: false, hintText: "Enter percentage").copyWith(suffixText: '%'),
                   validator: (value) =>
                       _validatePercentage(value, 8, "Enter value for Moisture"),
                 ),
@@ -413,6 +415,19 @@ class _QualityAssessmentReportState extends State<QualityAssessmentReport> {
                             ),
                     ),
                   ],
+                ),
+              ),
+
+              const SizedBox(height: 16),
+
+              // Remark field
+              labeled(
+                'Remark',
+                TextFormField(
+                  controller: _remarkController,
+                  decoration: modernDecoration('', labelInside: false, hintText: 'Enter remark'),
+                  validator: (value) =>
+                      value == null || value.isEmpty ? 'Enter remark' : null,
                 ),
               ),
 

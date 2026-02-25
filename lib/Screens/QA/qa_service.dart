@@ -44,16 +44,18 @@ class QaService {
     required String mobileNo,
     required String purchaseCenterID,
     required String cropID,
-    required String fy,
+    required int fy,
     required String foreignMatter,
     required String type,
     required String qualityAnalystName,
     required String fileSource,
-    required String imageBase64,
+    required String moisture,
     required String machineName,
+    required String imageBase64,
+    required String remark,
   }) async {
     try {
-      Map<String, dynamic> body = {
+      List<Map<String, dynamic>> body = [{
         "registrationNumber": registrationNumber,
         "farmerName": farmerName,
         "mobileNo": mobileNo,
@@ -64,9 +66,13 @@ class QaService {
         "type": type,
         "qualityAnalystName": qualityAnalystName,
         "fileSource": fileSource,
-        "imageBase64": imageBase64,
         "machineName": machineName,
-      };
+        "remark": remark,
+        "loginIP": "10.10.10.10",
+        "LoginSSOID": "KishanApp",
+        "moisture": moisture,
+        "imageBase64": imageBase64
+      }];
 
       var response = await ApiService.instance.apiCall(
           APIEndPoint.uploadFarmerRemark, HttpRequestType.post, body);
