@@ -6,6 +6,7 @@ import 'package:rajfed_qr/Screens/OpenSource/contact_us_screen.dart';
 import 'package:rajfed_qr/Screens/OpenSource/crop_calculate/crop_calculater_screen.dart';
 import 'package:rajfed_qr/Screens/OpenSource/farmer_desk_screen/farmer_desk_service.dart';
 import 'package:rajfed_qr/Screens/OpenSource/msp_rate_screen.dart';
+import 'package:rajfed_qr/Screens/Registration/screens/information_page.dart';
 import 'package:rajfed_qr/Screens/login/login_screen.dart';
 import 'package:rajfed_qr/common_views/loader_dialog.dart';
 import 'package:rajfed_qr/models/update_model.dart';
@@ -49,6 +50,11 @@ class _FarmerDeskScreenState extends State<FarmerDeskScreen> {
     DeviceItem(
       title: "Login",
       icon: Icons.login,
+      color: Color(0xFF26A69A), // Teal
+    ),
+    DeviceItem(
+      title: "Registration",
+      icon: Icons.how_to_reg,
       color: Color(0xFF26A69A), // Teal
     ),
   ];
@@ -167,6 +173,11 @@ class _FarmerDeskScreenState extends State<FarmerDeskScreen> {
                               context,
                               MaterialPageRoute(
                                   builder: (context) => LoginScreen()));
+                        } else if (index == 6) {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => InformationPage()));
                         }
                       },
                       child: Padding(

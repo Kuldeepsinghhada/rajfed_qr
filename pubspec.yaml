@@ -51,6 +51,8 @@ dependencies:
   connectivity_plus: ^6.1.2
   url_launcher: ^6.3.2
   marquee: ^2.3.0
+  pointycastle: ^3.9.1
+  encrypt: ^5.0.3
 
 dev_dependencies:
   flutter_test:

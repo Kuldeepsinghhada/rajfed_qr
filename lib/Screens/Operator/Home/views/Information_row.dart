@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:rajfed_qr/Screens/QA/quality_assesment_screen.dart';
 import 'package:rajfed_qr/models/dispatch_incharge_model.dart';
 import 'package:rajfed_qr/models/operator_details.dart';
 import 'package:rajfed_qr/utils/date_formatter.dart';
@@ -81,7 +82,23 @@ class InformationView extends StatelessWidget {
               : SizedBox(),
           InformationRow(
               title: "Copy Type",
-              subtitle: details?.cropTypeEN ?? model?.cropEN ?? 'NA')
+              subtitle: details?.cropTypeEN ?? model?.cropEN ?? 'NA'),
+          SizedBox(height: 20),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text("Quality Assessment Report",
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+              IconButton(
+                  onPressed: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (_) => QualityAssessmentReport()));
+                  },
+                  icon: Icon(Icons.add))
+            ],
+          )
         ],
       ),
     );
