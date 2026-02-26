@@ -88,7 +88,7 @@ class _QualityAssessmentReportState extends State<QualityAssessmentReport> {
       _moistureController.text = widget.existingRemark!.moisture.toString();
       _remarkController.text = widget.existingRemark!.remark ?? '';
       qualityType = widget.existingRemark!.type;
-      //selectedMachine = widget.existingRemark!.machineName;
+      selectedMachine = widget.existingRemark!.machineName;
     }
   }
 
@@ -267,28 +267,38 @@ class _QualityAssessmentReportState extends State<QualityAssessmentReport> {
           child: Column(
             children: [
               /// Machine Section - label above
-              labeled(
-                'Select Machine Name',
-                DropdownButtonFormField<String>(
-                  initialValue: selectedMachine,
-                  decoration: modernDecoration('Select Machine Name',
-                      labelInside: false),
-                  isExpanded: true,
-                  hint: Text("Select Machine"),
-                  validator: (value) => value == null ? "Select machine" : null,
-                  items: machineList
-                      .map((e) => DropdownMenuItem(
-                            value: e,
-                            child: Text(e),
-                          ))
-                      .toList(),
-                  onChanged: (val) {
-                    setState(() {
-                      selectedMachine = val;
-                    });
-                  },
-                ),
-              ),
+              widget.existingRemark != null
+                  ? labeled(
+                      'Machine Name',
+                      TextFormField(
+                        initialValue: widget.existingRemark!.machineName ?? '',
+                        readOnly: true,
+                        enableInteractiveSelection: false,
+                        decoration: modernDecoration('', labelInside: false),
+                      ),
+                    )
+                  : labeled(
+                      'Select Machine Name',
+                      DropdownButtonFormField<String>(
+                        initialValue: selectedMachine,
+                        decoration: modernDecoration('Select Machine Name',
+                            labelInside: false),
+                        isExpanded: true,
+                        hint: Text("Select Machine"),
+                        validator: (value) => value == null ? "Select machine" : null,
+                        items: machineList
+                            .map((e) => DropdownMenuItem(
+                                  value: e,
+                                  child: Text(e),
+                                ))
+                            .toList(),
+                        onChanged: (val) {
+                          setState(() {
+                            selectedMachine = val;
+                          });
+                        },
+                      ),
+                    ),
 
               SizedBox(
                 height: 12,
@@ -301,6 +311,8 @@ class _QualityAssessmentReportState extends State<QualityAssessmentReport> {
                     'Foreign Matter (Max 4%)',
                     TextFormField(
                       controller: _foreignMatterController,
+                      readOnly: widget.existingRemark != null,
+                      enableInteractiveSelection: widget.existingRemark == null,
                       keyboardType:
                           const TextInputType.numberWithOptions(decimal: true),
                       inputFormatters: [_decimalFormatter],
@@ -318,6 +330,8 @@ class _QualityAssessmentReportState extends State<QualityAssessmentReport> {
                 "Moisture (Upto 8%)",
                 TextFormField(
                   controller: _moistureController,
+                  readOnly: widget.existingRemark != null,
+                  enableInteractiveSelection: widget.existingRemark == null,
                   keyboardType:
                   const TextInputType.numberWithOptions(decimal: true),
                   inputFormatters: [_decimalFormatter],
@@ -333,24 +347,27 @@ class _QualityAssessmentReportState extends State<QualityAssessmentReport> {
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: labeled(
                   'Type',
-                  Card(
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16)),
-                    child: Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: SegmentedButton<String>(
-                        emptySelectionAllowed: true,
-                        segments: const [
-                          ButtonSegment(value: "FAQ", label: Text("FAQ")),
-                          ButtonSegment(
-                              value: "NON-FAQ", label: Text("NON-FAQ")),
-                        ],
-                        selected: qualityType != null ? {qualityType!} : {},
-                        onSelectionChanged: (newSelection) {
-                          setState(() {
-                            qualityType = newSelection.first;
-                          });
-                        },
+                  AbsorbPointer(
+                    absorbing: widget.existingRemark != null,
+                    child: Card(
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16)),
+                      child: Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: SegmentedButton<String>(
+                          emptySelectionAllowed: true,
+                          segments: const [
+                            ButtonSegment(value: "FAQ", label: Text("FAQ")),
+                            ButtonSegment(
+                                value: "NON-FAQ", label: Text("NON-FAQ")),
+                          ],
+                          selected: qualityType != null ? {qualityType!} : {},
+                          onSelectionChanged: (newSelection) {
+                            setState(() {
+                              qualityType = newSelection.first;
+                            });
+                          },
+                        ),
                       ),
                     ),
                   ),
@@ -364,6 +381,8 @@ class _QualityAssessmentReportState extends State<QualityAssessmentReport> {
                 'Quality Analyst Name',
                 TextFormField(
                   controller: _analystNameController,
+                  readOnly: widget.existingRemark != null,
+                  enableInteractiveSelection: widget.existingRemark == null,
                   decoration: modernDecoration('', labelInside: false,hintText: "Enter Name"),
                   validator: (value) => value == null || value.isEmpty
                       ? "Enter Analyst Name"
@@ -379,22 +398,23 @@ class _QualityAssessmentReportState extends State<QualityAssessmentReport> {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Row(
-                      children: [
-                        ElevatedButton.icon(
-                          onPressed: () => _pickImage(ImageSource.camera),
-                          icon: const Icon(Icons.camera_alt_outlined),
-                          label: const Text('Camera'),
-                        ),
-                        const SizedBox(width: 12),
-                        ElevatedButton.icon(
-                          onPressed: () => _pickImage(ImageSource.gallery),
-                          icon: const Icon(Icons.photo_library_outlined),
-                          label: const Text('Gallery'),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 12),
+                    if (widget.existingRemark == null)
+                      Row(
+                        children: [
+                          ElevatedButton.icon(
+                            onPressed: () => _pickImage(ImageSource.camera),
+                            icon: const Icon(Icons.camera_alt_outlined),
+                            label: const Text('Camera'),
+                          ),
+                          const SizedBox(width: 12),
+                          ElevatedButton.icon(
+                            onPressed: () => _pickImage(ImageSource.gallery),
+                            icon: const Icon(Icons.photo_library_outlined),
+                            label: const Text('Gallery'),
+                          ),
+                        ],
+                      ),
+                    if (widget.existingRemark == null) const SizedBox(height: 12),
                     Container(
                       width: double.infinity,
                       height: 180,
@@ -403,28 +423,38 @@ class _QualityAssessmentReportState extends State<QualityAssessmentReport> {
                         color: Colors.white,
                         border: Border.all(color: Colors.grey.shade300),
                       ),
-                      child: _pickedImage == null
-                          ? Center(
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: const [
-                                  Icon(Icons.image_outlined,
-                                      size: 42, color: Colors.grey),
-                                  SizedBox(height: 8),
-                                  Text('No image selected',
-                                      style: TextStyle(color: Colors.grey)),
-                                ],
-                              ),
-                            )
-                          : ClipRRect(
+                      child: widget.existingRemark != null && widget.existingRemark!.imageBase64 != null && widget.existingRemark!.imageBase64!.isNotEmpty
+                          ? ClipRRect(
                               borderRadius: BorderRadius.circular(12),
-                              child: Image.file(
-                                File(_pickedImage!.path),
+                              child: Image.memory(
+                                base64Decode(widget.existingRemark!.imageBase64!),
                                 fit: BoxFit.cover,
                                 width: double.infinity,
                                 height: double.infinity,
                               ),
-                            ),
+                            )
+                          : _pickedImage == null
+                              ? Center(
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: const [
+                                      Icon(Icons.image_outlined,
+                                          size: 42, color: Colors.grey),
+                                      SizedBox(height: 8),
+                                      Text('No image selected',
+                                          style: TextStyle(color: Colors.grey)),
+                                    ],
+                                  ),
+                                )
+                              : ClipRRect(
+                                  borderRadius: BorderRadius.circular(12),
+                                  child: Image.file(
+                                    File(_pickedImage!.path),
+                                    fit: BoxFit.cover,
+                                    width: double.infinity,
+                                    height: double.infinity,
+                                  ),
+                                ),
                     ),
                   ],
                 ),
@@ -437,6 +467,8 @@ class _QualityAssessmentReportState extends State<QualityAssessmentReport> {
                 'Remark',
                 TextFormField(
                   controller: _remarkController,
+                  readOnly: widget.existingRemark != null,
+                  enableInteractiveSelection: widget.existingRemark == null,
                   decoration: modernDecoration('', labelInside: false, hintText: 'Enter remark'),
                   validator: (value) =>
                       value == null || value.isEmpty ? 'Enter remark' : null,
