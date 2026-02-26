@@ -7,6 +7,7 @@ import 'dart:convert';
 
 import 'package:rajfed_qr/common_views/common_button.dart';
 import 'package:rajfed_qr/Screens/QA/qa_service.dart';
+import 'package:rajfed_qr/models/farmer_remark_model.dart';
 import 'package:rajfed_qr/models/machine_model.dart';
 
 class QualityAssessmentReport extends StatefulWidget {
@@ -15,6 +16,7 @@ class QualityAssessmentReport extends StatefulWidget {
   final String mobileNo;
   final String purchaseCenterID;
   final String cropID;
+  final FarmerRemarkModel? existingRemark;
 
   const QualityAssessmentReport({
     super.key,
@@ -23,6 +25,7 @@ class QualityAssessmentReport extends StatefulWidget {
     required this.mobileNo,
     required this.purchaseCenterID,
     required this.cropID,
+    required this.existingRemark,
   });
 
   @override
@@ -48,6 +51,7 @@ class _QualityAssessmentReportState extends State<QualityAssessmentReport> {
 
   // Image picker
   final ImagePicker _picker = ImagePicker();
+  XFile? _pickedImage;
 
   @override
   void initState() {
@@ -71,11 +75,22 @@ class _QualityAssessmentReportState extends State<QualityAssessmentReport> {
               }
             }
           }
+          initData();
         });
       }
     }
   }
-  XFile? _pickedImage;
+
+  initData(){
+    if(widget.existingRemark != null){
+      _foreignMatterController.text = widget.existingRemark!.foreignMatter.toString();
+      _analystNameController.text = widget.existingRemark!.qualityAnalystName ?? '';
+      _moistureController.text = widget.existingRemark!.moisture.toString();
+      _remarkController.text = widget.existingRemark!.remark ?? '';
+      qualityType = widget.existingRemark!.type;
+      //selectedMachine = widget.existingRemark!.machineName;
+    }
+  }
 
   @override
   void dispose() {
@@ -120,17 +135,14 @@ class _QualityAssessmentReportState extends State<QualityAssessmentReport> {
 
       try {
         String imageBase64 = base64Encode(File(_pickedImage!.path).readAsBytesSync());
-        int year = DateTime.now().year;
-
         var purchaseCenterId = await SharedPreferenceHelper.instance.getPurchaseCenterId();
-
         var response = await QaService.instance.uploadFarmerRemark(
           registrationNumber: widget.registrationNumber,
           farmerName: widget.farmerName,
           mobileNo: widget.mobileNo,
           purchaseCenterID: purchaseCenterId.toString(),
           cropID: widget.cropID,
-          fy: year,
+          fy: 27,
           foreignMatter: _foreignMatterController.text,
           type: qualityType!,
           qualityAnalystName: _analystNameController.text,
@@ -438,7 +450,7 @@ class _QualityAssessmentReportState extends State<QualityAssessmentReport> {
       ),
 
       /// Modern Bottom Button
-      bottomNavigationBar: SafeArea(
+      bottomNavigationBar: widget.existingRemark == null ? SafeArea(
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           decoration: BoxDecoration(
@@ -456,7 +468,7 @@ class _QualityAssessmentReportState extends State<QualityAssessmentReport> {
             },
           ),
         ),
-      ),
+      ) : null,
     );
   }
 }

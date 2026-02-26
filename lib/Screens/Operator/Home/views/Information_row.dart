@@ -2,13 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:rajfed_qr/APIService/data_manager.dart';
 import 'package:rajfed_qr/Screens/QA/quality_assesment_screen.dart';
 import 'package:rajfed_qr/models/dispatch_incharge_model.dart';
+import 'package:rajfed_qr/models/farmer_remark_model.dart';
 import 'package:rajfed_qr/models/operator_details.dart';
 import 'package:rajfed_qr/utils/date_formatter.dart';
 
 class InformationView extends StatelessWidget {
-  const InformationView({required this.details, this.model, super.key});
+  const InformationView(
+      {required this.details, this.model, this.remarks, super.key});
   final OperatorDetails? details;
   final DispatchInchargeModel? model;
+  final List<FarmerRemarkModel>? remarks;
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -92,8 +95,9 @@ class InformationView extends StatelessWidget {
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
               IconButton(
                   onPressed: () {
-                    var index = DataManager.instance.cropList.indexWhere((item) => item.cropDescEN == details?.cropTypeEN);
-                    if(index == -1) {
+                    var index = DataManager.instance.cropList.indexWhere(
+                        (item) => item.cropDescEN == details?.cropTypeEN);
+                    if (index == -1) {
                       return;
                     }
                     Navigator.push(
@@ -107,12 +111,64 @@ class InformationView extends StatelessWidget {
                                   mobileNo: '',
                                   purchaseCenterID:
                                       model?.purchaseCenterId?.toString() ?? '',
-                                  cropID: DataManager.instance.cropList[index].cropID.toString(),
+                                  cropID: DataManager
+                                      .instance.cropList[index].cropID
+                                      .toString(),
+                                  existingRemark: null,
                                 )));
                   },
                   icon: Icon(Icons.add))
             ],
-          )
+          ),
+          ListView.builder(
+              itemBuilder: (context, index) {
+                var remark = remarks?[index];
+                return GestureDetector(
+                  onTap: () {
+                    var index = DataManager.instance.cropList.indexWhere(
+                        (item) => item.cropDescEN == details?.cropTypeEN);
+                    if (index == -1) {
+                      return;
+                    }
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (_) => QualityAssessmentReport(
+                                  registrationNumber: details?.farmerRegID ??
+                                      model?.farmerRegId ??
+                                      '',
+                                  farmerName: details?.farmerName ?? '',
+                                  mobileNo: '',
+                                  purchaseCenterID:
+                                      model?.purchaseCenterId?.toString() ?? '',
+                                  cropID: DataManager
+                                      .instance.cropList[index].cropID
+                                      .toString(),
+                                  existingRemark: remark,
+                                )));
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          remark?.machineName ?? '',
+                          style: TextStyle(fontSize: 16),
+                        ),
+                        Icon(
+                          Icons.arrow_forward_ios,
+                          color: Colors.grey,
+                          size: 16,
+                        )
+                      ],
+                    ),
+                  ),
+                );
+              },
+              itemCount: remarks?.length ?? 0,
+              shrinkWrap: true,
+              physics: NeverScrollableScrollPhysics())
         ],
       ),
     );

@@ -1,4 +1,5 @@
 import 'package:rajfed_qr/models/machine_model.dart';
+import 'package:rajfed_qr/models/farmer_remark_model.dart';
 import 'package:rajfed_qr/APIService/api_endpoint.dart';
 import 'package:rajfed_qr/APIService/api_service.dart';
 import 'package:rajfed_qr/models/APIModel/api_response.dart';
@@ -84,4 +85,25 @@ class QaService {
       return null;
     }
   }
+
+  Future<APIResponse?> getFarmerRemark(String registrationNumber) async {
+    try {
+      var query = "?registrationNumber=$registrationNumber";
+      var response = await ApiService.instance.apiCall(
+          APIEndPoint.getFarmerRemark + query, HttpRequestType.get, null);
+      if (response.status) {
+        var data = response.data;
+        List<FarmerRemarkModel> remarkList = [];
+        if (data is List) {
+          remarkList = data.map((item) => FarmerRemarkModel.fromJson(item)).toList();
+        }
+        return APIResponse(true, remarkList, "");
+      }
+      return APIResponse(false, null, response.error);
+    } catch (e) {
+      return null;
+    }
+  }
 }
+
+

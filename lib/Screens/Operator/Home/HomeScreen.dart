@@ -11,6 +11,8 @@ import 'package:rajfed_qr/Screens/OpenSource/farmer_desk_screen/farmer_desk_scre
 import 'package:rajfed_qr/Screens/Operator/DeleteQr/delete_qr_screen.dart';
 import 'package:rajfed_qr/Screens/Operator/Home/op_home_service.dart';
 import 'package:rajfed_qr/Screens/Operator/Home/views/Information_row.dart';
+import 'package:rajfed_qr/Screens/QA/qa_service.dart';
+import 'package:rajfed_qr/models/farmer_remark_model.dart';
 import 'package:rajfed_qr/Screens/QRScannerScreen/qr_code_screen.dart';
 import 'package:rajfed_qr/common_views/common_button.dart';
 import 'package:rajfed_qr/common_views/loader_dialog.dart';
@@ -52,6 +54,7 @@ class _MyHomePageState extends State<MyHomePage> {
   String? selectedCropValue;
   List<CropModel> cropList = [];
   List<String> cropStringList = [];
+  List<FarmerRemarkModel> remarkList = [];
 
   @override
   void initState() {
@@ -634,6 +637,14 @@ class _MyHomePageState extends State<MyHomePage> {
       try {
         var response = await OPHomeService.instance.operatorDetails(
             _searchController.text, cropList[index].cropID ?? 0);
+
+        var remarkResponse =
+            await QaService.instance.getFarmerRemark(_searchController.text);
+        if (remarkResponse != null && remarkResponse.status) {
+          // we can optionally parse it into a variable if needed later
+          remarkList = remarkResponse.data;
+        }
+
         if (response?.status == true) {
           if (!mounted) return;
           Navigator.pop(context);
@@ -790,7 +801,7 @@ class _MyHomePageState extends State<MyHomePage> {
             child: Column(
               spacing: 10,
               children: [
-                InformationView(details: operatorDetails),
+                InformationView(details: operatorDetails, remarks: remarkList),
                 SizedBox(
                   height: operatorDetails != null ? 10 : 0,
                 ),
