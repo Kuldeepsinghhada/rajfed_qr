@@ -93,31 +93,35 @@ class InformationView extends StatelessWidget {
             children: [
               Text("Quality Assessment Report",
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
-              IconButton(
-                  onPressed: () {
-                    var index = DataManager.instance.cropList.indexWhere(
-                        (item) => item.cropDescEN == details?.cropTypeEN);
-                    if (index == -1) {
-                      return;
-                    }
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (_) => QualityAssessmentReport(
-                                  registrationNumber: details?.farmerRegID ??
-                                      model?.farmerRegId ??
-                                      '',
-                                  farmerName: details?.farmerName ?? '',
-                                  mobileNo: '',
-                                  purchaseCenterID:
-                                      model?.purchaseCenterId?.toString() ?? '',
-                                  cropID: DataManager
-                                      .instance.cropList[index].cropID
-                                      .toString(),
-                                  existingRemark: null,
-                                )));
-                  },
-                  icon: Icon(Icons.add))
+              remarks?.length == 3
+                  ? SizedBox(height: 40)
+                  : IconButton(
+                      onPressed: () {
+                        var index = DataManager.instance.cropList.indexWhere(
+                            (item) => item.cropDescEN == details?.cropTypeEN);
+                        if (index == -1) {
+                          return;
+                        }
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (_) => QualityAssessmentReport(
+                                      registrationNumber:
+                                          details?.farmerRegID ??
+                                              model?.farmerRegId ??
+                                              '',
+                                      farmerName: details?.farmerName ?? '',
+                                      mobileNo: '',
+                                      purchaseCenterID:
+                                          model?.purchaseCenterId?.toString() ??
+                                              '',
+                                      cropID: DataManager
+                                          .instance.cropList[index].cropID
+                                          .toString(),
+                                      existingRemark: null,
+                                    )));
+                      },
+                      icon: Icon(Icons.add))
             ],
           ),
           ListView.builder(
