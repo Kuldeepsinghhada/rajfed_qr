@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:rajfed_qr/APIService/shared_preference_helper.dart';
 import 'package:rajfed_qr/Screens/Incharge/incharge_dashboard/incharge_dashboard_screen.dart';
-import 'package:rajfed_qr/Screens/OpenSource/farmer_desk_screen/farmer_desk_screen.dart';
 import 'package:rajfed_qr/Screens/Operator/OperatorDashboard/operator_dashboard.dart';
 import 'package:rajfed_qr/Screens/Warehouse/warehouse_dashboard.dart';
 import 'package:upgrader/upgrader.dart';
@@ -10,12 +9,14 @@ import 'package:rajfed_qr/Screens/Registration/screens/information_page.dart';
 import 'package:rajfed_qr/Screens/Registration/screens/jan_aadhar_page.dart';
 import 'package:rajfed_qr/Screens/Registration/screens/farmer_detail_page.dart';
 import 'package:rajfed_qr/Screens/Registration/screens/bataidar_page.dart';
+import 'Screens/OpenSource/farmer_desk_screen/farmer_desk_screen.dart';
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
+  // App default initial route should be FarmerDeskScreen
   Widget initialRoute = FarmerDeskScreen();
 
   // Ensure token is loaded (value not used here). If you plan to use it later, restore assignment.

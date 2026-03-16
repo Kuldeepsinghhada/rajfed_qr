@@ -280,7 +280,7 @@ class _QualityAssessmentReportState extends State<QualityAssessmentReport> {
                   : labeled(
                       'Select Machine Name',
                       DropdownButtonFormField<String>(
-                        initialValue: selectedMachine,
+                        value: selectedMachine,
                         decoration: modernDecoration('Select Machine Name',
                             labelInside: false),
                         isExpanded: true,

@@ -6,7 +6,7 @@ import 'package:rajfed_qr/Screens/OpenSource/contact_us_screen.dart';
 import 'package:rajfed_qr/Screens/OpenSource/crop_calculate/crop_calculater_screen.dart';
 import 'package:rajfed_qr/Screens/OpenSource/farmer_desk_screen/farmer_desk_service.dart';
 import 'package:rajfed_qr/Screens/OpenSource/msp_rate_screen.dart';
-import 'package:rajfed_qr/Screens/Registration/screens/information_page.dart';
+import 'package:rajfed_qr/Screens/OpenSource/registration_webview_screen.dart';
 import 'package:rajfed_qr/Screens/login/login_screen.dart';
 import 'package:rajfed_qr/common_views/loader_dialog.dart';
 import 'package:rajfed_qr/models/update_model.dart';
@@ -22,6 +22,11 @@ class FarmerDeskScreen extends StatefulWidget {
 class _FarmerDeskScreenState extends State<FarmerDeskScreen> {
   /// List of Item
   final List<DeviceItem> items = const [
+    DeviceItem(
+      title: "Registration",
+      icon: Icons.how_to_reg,
+      color: Color(0xFF26A69A), // Teal
+    ),
     DeviceItem(
       title: "Search Farmer",
       icon: Icons.search,
@@ -50,11 +55,6 @@ class _FarmerDeskScreenState extends State<FarmerDeskScreen> {
     DeviceItem(
       title: "Login",
       icon: Icons.login,
-      color: Color(0xFF26A69A), // Teal
-    ),
-    DeviceItem(
-      title: "Registration",
-      icon: Icons.how_to_reg,
       color: Color(0xFF26A69A), // Teal
     ),
   ];
@@ -142,42 +142,43 @@ class _FarmerDeskScreenState extends State<FarmerDeskScreen> {
                     color: items[index].color,
                     child: InkWell(
                       onTap: () {
+                        // New ordering: 0: Registration, 1: Search Farmer, 2: Search QR, 3: MSP Rate,
+                        // 4: Crop Calculator, 5: Help, 6: Login
                         if (index == 0) {
                           Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) => FarmerDetailScreen()));
+                                  builder: (context) => RegistrationWebViewScreen()));
                         } else if (index == 1) {
                           Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) => FarmerSearchByQR()));
+                                  builder: (context) => FarmerDetailScreen()));
                         } else if (index == 2) {
                           Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) => MspRateScreen()));
+                                  builder: (context) => FarmerSearchByQR()));
                         } else if (index == 3) {
                           Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) =>
-                                      CropCalculaterScreen()));
+                                  builder: (context) => MspRateScreen()));
                         } else if (index == 4) {
                           Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) => ContactUsScreen()));
+                                  builder: (context) => CropCalculaterScreen()));
                         } else if (index == 5) {
                           Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) => LoginScreen()));
+                                  builder: (context) => ContactUsScreen()));
                         } else if (index == 6) {
                           Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) => InformationPage()));
+                                  builder: (context) => LoginScreen()));
                         }
                       },
                       child: Padding(
