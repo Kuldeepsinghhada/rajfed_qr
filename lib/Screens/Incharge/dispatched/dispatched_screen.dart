@@ -50,11 +50,13 @@ class _DiapatchInchargeScreenState extends State<DiapatchInchargeScreen> {
       try {
         dynamic response;
         if (userType == 2) {
-          response = await InchargeService.instance
-              .sentInchargeList(vehicleController.text);
+          response = await InchargeService.instance.sentInchargeList(
+            vehicleController.text,
+          );
         } else {
-          response = await WarehouseService.instance
-              .acceptedWarehouseList(vehicleController.text);
+          response = await WarehouseService.instance.acceptedWarehouseList(
+            vehicleController.text,
+          );
         }
 
         Navigator.pop(context);
@@ -96,10 +98,7 @@ class _DiapatchInchargeScreenState extends State<DiapatchInchargeScreen> {
       ),
       body: Column(
         children: [
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: searchBar(),
-          ),
+          Padding(padding: const EdgeInsets.all(16), child: searchBar()),
 
           /// 📌 GROUPED LIST
           Expanded(
@@ -112,6 +111,12 @@ class _DiapatchInchargeScreenState extends State<DiapatchInchargeScreen> {
                       final groupKey = keys[index];
                       final items = groupedData[groupKey]!;
 
+                      // Calculate total noOfBardana for this group.
+                      final totalBardana = items.fold<int>(
+                        0,
+                        (sum, item) => sum + (item.noOfBardana ?? 0),
+                      );
+
                       return Card(
                         margin: EdgeInsets.only(bottom: 16),
                         elevation: 3,
@@ -122,14 +127,18 @@ class _DiapatchInchargeScreenState extends State<DiapatchInchargeScreen> {
                           title: Text(
                             "Dispatch ID: $groupKey",
                             style: TextStyle(
-                                fontWeight: FontWeight.bold, fontSize: 16),
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                            ),
                           ),
                           subtitle: Text(
-                            "Items: ${items.length}",
+                            "Items: ${items.length}  •  Total Bardana: $totalBardana",
                             style: TextStyle(fontSize: 13),
                           ),
-                          tilePadding:
-                              EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                          tilePadding: EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 8,
+                          ),
                           childrenPadding: EdgeInsets.all(16),
 
                           /// 🔽 Expanded list items
@@ -143,7 +152,7 @@ class _DiapatchInchargeScreenState extends State<DiapatchInchargeScreen> {
                                 border: Border.all(color: Colors.black12),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: Colors.grey.withOpacity(0.15),
+                                    color: Color.fromRGBO(158, 158, 158, 0.15),
                                     blurRadius: 5,
                                     offset: Offset(2, 2),
                                   ),
@@ -152,54 +161,65 @@ class _DiapatchInchargeScreenState extends State<DiapatchInchargeScreen> {
                               child: Column(
                                 children: [
                                   InformationRow(
-                                      title: "Lot no.",
-                                      subtitle: "${details.lotNo ?? 'NA'}"),
+                                    title: "Lot no.",
+                                    subtitle: "${details.lotNo ?? 'NA'}",
+                                  ),
                                   InformationRow(
-                                      title: "Registration no.",
-                                      subtitle: details.farmerRegId ?? 'NA'),
+                                    title: "Registration no.",
+                                    subtitle: details.farmerRegId ?? 'NA',
+                                  ),
                                   InformationRow(
-                                      title: "Purchase Center",
-                                      subtitle:
-                                          details.purchaseCenterKendra ?? 'NA'),
+                                    title: "Purchase Center",
+                                    subtitle:
+                                        details.purchaseCenterKendra ?? 'NA',
+                                  ),
                                   if (details.transctionDate != null)
                                     InformationRow(
-                                        title: "Purchase Date",
-                                        subtitle:
-                                            DateFormatter.formatDateToDDMMMYYYY(
-                                                details.transctionDate ?? '')),
+                                      title: "Purchase Date",
+                                      subtitle:
+                                          DateFormatter.formatDateToDDMMMYYYY(
+                                            details.transctionDate ?? '',
+                                          ),
+                                    ),
                                   if (details.dispatchDateTime != null)
                                     InformationRow(
-                                        title: "Dispatch Date",
-                                        subtitle:
-                                            DateFormatter.formatDateToDDMMMYYYY(
-                                                details.dispatchDateTime ??
-                                                    '')),
+                                      title: "Dispatch Date",
+                                      subtitle:
+                                          DateFormatter.formatDateToDDMMMYYYY(
+                                            details.dispatchDateTime ?? '',
+                                          ),
+                                    ),
                                   if (details.receivedDateTime != null)
                                     InformationRow(
-                                        title: "Received Date",
-                                        subtitle:
-                                            DateFormatter.formatDateToDDMMMYYYY(
-                                                details.receivedDateTime ??
-                                                    '')),
-                                  InformationRow(
-                                      title: "No. of Bardana",
+                                      title: "Received Date",
                                       subtitle:
-                                          "${details.noOfBardana ?? 'NA'}"),
+                                          DateFormatter.formatDateToDDMMMYYYY(
+                                            details.receivedDateTime ?? '',
+                                          ),
+                                    ),
                                   InformationRow(
-                                      title: "Crop Type",
-                                      subtitle: (details.cropEN ??
-                                          details.crop_descEN ??
-                                          'NA')),
+                                    title: "No. of Bardana",
+                                    subtitle: "${details.noOfBardana ?? 'NA'}",
+                                  ),
                                   InformationRow(
-                                      title: "Warehouse",
-                                      subtitle: details.warehouseName ?? 'NA'),
+                                    title: "Crop Type",
+                                    subtitle:
+                                        (details.cropEN ??
+                                        details.crop_descEN ??
+                                        'NA'),
+                                  ),
+                                  InformationRow(
+                                    title: "Warehouse",
+                                    subtitle: details.warehouseName ?? 'NA',
+                                  ),
                                 ],
                               ),
                             );
                           }).toList(),
                         ),
                       );
-                    }),
+                    },
+                  ),
           ),
         ],
       ),
@@ -225,10 +245,13 @@ class _DiapatchInchargeScreenState extends State<DiapatchInchargeScreen> {
                 filled: true,
                 fillColor: Colors.grey[100],
                 border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(30),
-                    borderSide: BorderSide.none),
-                contentPadding:
-                    EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+                  borderRadius: BorderRadius.circular(30),
+                  borderSide: BorderSide.none,
+                ),
+                contentPadding: EdgeInsets.symmetric(
+                  vertical: 14,
+                  horizontal: 16,
+                ),
               ),
               validator: (value) {
                 if (value == null || value.trim().isEmpty) {
