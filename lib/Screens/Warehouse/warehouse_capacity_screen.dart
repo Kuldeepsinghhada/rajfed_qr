@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:rajfed_qr/APIService/shared_preference_helper.dart';
 import 'package:rajfed_qr/Screens/Incharge/incharge_home/incharge_service.dart';
 import 'package:rajfed_qr/common_views/common_button.dart';
 import 'package:rajfed_qr/common_views/loader_dialog.dart';
@@ -20,6 +21,9 @@ class WarehouseCapacityScreen extends StatefulWidget {
 class _WarehouseCapacityScreenState extends State<WarehouseCapacityScreen> {
   final _formKey = GlobalKey<FormState>();
 
+  int? userType;
+  int? assignedWarehouseId;
+
   String? selectedDistrictValue;
   List<DistrictModel> districtList = [];
   List<String> districtStringList = [];
@@ -35,8 +39,15 @@ class _WarehouseCapacityScreenState extends State<WarehouseCapacityScreen> {
   @override
   void initState() {
     super.initState();
-    _getDistricts();
+    _initUserAndData();
     _getCurrentLocation();
+  }
+
+  Future<void> _initUserAndData() async {
+    userType = await SharedPreferenceHelper.instance.getUserType();
+    assignedWarehouseId = await SharedPreferenceHelper.instance
+        .getPurchaseCenterId();
+    _getDistricts();
   }
 
   void _getDistricts() async {
@@ -54,7 +65,13 @@ class _WarehouseCapacityScreenState extends State<WarehouseCapacityScreen> {
             .where((item) => item.districtNameEN != null)
             .map((item) => item.districtNameEN!)
             .toList();
-        setState(() {});
+
+        // If warehouse user, auto-fetch their specific data
+        if (userType == 13 && assignedWarehouseId != null) {
+          _fetchExistingDetails();
+        } else {
+          setState(() {});
+        }
       } else {
         showErrorToast(response?.error ?? "Failed to load districts");
       }
@@ -62,6 +79,65 @@ class _WarehouseCapacityScreenState extends State<WarehouseCapacityScreen> {
       if (!mounted) return;
       Navigator.pop(context);
       showErrorToast("Something went wrong");
+    }
+  }
+
+  void _fetchExistingDetails() async {
+    showLoadingDialog(context);
+    try {
+      final response = await InchargeService.instance.getAllWarehouseData();
+      if (!mounted) return;
+      Navigator.pop(context);
+
+      if (response?.status == true) {
+        final List<WareHouseModel> allData = response?.data ?? [];
+
+        // Find my warehouse safely
+        WareHouseModel? myWarehouse;
+        try {
+          myWarehouse = allData.firstWhere(
+            (w) => w.wareHouseId == assignedWarehouseId,
+          );
+        } catch (e) {
+          myWarehouse = null;
+        }
+
+        if (myWarehouse != null) {
+          isAlreadyUpdated = myWarehouse.status?.toLowerCase() == "updated";
+          setState(() {
+            // Find and set district
+            try {
+              final district = districtList.firstWhere(
+                (d) => d.district == myWarehouse?.districTCODE,
+              );
+              selectedDistrictValue = district.districtNameEN;
+            } catch (e) {
+              selectedDistrictValue = null;
+            }
+
+            // Set warehouse list and selection
+            warehouseList = [myWarehouse!];
+            warehouseStringList = [myWarehouse.wareHouseName ?? "Unknown"];
+            selectedWarehouse = myWarehouse.wareHouseName;
+
+            // Pre-fill existing values
+            if (myWarehouse.lat != null) {
+              _latController.text = myWarehouse.lat!.toStringAsFixed(5);
+            }
+            if (myWarehouse.long != null) {
+              _longController.text = myWarehouse.long!.toStringAsFixed(5);
+            }
+            if (myWarehouse.capacity != null) {
+              _capacityController.text = myWarehouse.capacity!
+                  .toInt()
+                  .toString();
+            }
+          });
+        }
+      }
+    } catch (e) {
+      if (!mounted) return;
+      Navigator.pop(context);
     }
   }
 
@@ -142,6 +218,8 @@ class _WarehouseCapacityScreenState extends State<WarehouseCapacityScreen> {
     }
   }
 
+  bool isAlreadyUpdated = false;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -157,8 +235,17 @@ class _WarehouseCapacityScreenState extends State<WarehouseCapacityScreen> {
               wareHouseDropdown(),
               locationFields(),
               capacityField(),
+              if (isAlreadyUpdated)
+                const Text(
+                  "Information already updated.",
+                  style: TextStyle(
+                      color: Colors.red,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16),
+                ),
               const SizedBox(height: 10),
-              CommonButton(text: "Submit", onPressed: _submit),
+              if (!isAlreadyUpdated)
+                CommonButton(text: "Submit", onPressed: _submit),
             ],
           ),
         ),
@@ -176,19 +263,23 @@ class _WarehouseCapacityScreenState extends State<WarehouseCapacityScreen> {
                 DropdownMenuItem(value: value, child: Text(value)),
           )
           .toList(),
-      onChanged: (newValue) {
-        setState(() {
-          selectedDistrictValue = newValue;
-          selectedWarehouse = null;
-          warehouseStringList = [];
-        });
-        if (newValue != null) {
-          var index = districtStringList.indexOf(newValue);
-          _getWarehouses(districtList[index].district ?? '');
-        }
-      },
+      onChanged: (userType == 13)
+          ? null
+          : (newValue) {
+              setState(() {
+                selectedDistrictValue = newValue;
+                selectedWarehouse = null;
+                warehouseStringList = [];
+              });
+              if (newValue != null) {
+                var index = districtStringList.indexOf(newValue);
+                _getWarehouses(districtList[index].district ?? '');
+              }
+            },
       validator: (value) => value == null ? 'Please select district' : null,
-      decoration: _inputDecoration("District"),
+      decoration: _inputDecoration(
+        "District",
+      ).copyWith(enabled: userType != 13),
     );
   }
 
@@ -202,13 +293,17 @@ class _WarehouseCapacityScreenState extends State<WarehouseCapacityScreen> {
                 DropdownMenuItem(value: value, child: Text(value)),
           )
           .toList(),
-      onChanged: (newValue) {
-        setState(() {
-          selectedWarehouse = newValue;
-        });
-      },
+      onChanged: (userType == 13)
+          ? null
+          : (newValue) {
+              setState(() {
+                selectedWarehouse = newValue;
+              });
+            },
       validator: (value) => value == null ? 'Please select warehouse' : null,
-      decoration: _inputDecoration("Warehouse"),
+      decoration: _inputDecoration(
+        "Warehouse",
+      ).copyWith(enabled: userType != 13),
     );
   }
 
@@ -222,7 +317,7 @@ class _WarehouseCapacityScreenState extends State<WarehouseCapacityScreen> {
             readOnly: true,
             decoration: _inputDecoration("Latitude").copyWith(
               suffixIcon: IconButton(
-                onPressed: _getCurrentLocation,
+                onPressed: isAlreadyUpdated ? null : _getCurrentLocation,
                 icon: const Icon(Icons.my_location, color: Colors.green),
               ),
             ),
@@ -257,6 +352,7 @@ class _WarehouseCapacityScreenState extends State<WarehouseCapacityScreen> {
     return TextFormField(
       controller: _capacityController,
       keyboardType: TextInputType.number,
+      readOnly: isAlreadyUpdated,
       inputFormatters: [FilteringTextInputFormatter.digitsOnly],
       decoration: _inputDecoration("Capacity (MT)"),
       style: const TextStyle(fontWeight: FontWeight.w600),

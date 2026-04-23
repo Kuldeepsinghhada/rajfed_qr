@@ -72,10 +72,12 @@ class _WarehouseHomeState extends State<WarehouseHome> {
         "lotNo": item,
         "status": status,
         "message": status == "R" ? _commentController.text : "string",
-        "qrCode": "string"
+        "qrCode": "string",
       });
     }
-    log("URL: https://rajfed.rajasthan.gov.in/rajfed_API/QrScanner/ReceivedInWareHouseLotWise");
+    log(
+      "URL: https://rajfed.rajasthan.gov.in/rajfed_API/QrScanner/ReceivedInWareHouseLotWise",
+    );
     log("Body: $list");
     Response response;
     try {
@@ -86,14 +88,15 @@ class _WarehouseHomeState extends State<WarehouseHome> {
         options: Options(
           headers: {
             "Authorization": "Bearer $token",
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
           },
         ),
       );
       log("Response: $response");
       if (response.statusCode! >= 200 && response.statusCode! < 300) {
         showSuccessToast(
-            status == "A" ? "Accepted Successfully" : "Rejected Successfully");
+          status == "A" ? "Accepted Successfully" : "Rejected Successfully",
+        );
         //_searchController.text = "";
         _commentController.text = "";
         if (!mounted) return;
@@ -150,8 +153,10 @@ class _WarehouseHomeState extends State<WarehouseHome> {
                 Navigator.pop(context);
                 acceptOrRejectByWarehouse("R");
               },
-              child: Text("Confirm",
-                  style: TextStyle(color: Colors.red, fontSize: 18)),
+              child: Text(
+                "Confirm",
+                style: TextStyle(color: Colors.red, fontSize: 18),
+              ),
             ),
           ],
         );
@@ -166,11 +171,9 @@ class _WarehouseHomeState extends State<WarehouseHome> {
   }
 
   void getQrCodeByScan() async {
-    var data = await Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => QRScannerScreen(),
-      ),
-    );
+    var data = await Navigator.of(
+      context,
+    ).push(MaterialPageRoute(builder: (context) => QRScannerScreen()));
     if (data != null) {
       _searchController.text = data.toString();
       setState(() {});
@@ -181,8 +184,11 @@ class _WarehouseHomeState extends State<WarehouseHome> {
     if (!mounted) return;
     showLoadingDialog(context);
     try {
-      var data = await ApiService.instance
-          .apiCall(APIEndPoint.logout, HttpRequestType.get, null);
+      var data = await ApiService.instance.apiCall(
+        APIEndPoint.logout,
+        HttpRequestType.get,
+        null,
+      );
       if (!mounted) return;
       Navigator.pop(context);
       if (data.status == true) {
@@ -206,13 +212,14 @@ class _WarehouseHomeState extends State<WarehouseHome> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(15),
+          ),
           title: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               Icon(Icons.logout, color: Colors.red, size: 60), // Warning icon
-              SizedBox(width: 10)
+              SizedBox(width: 10),
             ],
           ),
           content: Text("Are you sure you want to logout?"),
@@ -227,10 +234,7 @@ class _WarehouseHomeState extends State<WarehouseHome> {
                 logoutAPICall();
               },
               style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-              child: Text(
-                "Logout",
-                style: TextStyle(color: Colors.white),
-              ),
+              child: Text("Logout", style: TextStyle(color: Colors.white)),
             ),
           ],
         );
@@ -245,8 +249,9 @@ class _WarehouseHomeState extends State<WarehouseHome> {
       if (!mounted) return;
       showLoadingDialog(context);
       try {
-        var response = await WarehouseService.instance
-            .getListByVehicleNo(_searchController.text);
+        var response = await WarehouseService.instance.getListByVehicleNo(
+          _searchController.text,
+        );
         if (!mounted) return;
         Navigator.pop(context);
         if (response?.status == true) {
@@ -269,9 +274,7 @@ class _WarehouseHomeState extends State<WarehouseHome> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Home'),
-      ),
+      appBar: AppBar(title: Text('Home')),
       drawer: CustomDrawer(
         userName: userName,
         callback: (value) {
@@ -280,20 +283,32 @@ class _WarehouseHomeState extends State<WarehouseHome> {
           if (value == "Logout") {
             showLogoutDialog(context);
           } else if (value == "Change Password") {
-            Navigator.push(context,
-                MaterialPageRoute(builder: (_) => const ChangePasswordScreen()));
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const ChangePasswordScreen()),
+            );
           } else if (value == "Dispatched") {
-            Navigator.push(context,
-                MaterialPageRoute(builder: (_) => const DiapatchInchargeScreen()));
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const DiapatchInchargeScreen()),
+            );
           } else if (value == "Rejected") {
-            Navigator.push(context,
-                MaterialPageRoute(builder: (_) => const RejectedInchargeScreen()));
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const RejectedInchargeScreen()),
+            );
           } else if (value == "Warehouse Capacity") {
-            Navigator.push(context,
-                MaterialPageRoute(builder: (_) => const WarehouseCapacityScreen()));
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => const WarehouseCapacityScreen(),
+              ),
+            );
           } else if (value == "All Warehouse Data") {
-            Navigator.push(context,
-                MaterialPageRoute(builder: (_) => const AllWareHouseDataScreen()));
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const AllWareHouseDataScreen()),
+            );
           }
         },
       ),
@@ -307,16 +322,7 @@ class _WarehouseHomeState extends State<WarehouseHome> {
               children: [
                 searchBar(),
                 const SizedBox(height: 16),
-                CommonButton(
-                  text: 'View All Warehouse Status',
-                  onPressed: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const AllWareHouseDataScreen()));
-                  },
-                ),
-                lotWiseList()
+                lotWiseList(),
               ],
             ),
           ),
@@ -346,8 +352,10 @@ class _WarehouseHomeState extends State<WarehouseHome> {
                 borderRadius: BorderRadius.circular(30),
                 borderSide: BorderSide.none,
               ),
-              contentPadding:
-                  EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+              contentPadding: EdgeInsets.symmetric(
+                vertical: 14,
+                horizontal: 16,
+              ),
             ),
             validator: (value) {
               if (value != null && value.trim().isEmpty) {
@@ -359,7 +367,6 @@ class _WarehouseHomeState extends State<WarehouseHome> {
         ),
 
         SizedBox(width: 10), // Space between
-
         // Search Button
         GestureDetector(
           onTap: () {
@@ -394,7 +401,8 @@ class _WarehouseHomeState extends State<WarehouseHome> {
               children: [
                 Container(
                   decoration: BoxDecoration(
-                      border: Border.all(color: Colors.green.shade400)),
+                    border: Border.all(color: Colors.green.shade400),
+                  ),
                   child: Column(
                     children: [
                       Container(
@@ -402,42 +410,39 @@ class _WarehouseHomeState extends State<WarehouseHome> {
                         color: Colors.green.shade400,
                         child: Row(
                           children: [
-                            SizedBox(
-                              width: 10,
-                            ),
-                            Icon(
-                              Icons.add_box_outlined,
-                              color: Colors.white,
-                            ),
+                            SizedBox(width: 10),
+                            Icon(Icons.add_box_outlined, color: Colors.white),
                             Expanded(
                               child: Padding(
                                 padding: const EdgeInsets.only(left: 12.0),
                                 child: Text(
                                   "Lots",
                                   style: TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.w600,
-                                      color: Colors.white),
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.white,
+                                  ),
                                 ),
                               ),
                             ),
                             Checkbox(
-                                value: isAllSelect,
-                                checkColor: Colors.black,
-                                activeColor: Colors.white,
-                                onChanged: (value) {
-                                  setState(() {
-                                    isAllSelect = value ?? false;
-                                    if (value != true) {
-                                      selectedList.clear();
-                                    } else {
-                                      selectedList.clear();
-                                      for (var item in wareHouseList) {
-                                        selectedList.add(item.lotNo ?? 0);
-                                      }
+                              value: isAllSelect,
+                              checkColor: Colors.black,
+                              activeColor: Colors.white,
+                              onChanged: (value) {
+                                setState(() {
+                                  isAllSelect = value ?? false;
+                                  if (value != true) {
+                                    selectedList.clear();
+                                  } else {
+                                    selectedList.clear();
+                                    for (var item in wareHouseList) {
+                                      selectedList.add(item.lotNo ?? 0);
                                     }
-                                  });
-                                })
+                                  }
+                                });
+                              },
+                            ),
                           ],
                         ),
                       ),
@@ -450,15 +455,18 @@ class _WarehouseHomeState extends State<WarehouseHome> {
                           return LotView(
                             details: null,
                             model: wareHouseList[index],
-                            isSelected: selectedList
-                                .contains(wareHouseList[index].lotNo),
+                            isSelected: selectedList.contains(
+                              wareHouseList[index].lotNo,
+                            ),
                             onCheckPressed: () {
-                              if (selectedList
-                                  .contains(wareHouseList[index].lotNo)) {
+                              if (selectedList.contains(
+                                wareHouseList[index].lotNo,
+                              )) {
                                 selectedList.remove(wareHouseList[index].lotNo);
                               } else {
-                                selectedList
-                                    .add(wareHouseList[index].lotNo ?? 0);
+                                selectedList.add(
+                                  wareHouseList[index].lotNo ?? 0,
+                                );
                               }
                               log(selectedList.toString());
                               setState(() {});
@@ -466,9 +474,7 @@ class _WarehouseHomeState extends State<WarehouseHome> {
                           );
                         },
                         separatorBuilder: (context, index) {
-                          return SizedBox(
-                            height: 12,
-                          );
+                          return SizedBox(height: 12);
                         },
                       ),
                     ],
@@ -476,15 +482,15 @@ class _WarehouseHomeState extends State<WarehouseHome> {
                 ),
                 SizedBox(height: 20),
                 Visibility(
-                    visible: selectedList.isNotEmpty,
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Row(
-                          spacing: 10,
-                          children: [
-                            Expanded(
-                                child: CommonButton(
+                  visible: selectedList.isNotEmpty,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Row(
+                        spacing: 10,
+                        children: [
+                          Expanded(
+                            child: CommonButton(
                               text: 'Accept',
                               onPressed: () {
                                 showDialog(
@@ -493,19 +499,22 @@ class _WarehouseHomeState extends State<WarehouseHome> {
                                     return AlertDialog(
                                       title: Text("Confirm"),
                                       content: Text(
-                                          "Are you sure you want to Accept all Lots?"),
+                                        "Are you sure you want to Accept all Lots?",
+                                      ),
                                       actions: [
                                         TextButton(
                                           onPressed: () {
                                             Navigator.pop(
-                                                context); // Close the dialog
+                                              context,
+                                            ); // Close the dialog
                                             log("Rejected");
                                           },
                                           child: Text(
                                             "Cancel",
                                             style: TextStyle(
-                                                color: Colors.red,
-                                                fontSize: 18),
+                                              color: Colors.red,
+                                              fontSize: 18,
+                                            ),
                                           ),
                                         ),
                                         TextButton(
@@ -517,8 +526,9 @@ class _WarehouseHomeState extends State<WarehouseHome> {
                                           child: Text(
                                             "Accept",
                                             style: TextStyle(
-                                                color: Colors.green,
-                                                fontSize: 18),
+                                              color: Colors.green,
+                                              fontSize: 18,
+                                            ),
                                           ),
                                         ),
                                       ],
@@ -526,35 +536,37 @@ class _WarehouseHomeState extends State<WarehouseHome> {
                                   },
                                 );
                               },
-                            )),
-                            Expanded(
-                                child: CommonButton(
+                            ),
+                          ),
+                          Expanded(
+                            child: CommonButton(
                               text: 'Reject',
                               bgColor: Colors.red,
                               onPressed: () {
                                 showRejectedDialog(context);
                               },
-                            ))
-                          ],
-                        ),
-                        SizedBox(
-                          height: 10,
-                        ),
-                        CommonButton(
-                          text: 'Partially Reject',
-                          onPressed: () async {
-                            var status = await Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) =>
-                                        PartialRejectScreen()));
-                            if (status == true) {
-                              getDetailsByQrCode();
-                            }
-                          },
-                        )
-                      ],
-                    ))
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 10),
+                      CommonButton(
+                        text: 'Partially Reject',
+                        onPressed: () async {
+                          var status = await Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => PartialRejectScreen(),
+                            ),
+                          );
+                          if (status == true) {
+                            getDetailsByQrCode();
+                          }
+                        },
+                      ),
+                    ],
+                  ),
+                ),
               ],
             ),
           )
@@ -563,12 +575,13 @@ class _WarehouseHomeState extends State<WarehouseHome> {
 }
 
 class LotView extends StatelessWidget {
-  const LotView(
-      {required this.details,
-      this.model,
-      required this.isSelected,
-      required this.onCheckPressed,
-      super.key});
+  const LotView({
+    required this.details,
+    this.model,
+    required this.isSelected,
+    required this.onCheckPressed,
+    super.key,
+  });
   final OperatorDetails? details;
   final DispatchInchargeModel? model;
   final bool isSelected;
@@ -595,63 +608,82 @@ class LotView extends StatelessWidget {
             child: Column(
               children: [
                 InformationRow(
-                    title: "Dispatch ID",
-                    subtitle: (model?.dispatch_id ?? 'NA').toString()),
+                  title: "Dispatch ID",
+                  subtitle: (model?.dispatch_id ?? 'NA').toString(),
+                ),
                 InformationRow(
-                    title: "Lot No.",
-                    subtitle:
-                        (details?.lotId ?? model?.lotNo ?? 'NA').toString()),
+                  title: "Lot No.",
+                  subtitle: (details?.lotId ?? model?.lotNo ?? 'NA').toString(),
+                ),
                 InformationRow(
-                    title: "Registration no.",
-                    subtitle: details?.farmerRegID ?? model?.farmerRegId ?? ''),
-                Visibility(
-                    visible: details != null,
-                    child: InformationRow(
-                        title: "Name", subtitle: details?.farmerName ?? '')),
-                InformationRow(
-                    title: "Purchase Center",
-                    subtitle: details?.purchaseCenterKendra ??
-                        model?.purchaseCenterKendra ??
-                        ''),
+                  title: "Registration no.",
+                  subtitle: details?.farmerRegID ?? model?.farmerRegId ?? '',
+                ),
                 Visibility(
                   visible: details != null,
                   child: InformationRow(
-                      title: "Purchase Date",
-                      subtitle: DateFormatter.formatDateToDDMMMYYYY(
-                          details?.regDate ?? '')),
+                    title: "Name",
+                    subtitle: details?.farmerName ?? '',
+                  ),
+                ),
+                InformationRow(
+                  title: "Purchase Center",
+                  subtitle:
+                      details?.purchaseCenterKendra ??
+                      model?.purchaseCenterKendra ??
+                      '',
                 ),
                 Visibility(
-                    visible: model?.dispatchDateTime != null,
-                    child: InformationRow(
-                        title: "Dispatch Date",
-                        subtitle: DateFormatter.formatDateToDDMMMYYYY(
-                            model?.dispatchDateTime ?? 'NA'))),
+                  visible: details != null,
+                  child: InformationRow(
+                    title: "Purchase Date",
+                    subtitle: DateFormatter.formatDateToDDMMMYYYY(
+                      details?.regDate ?? '',
+                    ),
+                  ),
+                ),
                 Visibility(
-                    visible: model?.receivedDateTime != null,
-                    child: InformationRow(
-                        title: "Received Date",
-                        subtitle: DateFormatter.formatDateToDDMMMYYYY(
-                            model?.receivedDateTime ?? 'NA'))),
+                  visible: model?.dispatchDateTime != null,
+                  child: InformationRow(
+                    title: "Dispatch Date",
+                    subtitle: DateFormatter.formatDateToDDMMMYYYY(
+                      model?.dispatchDateTime ?? 'NA',
+                    ),
+                  ),
+                ),
+                Visibility(
+                  visible: model?.receivedDateTime != null,
+                  child: InformationRow(
+                    title: "Received Date",
+                    subtitle: DateFormatter.formatDateToDDMMMYYYY(
+                      model?.receivedDateTime ?? 'NA',
+                    ),
+                  ),
+                ),
                 InformationRow(
-                    title: "No. of Bardana",
-                    subtitle:
-                        "${details?.transctionBardana ?? model?.noOfBardana ?? 'NA'}"),
+                  title: "No. of Bardana",
+                  subtitle:
+                      "${details?.transctionBardana ?? model?.noOfBardana ?? 'NA'}",
+                ),
                 model != null
                     ? InformationRow(
                         title: "Quantity (Qtl)",
-                        subtitle: "${model?.qtl ?? 'NA'}")
+                        subtitle: "${model?.qtl ?? 'NA'}",
+                      )
                     : SizedBox(),
                 InformationRow(
-                    title: "Copy Type",
-                    subtitle: details?.cropTypeEN ?? model?.cropEN ?? 'NA')
+                  title: "Copy Type",
+                  subtitle: details?.cropTypeEN ?? model?.cropEN ?? 'NA',
+                ),
               ],
             ),
           ),
           Checkbox(
-              value: isSelected,
-              onChanged: (valur) {
-                onCheckPressed();
-              })
+            value: isSelected,
+            onChanged: (valur) {
+              onCheckPressed();
+            },
+          ),
         ],
       ),
     );
