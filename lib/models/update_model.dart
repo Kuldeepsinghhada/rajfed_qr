@@ -4,7 +4,7 @@ class UpdateModel {
   String? message;
   String? createdAt;
 
-  UpdateModel({this.id, this.listName, this.message, this.createdAt});
+  UpdateModel({id, listName, message, createdAt});
 
   UpdateModel.fromJson(Map<String, dynamic> json) {
     id = json['id'];
@@ -14,11 +14,11 @@ class UpdateModel {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['id'] = this.id;
-    data['listName'] = this.listName;
-    data['message'] = this.message;
-    data['createdAt'] = this.createdAt;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['id'] = id;
+    data['listName'] = listName;
+    data['message'] = message;
+    data['createdAt'] = createdAt;
     return data;
   }
 }

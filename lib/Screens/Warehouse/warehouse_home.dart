@@ -7,10 +7,16 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:rajfed_qr/APIService/api_endpoint.dart';
 import 'package:rajfed_qr/APIService/api_service.dart';
 import 'package:rajfed_qr/APIService/shared_preference_helper.dart';
+import 'package:rajfed_qr/Screens/ChangePassword/change_password.dart';
+import 'package:rajfed_qr/Screens/Incharge/Rejected/rejected_screen.dart';
+import 'package:rajfed_qr/Screens/Incharge/dispatched/dispatched_screen.dart';
 import 'package:rajfed_qr/Screens/Incharge/upload_warehouse_screen/upload_warehouse_screen.dart';
 import 'package:rajfed_qr/Screens/OpenSource/farmer_desk_screen/farmer_desk_screen.dart';
 import 'package:rajfed_qr/Screens/Operator/Home/views/Information_row.dart';
+import 'package:rajfed_qr/Screens/Operator/Home/views/custom_drawer.dart';
 import 'package:rajfed_qr/Screens/Warehouse/partial_reject_screen.dart';
+import 'package:rajfed_qr/Screens/Warehouse/all_warehouse_data_screen.dart';
+import 'package:rajfed_qr/Screens/Warehouse/warehouse_capacity_screen.dart';
 import 'package:rajfed_qr/Screens/Warehouse/warehouse_service.dart';
 import 'package:rajfed_qr/Screens/QRScannerScreen/qr_code_screen.dart';
 import 'package:rajfed_qr/common_views/common_button.dart';
@@ -266,25 +272,31 @@ class _WarehouseHomeState extends State<WarehouseHome> {
       appBar: AppBar(
         title: Text('Home'),
       ),
-      // drawer: CustomDrawer(
-      //   userName: userName,
-      //   callback: (value) {
-      //     if (!mounted) return;
-      //     Navigator.pop(context);
-      //     if (value == "Logout") {
-      //       showLogoutDialog(context);
-      //     } else if (value == "Change Password") {
-      //       Navigator.push(context,
-      //           MaterialPageRoute(builder: (_) => ChangePasswordScreen()));
-      //     } else if (value == "Dispatched") {
-      //       Navigator.push(context,
-      //           MaterialPageRoute(builder: (_) => DiapatchInchargeScreen()));
-      //     } else if (value == "Rejected") {
-      //       Navigator.push(context,
-      //           MaterialPageRoute(builder: (_) => RejectedInchargeScreen()));
-      //     }
-      //   },
-      // ),
+      drawer: CustomDrawer(
+        userName: userName,
+        callback: (value) {
+          if (!mounted) return;
+          Navigator.pop(context);
+          if (value == "Logout") {
+            showLogoutDialog(context);
+          } else if (value == "Change Password") {
+            Navigator.push(context,
+                MaterialPageRoute(builder: (_) => const ChangePasswordScreen()));
+          } else if (value == "Dispatched") {
+            Navigator.push(context,
+                MaterialPageRoute(builder: (_) => const DiapatchInchargeScreen()));
+          } else if (value == "Rejected") {
+            Navigator.push(context,
+                MaterialPageRoute(builder: (_) => const RejectedInchargeScreen()));
+          } else if (value == "Warehouse Capacity") {
+            Navigator.push(context,
+                MaterialPageRoute(builder: (_) => const WarehouseCapacityScreen()));
+          } else if (value == "All Warehouse Data") {
+            Navigator.push(context,
+                MaterialPageRoute(builder: (_) => const AllWareHouseDataScreen()));
+          }
+        },
+      ),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
@@ -292,7 +304,20 @@ class _WarehouseHomeState extends State<WarehouseHome> {
             key: _formKey,
             child: Column(
               spacing: 0,
-              children: [searchBar(), lotWiseList()],
+              children: [
+                searchBar(),
+                const SizedBox(height: 16),
+                CommonButton(
+                  text: 'View All Warehouse Status',
+                  onPressed: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const AllWareHouseDataScreen()));
+                  },
+                ),
+                lotWiseList()
+              ],
             ),
           ),
         ),

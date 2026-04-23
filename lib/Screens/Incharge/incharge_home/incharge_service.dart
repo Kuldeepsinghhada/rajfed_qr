@@ -222,4 +222,36 @@ class InchargeService {
       return null;
     }
   }
+
+  Future<APIResponse?> updateWarehouseMaster(Map<String, dynamic> body) async {
+    try {
+      var response = await ApiService.instance.apiCall(
+          APIEndPoint.updateWarehouseMaster, HttpRequestType.post, body);
+      return response;
+    } catch (e) {
+      showErrorToast("Something went wrong");
+      return null;
+    }
+  }
+
+  Future<APIResponse?> getAllWarehouseData() async {
+    try {
+      var query = "?flag=ALL";
+      var response = await ApiService.instance.apiCall(
+          APIEndPoint.getWarehouseLatLongStatus + query,
+          HttpRequestType.get,
+          null);
+      if (response.status) {
+        List<WareHouseModel> wareHouseList =
+            (response.data['data'] as List)
+                .map((item) => WareHouseModel.fromJson(item))
+                .toList();
+        return APIResponse(true, wareHouseList, "");
+      }
+      return APIResponse(false, null, response.error);
+    } catch (e) {
+      showErrorToast("Something went wrong");
+      return null;
+    }
+  }
 }

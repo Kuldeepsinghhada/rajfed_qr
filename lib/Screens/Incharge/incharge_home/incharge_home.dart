@@ -6,12 +6,18 @@ import 'package:rajfed_qr/APIService/api_endpoint.dart';
 import 'package:rajfed_qr/APIService/api_service.dart';
 import 'package:rajfed_qr/APIService/data_manager.dart';
 import 'package:rajfed_qr/APIService/shared_preference_helper.dart';
+import 'package:rajfed_qr/Screens/ChangePassword/change_password.dart';
 import 'package:rajfed_qr/Screens/Incharge/DispatchConfirm/dispatch_confirm_screen.dart';
+import 'package:rajfed_qr/Screens/Incharge/Rejected/rejected_screen.dart';
+import 'package:rajfed_qr/Screens/Incharge/dispatched/dispatched_screen.dart';
 import 'package:rajfed_qr/Screens/Incharge/incharge_home/incharge_service.dart';
 import 'package:rajfed_qr/Screens/OpenSource/farmer_desk_screen/farmer_desk_screen.dart';
 import 'package:rajfed_qr/Screens/Operator/Home/op_home_service.dart';
 import 'package:rajfed_qr/Screens/Operator/Home/views/Information_row.dart';
+import 'package:rajfed_qr/Screens/Operator/Home/views/custom_drawer.dart';
 import 'package:rajfed_qr/Screens/QRScannerScreen/qr_code_screen.dart';
+import 'package:rajfed_qr/Screens/Warehouse/all_warehouse_data_screen.dart';
+import 'package:rajfed_qr/Screens/Warehouse/warehouse_capacity_screen.dart';
 import 'package:rajfed_qr/common_views/common_button.dart';
 import 'package:rajfed_qr/common_views/loader_dialog.dart';
 import 'package:rajfed_qr/models/incharge_details.dart';
@@ -348,25 +354,31 @@ class _InchargeHomeState extends State<InchargeHome> {
       appBar: AppBar(
         title: Text('Home'),
       ),
-      // drawer: CustomDrawer(
-      //   userName: userName,
-      //   callback: (value) {
-      //     if (!mounted) return;
-      // Navigator.pop(context);
-      //     if (value == "Logout") {
-      //       showLogoutDialog(context);
-      //     } else if (value == "Change Password") {
-      //       Navigator.push(context,
-      //           MaterialPageRoute(builder: (_) => ChangePasswordScreen()));
-      //     } else if (value == "Dispatched") {
-      //       Navigator.push(context,
-      //           MaterialPageRoute(builder: (_) => DiapatchInchargeScreen()));
-      //     } else if (value == "Rejected") {
-      //       Navigator.push(context,
-      //           MaterialPageRoute(builder: (_) => RejectedInchargeScreen()));
-      //     }
-      //   },
-      // ),
+      drawer: CustomDrawer(
+        userName: userName,
+        callback: (value) {
+          if (!mounted) return;
+          Navigator.pop(context);
+          if (value == "Logout") {
+            showLogoutDialog(context);
+          } else if (value == "Change Password") {
+            Navigator.push(context,
+                MaterialPageRoute(builder: (_) => const ChangePasswordScreen()));
+          } else if (value == "Dispatched") {
+            Navigator.push(context,
+                MaterialPageRoute(builder: (_) => const DiapatchInchargeScreen()));
+          } else if (value == "Rejected") {
+            Navigator.push(context,
+                MaterialPageRoute(builder: (_) => const RejectedInchargeScreen()));
+          } else if (value == "Warehouse Capacity") {
+            Navigator.push(context,
+                MaterialPageRoute(builder: (_) => const WarehouseCapacityScreen()));
+          } else if (value == "All Warehouse Data") {
+            Navigator.push(context,
+                MaterialPageRoute(builder: (_) => const AllWareHouseDataScreen()));
+          }
+        },
+      ),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 30),

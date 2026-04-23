@@ -9,11 +9,16 @@ import 'package:rajfed_qr/APIService/data_manager.dart';
 import 'package:rajfed_qr/APIService/shared_preference_helper.dart';
 import 'package:rajfed_qr/Screens/OpenSource/farmer_desk_screen/farmer_desk_screen.dart';
 import 'package:rajfed_qr/Screens/Operator/DeleteQr/delete_qr_screen.dart';
+import 'package:rajfed_qr/Screens/ChangePassword/change_password.dart';
 import 'package:rajfed_qr/Screens/Operator/Home/op_home_service.dart';
 import 'package:rajfed_qr/Screens/Operator/Home/views/Information_row.dart';
+import 'package:rajfed_qr/Screens/Operator/Home/views/custom_drawer.dart';
+import 'package:rajfed_qr/Screens/Operator/rejected_screen/rejected_screen.dart';
 import 'package:rajfed_qr/Screens/QA/qa_service.dart';
 import 'package:rajfed_qr/models/farmer_remark_model.dart';
 import 'package:rajfed_qr/Screens/QRScannerScreen/qr_code_screen.dart';
+import 'package:rajfed_qr/Screens/Warehouse/all_warehouse_data_screen.dart';
+import 'package:rajfed_qr/Screens/Warehouse/warehouse_capacity_screen.dart';
 import 'package:rajfed_qr/common_views/common_button.dart';
 import 'package:rajfed_qr/common_views/loader_dialog.dart';
 import 'package:rajfed_qr/models/APIModel/api_response.dart';
@@ -673,25 +678,30 @@ class _MyHomePageState extends State<MyHomePage> {
         //backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: Text('Home'),
       ),
-      // drawer: CustomDrawer(
-      //   userName: userName,
-      //   callback: (value) {
-      //     if (!mounted) return;
-      // Navigator.pop(context);
-      //     if (value == "Logout") {
-      //       showLogoutDialog(context);
-      //     } else if (value == "Change Password") {
-      //       Navigator.push(context,
-      //           MaterialPageRoute(builder: (_) => ChangePasswordScreen()));
-      //     } else if (value == "Home") {
-      //       //if (!mounted) return;
-      //       Navigator.pop(context);
-      //     } else {
-      //       Navigator.push(
-      //           context, MaterialPageRoute(builder: (_) => RejectedScreen()));
-      //     }
-      //   },
-      // ),
+      drawer: CustomDrawer(
+        userName: userName,
+        callback: (value) {
+          if (!mounted) return;
+          Navigator.pop(context);
+          if (value == "Logout") {
+            showLogoutDialog(context);
+          } else if (value == "Change Password") {
+            Navigator.push(context,
+                MaterialPageRoute(builder: (_) => const ChangePasswordScreen()));
+          } else if (value == "Home") {
+            // Already on Home
+          } else if (value == "Warehouse Capacity") {
+            Navigator.push(context,
+                MaterialPageRoute(builder: (_) => const WarehouseCapacityScreen()));
+          } else if (value == "All Warehouse Data") {
+            Navigator.push(context,
+                MaterialPageRoute(builder: (_) => const AllWareHouseDataScreen()));
+          } else {
+            Navigator.push(
+                context, MaterialPageRoute(builder: (_) => const RejectedScreen()));
+          }
+        },
+      ),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 30),

@@ -58,69 +58,94 @@ class _CustomDrawerState extends State<CustomDrawer> {
               ),
             ),
           ),
-          // Drawer Items
-          ListTile(
-            leading: Icon(Icons.home),
-            title: Text("Home"),
-            onTap: () {
-              widget.callback("Home"); // Close Drawer
-            },
-          ),
-          Visibility(
-            visible: userType == 10,
-            child: ListTile(
-              leading: Icon(Icons.notes_outlined),
-              title: Text("Warehouse Rejected"),
-              onTap: () {
-                widget.callback("Warehouse Rejected");
-              },
+          Expanded(
+            child: ListView(
+              padding: EdgeInsets.zero,
+              children: [
+                ListTile(
+                  leading: Icon(Icons.home),
+                  title: Text("Home"),
+                  onTap: () {
+                    widget.callback("Home"); // Close Drawer
+                  },
+                ),
+                Visibility(
+                  visible: userType == 10,
+                  child: ListTile(
+                    leading: Icon(Icons.notes_outlined),
+                    title: Text("Warehouse Rejected"),
+                    onTap: () {
+                      widget.callback("Warehouse Rejected");
+                    },
+                  ),
+                ),
+                Visibility(
+                  visible: (userType == 2) || (userType == 13),
+                  child: ListTile(
+                    leading: Icon(Icons.send_time_extension_outlined),
+                    title: Text(userType == 13 ? "Accepted" : "Dispatched"),
+                    onTap: () {
+                      widget.callback("Dispatched");
+                    },
+                  ),
+                ),
+                Visibility(
+                  visible: (userType == 2) || (userType == 13),
+                  child: ListTile(
+                    leading: Icon(Icons.do_not_disturb_alt_sharp),
+                    title: Text("Rejected"),
+                    onTap: () {
+                      widget.callback("Rejected");
+                    },
+                  ),
+                ),
+                ListTile(
+                  leading: Icon(Icons.lock_reset),
+                  title: Text("Change Password"),
+                  onTap: () {
+                    widget.callback("Change Password");
+                  },
+                ),
+                Visibility(
+                  visible: true,
+                  child: ListTile(
+                    leading: Icon(Icons.location_on_outlined),
+                    title: Text("Update Location"),
+                    onTap: () {
+                      saveLocation();
+                    },
+                  ),
+                ),
+                Visibility(
+                  visible: userType == 13 || userType == 7,
+                  child: ListTile(
+                    leading: Icon(Icons.storage_rounded),
+                    title: Text("Warehouse Capacity"),
+                    onTap: () {
+                      widget.callback("Warehouse Capacity");
+                    },
+                  ),
+                ),
+                Visibility(
+                  visible: userType == 13 || userType == 7,
+                  child: ListTile(
+                    leading: Icon(Icons.list_alt_rounded),
+                    title: Text("All Warehouse Data"),
+                    onTap: () {
+                      widget.callback("All Warehouse Data");
+                    },
+                  ),
+                ),
+                ListTile(
+                  leading: Icon(Icons.logout),
+                  title: Text("Logout"),
+                  onTap: () {
+                    widget.callback("Logout");
+                  },
+                ),
+              ],
             ),
           ),
-          Visibility(
-            visible: (userType == 2) || (userType == 13),
-            child: ListTile(
-              leading: Icon(Icons.send_time_extension_outlined),
-              title: Text(userType == 13 ? "Accepted" : "Dispatched"),
-              onTap: () {
-                widget.callback("Dispatched");
-              },
-            ),
-          ),
-          Visibility(
-            visible: (userType == 2) || (userType == 13),
-            child: ListTile(
-              leading: Icon(Icons.do_not_disturb_alt_sharp),
-              title: Text("Rejected"),
-              onTap: () {
-                widget.callback("Rejected");
-              },
-            ),
-          ),
-          ListTile(
-            leading: Icon(Icons.lock_reset),
-            title: Text("Change Password"),
-            onTap: () {
-              widget.callback("Change Password");
-            },
-          ),
-          Visibility(
-            visible: true,
-            child: ListTile(
-              leading: Icon(Icons.location_on_outlined),
-              title: Text("Update Location"),
-              onTap: () {
-                saveLocation();
-              },
-            ),
-          ),
-          ListTile(
-            leading: Icon(Icons.logout),
-            title: Text("Logout"),
-            onTap: () {
-              widget.callback("Logout");
-            },
-          ),
-          Spacer(), // Pushes the bottom section down
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: Text(

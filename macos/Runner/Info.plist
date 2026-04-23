@@ -28,5 +28,11 @@
 	<string>MainMenu</string>
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
+	<key>NSLocationUsageDescription</key>
+	<string>Location permission is required to capture warehouse coordinates.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Location permission is required to capture warehouse coordinates.</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>Location permission is required to capture warehouse coordinates.</string>
 </dict>
 </plist>

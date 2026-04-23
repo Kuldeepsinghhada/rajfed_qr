@@ -6,7 +6,6 @@ import 'package:rajfed_qr/APIService/api_service.dart';
 import 'package:rajfed_qr/APIService/shared_preference_helper.dart';
 import 'package:rajfed_qr/models/APIModel/api_response.dart';
 import 'package:rajfed_qr/models/crop_list_model.dart';
-import 'package:rajfed_qr/models/operator_details.dart';
 import 'package:rajfed_qr/models/profile_model.dart';
 import 'package:rajfed_qr/models/saved_qr_model.dart';
 import 'package:rajfed_qr/utils/enums.dart';

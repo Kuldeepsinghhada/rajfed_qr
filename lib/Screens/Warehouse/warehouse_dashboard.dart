@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:rajfed_qr/Screens/Incharge/Rejected/rejected_screen.dart';
 import 'package:rajfed_qr/Screens/Incharge/dispatched/dispatched_screen.dart';
-import 'package:rajfed_qr/Screens/Incharge/incharge_home/incharge_home.dart';
-import 'package:rajfed_qr/Screens/Admin/admin_home_screen.dart';
 import 'package:rajfed_qr/Screens/Operator/Profile/profile_screen.dart';
 import 'package:rajfed_qr/Screens/Warehouse/warehouse_home.dart';
 

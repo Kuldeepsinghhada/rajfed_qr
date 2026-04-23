@@ -21,7 +21,7 @@ class YieldMaster {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
+    final Map<String, dynamic> data = <String, dynamic>{};
     data['yield_ID'] = yieldID;
     data['yield_District'] = yieldDistrict;
     data['yield_CropID'] = yieldCropID;

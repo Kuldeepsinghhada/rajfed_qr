@@ -35,4 +35,6 @@ class APIEndPoint {
   // Farmer Details
   static String farmerDetails = "farmerDetails";
   static String getYield = "Yield";
+  static String updateWarehouseMaster = "UpdateWarehouseMaster";
+  static String getWarehouseLatLongStatus = "GetWarehouseLatLongStatus";
 }
