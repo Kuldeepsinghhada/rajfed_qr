@@ -8,6 +8,7 @@ import 'package:rajfed_qr/Screens/Operator/OperatorDashboard/operator_dashboard.
 import 'package:rajfed_qr/Screens/Warehouse/warehouse_dashboard.dart';
 import 'package:rajfed_qr/Screens/login/login_service.dart';
 import 'package:crypto/crypto.dart';
+import 'package:rajfed_qr/Screens/Warehouse/warehouse_manager_screen.dart';
 import 'package:rajfed_qr/common_views/loader_dialog.dart';
 import 'package:rajfed_qr/utils/toast_formatter.dart';
 
@@ -72,6 +73,11 @@ class _LoginScreenState extends State<LoginScreen> {
             Navigator.pushAndRemoveUntil(
                 context,
                 MaterialPageRoute(builder: (_) => WareHouseDashboard()),
+                (route) => false);
+          } else if (userType == 8) {
+            Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(builder: (_) => const WarehouseManagerScreen()),
                 (route) => false);
           } else if (userType == 7) {
             Navigator.pushAndRemoveUntil(

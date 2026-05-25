@@ -3,6 +3,7 @@ import 'package:rajfed_qr/APIService/shared_preference_helper.dart';
 import 'package:rajfed_qr/Screens/Incharge/incharge_dashboard/incharge_dashboard_screen.dart';
 import 'package:rajfed_qr/Screens/Operator/OperatorDashboard/operator_dashboard.dart';
 import 'package:rajfed_qr/Screens/Warehouse/warehouse_dashboard.dart';
+import 'package:rajfed_qr/Screens/Warehouse/warehouse_manager_screen.dart';
 import 'package:upgrader/upgrader.dart';
 import 'Screens/Admin/admin_home_screen.dart';
 import 'package:rajfed_qr/Screens/Registration/screens/information_page.dart';
@@ -29,6 +30,8 @@ void main() async {
     initialRoute = InchargeDashboard();
   } else if (userType == 13) {
     initialRoute = WareHouseDashboard();
+  } else if (userType == 8) {
+    initialRoute = const WarehouseManagerScreen();
   } else if (userType == 7) {
     initialRoute = AdminHomeScreen();
   }

@@ -5,14 +5,15 @@ import 'package:rajfed_qr/models/warehouse_model.dart';
 import 'package:rajfed_qr/utils/toast_formatter.dart';
 
 class AllWareHouseDataScreen extends StatefulWidget {
-  const AllWareHouseDataScreen({super.key});
+  final bool showAppBar;
+  const AllWareHouseDataScreen({super.key, this.showAppBar = true});
 
   @override
-  State<AllWareHouseDataScreen> createState() => _AllWareHouseDataScreenState();
+  State<AllWareHouseDataScreen> createState() => AllWareHouseDataScreenState();
 }
 
-class _AllWareHouseDataScreenState extends State<AllWareHouseDataScreen>
-    with TickerProviderStateMixin {
+class AllWareHouseDataScreenState extends State<AllWareHouseDataScreen>
+    with TickerProviderStateMixin, WidgetsBindingObserver {
   List<WareHouseModel> allWarehouses = [];
   List<WareHouseModel> filteredWarehouses = [];
   final TextEditingController _searchController = TextEditingController();
@@ -22,17 +23,26 @@ class _AllWareHouseDataScreenState extends State<AllWareHouseDataScreen>
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _tabController = TabController(length: statusTabs.length, vsync: this);
     _tabController.addListener(_handleTabSelection);
-    _fetchData();
+    fetchData();
   }
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _tabController.removeListener(_handleTabSelection);
     _tabController.dispose();
     _searchController.dispose();
     super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      fetchData();
+    }
   }
 
   void _handleTabSelection() {
@@ -40,7 +50,7 @@ class _AllWareHouseDataScreenState extends State<AllWareHouseDataScreen>
     _applyFilters();
   }
 
-  void _fetchData() async {
+  void fetchData() async {
     await Future.delayed(
       const Duration(milliseconds: 100),
     ); // Small delay for dialog
@@ -96,20 +106,38 @@ class _AllWareHouseDataScreenState extends State<AllWareHouseDataScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("All Warehouse Data"),
-        bottom: TabBar(
-          controller: _tabController,
-          indicatorColor: Colors.green.shade800,
-          labelColor: Colors.black,
-          unselectedLabelColor: Colors.black54,
-          indicatorWeight: 3,
-          labelStyle: const TextStyle(fontWeight: FontWeight.bold),
-          tabs: statusTabs
-              .map((status) => Tab(text: _getTabLabel(status)))
-              .toList(),
-        ),
-      ),
+      appBar: widget.showAppBar
+          ? AppBar(
+              title: const Text("All Warehouse Data"),
+              bottom: TabBar(
+                controller: _tabController,
+                indicatorColor: Colors.green.shade800,
+                labelColor: Colors.black,
+                unselectedLabelColor: Colors.black54,
+                indicatorWeight: 3,
+                labelStyle: const TextStyle(fontWeight: FontWeight.bold),
+                tabs: statusTabs
+                    .map((status) => Tab(text: _getTabLabel(status)))
+                    .toList(),
+              ),
+            )
+          : PreferredSize(
+              preferredSize: const Size.fromHeight(50),
+              child: Container(
+                color: Colors.white,
+                child: TabBar(
+                  controller: _tabController,
+                  indicatorColor: Colors.green.shade800,
+                  labelColor: Colors.black,
+                  unselectedLabelColor: Colors.black54,
+                  indicatorWeight: 3,
+                  labelStyle: const TextStyle(fontWeight: FontWeight.bold),
+                  tabs: statusTabs
+                      .map((status) => Tab(text: _getTabLabel(status)))
+                      .toList(),
+                ),
+              ),
+            ),
       body: Column(
         children: [
           Padding(
@@ -131,16 +159,22 @@ class _AllWareHouseDataScreenState extends State<AllWareHouseDataScreen>
             ),
           ),
           Expanded(
-            child: filteredWarehouses.isEmpty
-                ? const Center(child: Text("No Data Found"))
-                : ListView.builder(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    itemCount: filteredWarehouses.length,
-                    itemBuilder: (context, index) {
-                      final item = filteredWarehouses[index];
-                      return _buildWarehouseCard(item);
-                    },
-                  ),
+            child: RefreshIndicator(
+              onRefresh: () async {
+                fetchData();
+              },
+              child: filteredWarehouses.isEmpty
+                  ? const Center(child: Text("No Data Found"))
+                  : ListView.builder(
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      itemCount: filteredWarehouses.length,
+                      itemBuilder: (context, index) {
+                        final item = filteredWarehouses[index];
+                        return _buildWarehouseCard(item);
+                      },
+                    ),
+            ),
           ),
         ],
       ),

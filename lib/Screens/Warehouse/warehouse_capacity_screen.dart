@@ -11,7 +11,8 @@ import 'package:rajfed_qr/utils/location_service.dart';
 import 'package:rajfed_qr/utils/toast_formatter.dart';
 
 class WarehouseCapacityScreen extends StatefulWidget {
-  const WarehouseCapacityScreen({super.key});
+  final bool showAppBar;
+  const WarehouseCapacityScreen({super.key, this.showAppBar = true});
 
   @override
   State<WarehouseCapacityScreen> createState() =>
@@ -204,7 +205,7 @@ class _WarehouseCapacityScreenState extends State<WarehouseCapacityScreen> {
 
         if (response?.status == true) {
           showSuccessToast("Warehouse details updated successfully");
-          Navigator.pop(context);
+          // Navigator.pop(context);
         } else {
           showErrorToast(
             response?.error ?? "Failed to update warehouse details",
@@ -223,7 +224,9 @@ class _WarehouseCapacityScreenState extends State<WarehouseCapacityScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Warehouse Details")),
+      appBar: widget.showAppBar
+          ? AppBar(title: const Text("Warehouse Details"))
+          : null,
       body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 30),
         child: Form(
@@ -239,9 +242,10 @@ class _WarehouseCapacityScreenState extends State<WarehouseCapacityScreen> {
                 const Text(
                   "Information already updated.",
                   style: TextStyle(
-                      color: Colors.red,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16),
+                    color: Colors.red,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
                 ),
               const SizedBox(height: 10),
               if (!isAlreadyUpdated)
@@ -298,6 +302,35 @@ class _WarehouseCapacityScreenState extends State<WarehouseCapacityScreen> {
           : (newValue) {
               setState(() {
                 selectedWarehouse = newValue;
+                if (newValue != null) {
+                  try {
+                    final warehouse = warehouseList.firstWhere(
+                      (w) => w.wareHouseName == newValue,
+                    );
+                    isAlreadyUpdated =
+                        warehouse.status?.toLowerCase() == "updated";
+                    if (isAlreadyUpdated) {
+                      if (warehouse.lat != null) {
+                        _latController.text = warehouse.lat!.toStringAsFixed(5);
+                      }
+                      if (warehouse.long != null) {
+                        _longController.text = warehouse.long!.toStringAsFixed(
+                          5,
+                        );
+                      }
+                      if (warehouse.capacity != null) {
+                        _capacityController.text = warehouse.capacity!
+                            .toInt()
+                            .toString();
+                      }
+                    } else {
+                      // Reset fields if not updated, except location which might be auto-fetched
+                      _capacityController.clear();
+                    }
+                  } catch (e) {
+                    isAlreadyUpdated = false;
+                  }
+                }
               });
             },
       validator: (value) => value == null ? 'Please select warehouse' : null,
