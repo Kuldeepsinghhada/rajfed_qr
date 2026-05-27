@@ -18,7 +18,9 @@ class APIEndPoint {
   static String uploadFarmerRemark = "UploadFarmerRemark";
   static String getFarmerRemark = "GetFarmerRemark";
   static String getDistrict = "DistrictMaster";
+  static String getBlockMaster = "BlockMaster"; // added for block API
   static String getWareHouse = "WarehouseMaster";
+  static String getWareHouseNew = "WarehouseMasterNew";
   static String dispatchToWareHouse = "DispatchedToWareHouse";
   static String rejectedInchargeDashboard = "Rejected_Incharge";
   static String sentInchargeDashboard = "Sent_Incharge_Dashboard";

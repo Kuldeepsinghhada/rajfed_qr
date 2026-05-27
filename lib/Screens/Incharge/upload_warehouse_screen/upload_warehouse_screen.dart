@@ -30,12 +30,14 @@ class _UploadWarehouseScreenState extends State<UploadWarehouseScreen> {
   List<String> districtStringList = [];
 
   String? selectedWarehouse;
-  List<WareHouseModel> wareHouseList = [];
-  List<String> warehouseStringList = [];
-
   String? selectedVehicle;
   List<VehicleModel> vehicleList = [];
   List<String> vehicleStringList = [];
+
+  // Warehouse lists
+  List<WareHouseModel> wareHouseList = [];
+  List<String> warehouseStringList = [];
+  List<int?> warehouseIdList = [];
 
   final List<SavedQrModel> qrCodeList = [];
   final _formKey = GlobalKey<FormState>();
@@ -83,18 +85,43 @@ class _UploadWarehouseScreenState extends State<UploadWarehouseScreen> {
     if (!mounted) return;
     showLoadingDialog(context);
     try {
-      var response = await InchargeService.instance
-          .getWareHouseList(districtList[index].district ?? '');
+      var response = await InchargeService.instance.getWareHouseList(
+        districtList[index].district ?? '',
+      );
       if (!mounted) return;
       Navigator.pop(context);
       if (response?.status == true) {
+        // populate local lists and keep indices aligned
         wareHouseList = response?.data ?? [];
         warehouseStringList.clear();
+        warehouseIdList.clear();
         for (var item in wareHouseList) {
-          if (item.wareHouseName != null) {
-            warehouseStringList.add(item.wareHouseName!);
+          final name = (item.wareHouseName ?? '').trim();
+          if (name.isNotEmpty) {
+            warehouseStringList.add(name);
+            warehouseIdList.add(item.wareHouseId);
           }
         }
+        // Log parsed warehouse ids and names for debugging
+        log(
+          'getWareHouseAPICall parsed warehouses (all): ' +
+              wareHouseList
+                  .map(
+                    (w) => '{id: ${w.wareHouseId}, name: ${w.wareHouseName}}',
+                  )
+                  .join(', '),
+        );
+        log(
+          'getWareHouseAPICall display list: ' +
+              warehouseStringList
+                  .asMap()
+                  .entries
+                  .map(
+                    (e) =>
+                        '{index: ${e.key}, id: ${warehouseIdList[e.key]}, name: ${e.value}}',
+                  )
+                  .join(', '),
+        );
         setState(() {});
       } else {
         showErrorToast(response?.error ?? 'Something Went wrong');
@@ -145,7 +172,7 @@ class _UploadWarehouseScreenState extends State<UploadWarehouseScreen> {
         "purchaseCenterId": item.purchaseCenterId,
         "cropId": item.cropId,
         "wareHouseId": item.wareHouseId,
-        "vehicleNo": item.vehicleNo
+        "vehicleNo": item.vehicleNo,
       };
       list.add(obj);
     }
@@ -159,7 +186,7 @@ class _UploadWarehouseScreenState extends State<UploadWarehouseScreen> {
         options: Options(
           headers: {
             "Authorization": "Bearer $token",
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
           },
         ),
       );
@@ -169,9 +196,10 @@ class _UploadWarehouseScreenState extends State<UploadWarehouseScreen> {
         DataManager.instance.savedGadiItems = [];
         showSuccessToast("Record sent to warehouse successfully");
         Navigator.pushAndRemoveUntil(
-            context,
-            MaterialPageRoute(builder: (_) => InchargeDashboard()),
-            (route) => false);
+          context,
+          MaterialPageRoute(builder: (_) => InchargeDashboard()),
+          (route) => false,
+        );
       } else {
         showErrorToast('Record Not updated');
       }
@@ -197,21 +225,54 @@ class _UploadWarehouseScreenState extends State<UploadWarehouseScreen> {
               wareHouseDropdown(),
               vehicleDropdown(),
               CommonButton(
-                  text: "Send To Warehouse",
-                  onPressed: () {
-                    var status = _formKey.currentState!.validate();
-                    if (status == true) {
-                      qrCodeList.clear();
-                      var index =
-                          warehouseStringList.indexOf(selectedWarehouse ?? '');
-                      for (var item in widget.qrCodeList) {
-                        item.wareHouseId = wareHouseList[index].wareHouseId;
-                        item.vehicleNo = selectedVehicle;
-                        qrCodeList.add(item);
-                      }
-                      dispatchedToWarehouse();
+                text: "Send To Warehouse",
+                onPressed: () {
+                  var status = _formKey.currentState!.validate();
+                  if (status == true) {
+                    qrCodeList.clear();
+                    if (selectedWarehouse == null) {
+                      Fluttertoast.showToast(msg: 'Please select warehouse');
+                      return;
                     }
-                  })
+                    var index = warehouseStringList.indexOf(selectedWarehouse!);
+                    if (index < 0 || index >= warehouseIdList.length) {
+                      // log and show error
+                      log(
+                        'Invalid warehouse selection: selected="$selectedWarehouse", index=$index, warehouseIdListLength=${warehouseIdList.length}, wareHouseListLength=${wareHouseList.length}',
+                      );
+                      Fluttertoast.showToast(
+                        msg: 'Please select a valid warehouse',
+                      );
+                      return;
+                    }
+                    final selectedId = warehouseIdList[index];
+                    if (selectedId == null) {
+                      log('Selected warehouse id is null for index $index');
+                      Fluttertoast.showToast(
+                        msg: 'Selected warehouse has no valid id',
+                      );
+                      return;
+                    }
+                    // Log warehouse selected id
+                    log(
+                      'Selected warehouse id: $selectedId, name: ${warehouseStringList[index]}',
+                    );
+                    for (var item in widget.qrCodeList) {
+                      item.wareHouseId = selectedId;
+                      item.vehicleNo = selectedVehicle;
+                      qrCodeList.add(item);
+                    }
+                    // Log payload being sent
+                    log(
+                      'Dispatch payload: ' +
+                          jsonEncode(
+                            qrCodeList.map((e) => e.toJson()).toList(),
+                          ),
+                    );
+                    dispatchedToWarehouse();
+                  }
+                },
+              ),
             ],
           ),
         ),
@@ -221,13 +282,13 @@ class _UploadWarehouseScreenState extends State<UploadWarehouseScreen> {
 
   Widget districtDropdown() {
     return DropdownButtonFormField<String>(
-      value: selectedDistrictValue,
+      initialValue: selectedDistrictValue,
       hint: Text("Select a District"),
       items: districtStringList
-          .map((String value) => DropdownMenuItem(
-                value: value,
-                child: Text(value),
-              ))
+          .map(
+            (String value) =>
+                DropdownMenuItem(value: value, child: Text(value)),
+          )
           .toList(),
       onChanged: (newValue) {
         selectedWarehouse = null;
@@ -264,13 +325,13 @@ class _UploadWarehouseScreenState extends State<UploadWarehouseScreen> {
 
   Widget vehicleDropdown() {
     return DropdownButtonFormField<String>(
-      value: selectedVehicle,
+      initialValue: selectedVehicle,
       hint: Text("Select Vehicle"),
       items: vehicleStringList
-          .map((String value) => DropdownMenuItem(
-                value: value,
-                child: Text(value),
-              ))
+          .map(
+            (String value) =>
+                DropdownMenuItem(value: value, child: Text(value)),
+          )
           .toList(),
       onChanged: (newValue) {
         setState(() {
@@ -305,13 +366,13 @@ class _UploadWarehouseScreenState extends State<UploadWarehouseScreen> {
 
   Widget wareHouseDropdown() {
     return DropdownButtonFormField<String>(
-      value: selectedWarehouse,
+      initialValue: selectedWarehouse,
       hint: Text("Select a Warehouse"),
       items: warehouseStringList
-          .map((String value) => DropdownMenuItem(
-                value: value,
-                child: Text(value),
-              ))
+          .map(
+            (String value) =>
+                DropdownMenuItem(value: value, child: Text(value)),
+          )
           .toList(),
       onChanged: (newValue) {
         setState(() {
@@ -348,7 +409,9 @@ class _UploadWarehouseScreenState extends State<UploadWarehouseScreen> {
 class UpperCaseTextFormatter extends TextInputFormatter {
   @override
   TextEditingValue formatEditUpdate(
-      TextEditingValue oldValue, TextEditingValue newValue) {
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
     return TextEditingValue(
       text: newValue.text.toUpperCase(),
       selection: newValue.selection,

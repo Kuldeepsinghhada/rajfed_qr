@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:rajfed_qr/Screens/Incharge/incharge_home/incharge_service.dart';
 import 'package:rajfed_qr/common_views/loader_dialog.dart';
+import 'package:rajfed_qr/models/district_model.dart';
 import 'package:rajfed_qr/models/warehouse_model.dart';
 import 'package:rajfed_qr/utils/toast_formatter.dart';
 
@@ -16,6 +17,7 @@ class AllWareHouseDataScreenState extends State<AllWareHouseDataScreen>
     with TickerProviderStateMixin, WidgetsBindingObserver {
   List<WareHouseModel> allWarehouses = [];
   List<WareHouseModel> filteredWarehouses = [];
+  List<DistrictModel> districtList = [];
   final TextEditingController _searchController = TextEditingController();
   late TabController _tabController;
   final List<String> statusTabs = ["All", "Updated", "Pending"];
@@ -57,17 +59,30 @@ class AllWareHouseDataScreenState extends State<AllWareHouseDataScreen>
     if (!mounted) return;
     showLoadingDialog(context);
     try {
-      final response = await InchargeService.instance.getAllWarehouseData();
+      final results = await Future.wait([
+        InchargeService.instance.getDistrictList(),
+        InchargeService.instance.getAllWarehouseData(),
+      ]);
+
+      final districtResponse = results[0];
+      final warehouseResponse = results[1];
+
       if (!mounted) return;
       Navigator.pop(context);
 
-      if (response?.status == true) {
+      if (districtResponse?.status == true) {
+        districtList = districtResponse?.data ?? [];
+      }
+
+      if (warehouseResponse?.status == true) {
         setState(() {
-          allWarehouses = response?.data ?? [];
+          allWarehouses = warehouseResponse?.data ?? [];
           _applyFilters();
         });
       } else {
-        showErrorToast(response?.error ?? "Failed to load warehouse data");
+        showErrorToast(
+          warehouseResponse?.error ?? "Failed to load warehouse data",
+        );
       }
     } catch (e) {
       if (!mounted) return;
@@ -181,6 +196,18 @@ class AllWareHouseDataScreenState extends State<AllWareHouseDataScreen>
     );
   }
 
+  String _getDistrictName(String? districtCode) {
+    if (districtCode == null || districtCode.isEmpty) return "N/A";
+    try {
+      final district = districtList.firstWhere(
+        (d) => d.district == districtCode,
+      );
+      return "${district.districtNameEN ?? 'Unknown'} ($districtCode)";
+    } catch (e) {
+      return districtCode;
+    }
+  }
+
   Widget _buildWarehouseCard(WareHouseModel item) {
     return Card(
       elevation: 4,
@@ -210,8 +237,8 @@ class AllWareHouseDataScreenState extends State<AllWareHouseDataScreen>
             const Divider(height: 20),
             _buildDetailRow(
               Icons.location_city,
-              "District Code",
-              item.districTCODE ?? "N/A",
+              "District",
+              _getDistrictName(item.districTCODE),
             ),
             _buildDetailRow(
               Icons.pin_drop,
@@ -227,6 +254,16 @@ class AllWareHouseDataScreenState extends State<AllWareHouseDataScreen>
               Icons.badge,
               "Warehouse ID",
               "${item.wareHouseId ?? 'N/A'}",
+            ),
+            _buildDetailRow(
+              Icons.calendar_today,
+              "Construction Year",
+              item.constructionYear ?? "N/A",
+            ),
+            _buildDetailRow(
+              Icons.person,
+              "Owner Name",
+              item.ownerName ?? "N/A",
             ),
           ],
         ),
