@@ -6,6 +6,7 @@ class SharedPreferenceHelper {
   var userId = "userId";
   var userType = "userType";
   var purchaseCenterIdKey = "purchaseCenterId";
+  var districtCodeKey = "districtCode";
 
   SharedPreferenceHelper._();
 
@@ -68,6 +69,18 @@ class SharedPreferenceHelper {
   Future<int?> getPurchaseCenterId() async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
     var data = preferences.getInt(purchaseCenterIdKey);
+    return data;
+  }
+
+  Future<bool?> setDistrictCode(String districtCode) async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    var status = await preferences.setString(districtCodeKey, districtCode);
+    return status;
+  }
+
+  Future<String?> getDistrictCode() async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    var data = preferences.getString(districtCodeKey);
     return data;
   }
 

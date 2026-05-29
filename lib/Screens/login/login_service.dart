@@ -13,8 +13,11 @@ class LoginService {
 
   Future<APIResponse?> loginUser(String userName, String password) async {
     try {
-      var response = await ApiService.instance.apiCall(APIEndPoint.login,
-          HttpRequestType.post, {'user': userName, 'pass': password});
+      var response = await ApiService.instance.apiCall(
+        APIEndPoint.login,
+        HttpRequestType.post,
+        {'user': userName, 'pass': password},
+      );
       if (response.status) {
         var data = LoginResponse.fromJson(response.data['response']['data']);
         if (data.token != null) {
@@ -22,8 +25,12 @@ class LoginService {
           SharedPreferenceHelper.instance.setUserId(data.uid!);
           SharedPreferenceHelper.instance.setUserName(data.userName!);
           SharedPreferenceHelper.instance.setUserType(data.userType!);
-          SharedPreferenceHelper.instance
-              .setPurchaseCenterId(data.purchaseCenterID!);
+          SharedPreferenceHelper.instance.setPurchaseCenterId(
+            data.purchaseCenterID!,
+          );
+          if (data.districtCode != null) {
+            await SharedPreferenceHelper.instance.setDistrictCode(data.districtCode!);
+          }
           return APIResponse(true, data, "");
         }
         return APIResponse(false, null, "Data not parsed");

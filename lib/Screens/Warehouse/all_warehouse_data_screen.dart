@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:rajfed_qr/APIService/shared_preference_helper.dart';
 import 'package:rajfed_qr/Screens/Incharge/incharge_home/incharge_service.dart';
 import 'package:rajfed_qr/common_views/loader_dialog.dart';
 import 'package:rajfed_qr/models/district_model.dart';
@@ -18,6 +19,8 @@ class AllWareHouseDataScreenState extends State<AllWareHouseDataScreen>
   List<WareHouseModel> allWarehouses = [];
   List<WareHouseModel> filteredWarehouses = [];
   List<DistrictModel> districtList = [];
+  String? selectedDistrict;
+  int? userType;
   final TextEditingController _searchController = TextEditingController();
   late TabController _tabController;
   final List<String> statusTabs = ["All", "Updated", "Pending"];
@@ -28,7 +31,21 @@ class AllWareHouseDataScreenState extends State<AllWareHouseDataScreen>
     WidgetsBinding.instance.addObserver(this);
     _tabController = TabController(length: statusTabs.length, vsync: this);
     _tabController.addListener(_handleTabSelection);
+    _loadUserType();
     fetchData();
+  }
+
+  String? loginDistrictCode;
+
+  void _loadUserType() async {
+    int? type = await SharedPreferenceHelper.instance.getUserType();
+    String? dCode = await SharedPreferenceHelper.instance.getDistrictCode();
+    if (mounted) {
+      setState(() {
+        userType = type;
+        loginDistrictCode = dCode;
+      });
+    }
   }
 
   @override
@@ -56,12 +73,15 @@ class AllWareHouseDataScreenState extends State<AllWareHouseDataScreen>
     await Future.delayed(
       const Duration(milliseconds: 100),
     ); // Small delay for dialog
+
+    // Wait for district code to be loaded if not already
+    String? dCode = await SharedPreferenceHelper.instance.getDistrictCode();
     if (!mounted) return;
     showLoadingDialog(context);
     try {
       final results = await Future.wait([
         InchargeService.instance.getDistrictList(),
-        InchargeService.instance.getAllWarehouseData(),
+        InchargeService.instance.getAllWarehouseData(districtCode: dCode),
       ]);
 
       final districtResponse = results[0];
@@ -101,7 +121,9 @@ class AllWareHouseDataScreenState extends State<AllWareHouseDataScreen>
             item.wareHouseName?.toLowerCase().contains(query) ?? false;
         bool matchesStatus =
             selectedTab == "all" || item.status?.toLowerCase() == selectedTab;
-        return matchesSearch && matchesStatus;
+        bool matchesDistrict =
+            selectedDistrict == null || item.districTCODE == selectedDistrict;
+        return matchesSearch && matchesStatus && matchesDistrict;
       }).toList();
     });
   }
@@ -157,20 +179,61 @@ class AllWareHouseDataScreenState extends State<AllWareHouseDataScreen>
         children: [
           Padding(
             padding: const EdgeInsets.all(16.0),
-            child: TextField(
-              controller: _searchController,
-              onChanged: (_) => _applyFilters(),
-              decoration: InputDecoration(
-                hintText: "Search by Name",
-                prefixIcon: const Icon(Icons.search),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(30),
+            child: Column(
+              children: [
+                if (userType == 8 && loginDistrictCode == null) ...[
+                  DropdownButtonFormField<String?>(
+                    decoration: InputDecoration(
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 0,
+                      ),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(30),
+                      ),
+                    ),
+                    hint: const Text("Select District"),
+                    value: selectedDistrict,
+                    isExpanded: true,
+                    items: [
+                      const DropdownMenuItem<String?>(
+                        value: null,
+                        child: Text("All Districts"),
+                      ),
+                      ...districtList.where((d) => d.district != null).map((
+                        district,
+                      ) {
+                        return DropdownMenuItem<String?>(
+                          value: district.district,
+                          child: Text(district.districtNameEN ?? "Unknown"),
+                        );
+                      }).toList(),
+                    ],
+                    onChanged: (value) {
+                      setState(() {
+                        selectedDistrict = value;
+                        _applyFilters();
+                      });
+                    },
+                  ),
+                  const SizedBox(height: 10),
+                ],
+                TextField(
+                  controller: _searchController,
+                  onChanged: (_) => _applyFilters(),
+                  decoration: InputDecoration(
+                    hintText: "Search by Name",
+                    prefixIcon: const Icon(Icons.search),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(
+                      vertical: 0,
+                      horizontal: 20,
+                    ),
+                  ),
                 ),
-                contentPadding: const EdgeInsets.symmetric(
-                  vertical: 0,
-                  horizontal: 20,
-                ),
-              ),
+              ],
             ),
           ),
           Expanded(

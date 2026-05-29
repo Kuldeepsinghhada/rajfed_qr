@@ -348,9 +348,12 @@ class InchargeService {
     }
   }
 
-  Future<APIResponse?> getAllWarehouseData() async {
+  Future<APIResponse?> getAllWarehouseData({String? districtCode}) async {
     try {
       var query = "?flag=ALL";
+      if (districtCode != null && districtCode.isNotEmpty) {
+        query += "&DistrictCode=$districtCode";
+      }
       var response = await ApiService.instance.apiCall(
         APIEndPoint.getWarehouseLatLongStatus + query,
         HttpRequestType.get,

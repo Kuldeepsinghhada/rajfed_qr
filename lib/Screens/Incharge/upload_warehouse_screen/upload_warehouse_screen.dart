@@ -291,12 +291,12 @@ class _UploadWarehouseScreenState extends State<UploadWarehouseScreen> {
           )
           .toList(),
       onChanged: (newValue) {
-        selectedWarehouse = null;
-        setState(() {
-          selectedDistrictValue = newValue;
-        });
-        getWareHouseAPICall();
-      },
+              selectedWarehouse = null;
+              setState(() {
+                selectedDistrictValue = newValue;
+              });
+              getWareHouseAPICall();
+            },
       validator: (value) {
         if (value == null) {
           return 'Please select district';

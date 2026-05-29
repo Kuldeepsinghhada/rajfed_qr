@@ -25,6 +25,8 @@ class _WarehouseCapacityScreenState extends State<WarehouseCapacityScreen> {
 
   int? userType;
   int? assignedWarehouseId;
+  String? loginDistrictCode;
+  bool isDistrictFixed = false;
 
   String? selectedDistrictValue;
   List<DistrictModel> districtList = [];
@@ -71,6 +73,7 @@ class _WarehouseCapacityScreenState extends State<WarehouseCapacityScreen> {
     userType = await SharedPreferenceHelper.instance.getUserType();
     assignedWarehouseId = await SharedPreferenceHelper.instance
         .getPurchaseCenterId();
+    loginDistrictCode = await SharedPreferenceHelper.instance.getDistrictCode();
     _getDistricts();
   }
 
@@ -90,6 +93,16 @@ class _WarehouseCapacityScreenState extends State<WarehouseCapacityScreen> {
             .where((item) => item.districtNameEN != null)
             .map((item) => item.districtNameEN!)
             .toList();
+
+        if (loginDistrictCode != null) {
+          try {
+            final district = districtList.firstWhere(
+              (d) => d.district?.toString().trim() == loginDistrictCode?.toString().trim()
+            );
+            selectedDistrictValue = district.districtNameEN;
+            isDistrictFixed = true;
+          } catch(e) {}
+        }
 
         // If warehouse user, auto-fetch their specific data
         if (userType == 13 && assignedWarehouseId != null) {
@@ -389,7 +402,7 @@ class _WarehouseCapacityScreenState extends State<WarehouseCapacityScreen> {
           )
           .toList(),
       isDense: true,
-      onChanged: (userType == 13)
+      onChanged: (userType == 13 || isDistrictFixed)
           ? null
           : (newValue) {
               setState(() {
@@ -411,7 +424,7 @@ class _WarehouseCapacityScreenState extends State<WarehouseCapacityScreen> {
       validator: (value) => value == null ? 'Please select district' : null,
       decoration: _inputDecoration(
         "District",
-      ).copyWith(enabled: userType != 13),
+      ).copyWith(enabled: !(userType == 13 || isDistrictFixed)),
     );
   }
 

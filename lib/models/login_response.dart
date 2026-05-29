@@ -5,6 +5,7 @@ class LoginResponse {
   int? purchaseCenterID;
   int? userType;
   String? token;
+  String? districtCode;
 
   LoginResponse(
       {this.uid,
@@ -12,7 +13,8 @@ class LoginResponse {
         this.password,
         this.purchaseCenterID,
         this.userType,
-        this.token});
+        this.token,
+        this.districtCode});
 
   LoginResponse.fromJson(Map<String, dynamic> json) {
     uid = json['uid'];
@@ -21,5 +23,6 @@ class LoginResponse {
     purchaseCenterID = json['purchaseCenter_ID'];
     userType = json['userType'];
     token = json['token'];
+    districtCode = json['district_Code']?.toString();
   }
 }
