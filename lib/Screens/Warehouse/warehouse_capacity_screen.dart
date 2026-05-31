@@ -54,6 +54,9 @@ class _WarehouseCapacityScreenState extends State<WarehouseCapacityScreen> {
   String? selectedConstructionYear;
   final List<String> yearList = [];
 
+  String? selectedWarehouseCondition;
+  final List<String> conditionList = ["Usable", "Unusable"];
+
   @override
   void initState() {
     super.initState();
@@ -97,11 +100,13 @@ class _WarehouseCapacityScreenState extends State<WarehouseCapacityScreen> {
         if (loginDistrictCode != null) {
           try {
             final district = districtList.firstWhere(
-              (d) => d.district?.toString().trim() == loginDistrictCode?.toString().trim()
+              (d) =>
+                  d.district?.toString().trim() ==
+                  loginDistrictCode?.toString().trim(),
             );
             selectedDistrictValue = district.districtNameEN;
             isDistrictFixed = true;
-          } catch(e) {}
+          } catch (e) {}
         }
 
         // If warehouse user, auto-fetch their specific data
@@ -176,6 +181,12 @@ class _WarehouseCapacityScreenState extends State<WarehouseCapacityScreen> {
             }
             selectedConstructionYear = myWarehouse.constructionYear;
             _ownerNameController.text = myWarehouse.ownerName ?? "";
+            if (myWarehouse.warehouseCondtion != null &&
+                conditionList.contains(myWarehouse.warehouseCondtion)) {
+              selectedWarehouseCondition = myWarehouse.warehouseCondtion;
+            } else {
+              selectedWarehouseCondition = null;
+            }
           });
         }
       }
@@ -312,6 +323,7 @@ class _WarehouseCapacityScreenState extends State<WarehouseCapacityScreen> {
           "ownerName": _ownerNameController.text.trim(),
           "construction_year": selectedConstructionYear,
           "owner_name": _ownerNameController.text.trim(),
+          "warehouseCondtion": selectedWarehouseCondition,
         };
 
         final response = await InchargeService.instance.updateWarehouseMaster(
@@ -359,6 +371,7 @@ class _WarehouseCapacityScreenState extends State<WarehouseCapacityScreen> {
               capacityField(),
               ownerNameField(),
               constructionYearDropdown(),
+              warehouseConditionDropdown(),
               if (isAlreadyUpdated)
                 const Text(
                   "Information already updated.",
@@ -615,11 +628,18 @@ class _WarehouseCapacityScreenState extends State<WarehouseCapacityScreen> {
                   }
                   selectedConstructionYear = warehouseObj.constructionYear;
                   _ownerNameController.text = warehouseObj.ownerName ?? "";
+                  if (warehouseObj.warehouseCondtion != null &&
+                      conditionList.contains(warehouseObj.warehouseCondtion)) {
+                    selectedWarehouseCondition = warehouseObj.warehouseCondtion;
+                  } else {
+                    selectedWarehouseCondition = null;
+                  }
                 } else {
                   // Reset fields if not found
                   _capacityController.clear();
                   selectedConstructionYear = null;
                   _ownerNameController.clear();
+                  selectedWarehouseCondition = null;
                   isAlreadyUpdated = false;
                 }
               });
@@ -702,6 +722,33 @@ class _WarehouseCapacityScreenState extends State<WarehouseCapacityScreen> {
         }
         return null;
       },
+    );
+  }
+
+  Widget warehouseConditionDropdown() {
+    return DropdownButtonFormField<String>(
+      isExpanded: true,
+      initialValue: selectedWarehouseCondition,
+      hint: const Text("Select Warehouse Condition"),
+      items: conditionList
+          .map(
+            (String value) =>
+                DropdownMenuItem(value: value, child: Text(value)),
+          )
+          .toList(),
+      isDense: true,
+      onChanged: isAlreadyUpdated
+          ? null
+          : (newValue) {
+              setState(() {
+                selectedWarehouseCondition = newValue;
+              });
+            },
+      validator: (value) =>
+          value == null ? 'Please select warehouse condition' : null,
+      decoration: _inputDecoration(
+        "Warehouse Condition",
+      ).copyWith(enabled: !isAlreadyUpdated),
     );
   }
 

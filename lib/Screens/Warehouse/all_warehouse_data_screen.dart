@@ -328,6 +328,11 @@ class AllWareHouseDataScreenState extends State<AllWareHouseDataScreen>
               "Owner Name",
               item.ownerName ?? "N/A",
             ),
+            _buildDetailRow(
+              Icons.check_circle_outline,
+              "Condition",
+              item.warehouseCondtion ?? "N/A",
+            ),
           ],
         ),
       ),
