@@ -551,6 +551,7 @@ class _WarehouseCapacityScreenState extends State<WarehouseCapacityScreen> {
   Widget wareHouseDropdown() {
     return DropdownButtonFormField<String>(
       isExpanded: true,
+      itemHeight: null,
       initialValue: selectedWarehouse,
       hint: const Text("Select Warehouse/GSS"),
       items: warehouseStringList
@@ -562,8 +563,6 @@ class _WarehouseCapacityScreenState extends State<WarehouseCapacityScreen> {
                   Expanded(
                     child: Text(
                       value,
-                      overflow: TextOverflow.ellipsis,
-                      maxLines: 1,
                     ),
                   ),
                 ],
@@ -571,7 +570,7 @@ class _WarehouseCapacityScreenState extends State<WarehouseCapacityScreen> {
             ),
           )
           .toList(),
-      isDense: true,
+      isDense: false,
       onChanged: (userType == 13)
           ? null
           : (newValue) {
