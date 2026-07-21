@@ -10,6 +10,7 @@ class WareHouseModel {
   String? constructionYear;
   String? ownerName;
   String? warehouseCondtion;
+  int? extraGodam;
 
   WareHouseModel(
       {this.wareHouseId,
@@ -22,7 +23,8 @@ class WareHouseModel {
       this.status,
       this.constructionYear,
       this.ownerName,
-      this.warehouseCondtion});
+      this.warehouseCondtion,
+      this.extraGodam});
 
   WareHouseModel.fromJson(Map<String, dynamic> json) {
     // Parse wareHouseId that may come as int or string. Try common keys first,
@@ -70,6 +72,8 @@ class WareHouseModel {
     constructionYear = (json['constructionYear'] ?? json['construction_year'] ?? json['constructionYear'] ?? json['yearOfConstruction'])?.toString();
     ownerName = (json['ownerName'] ?? json['owner_name'] ?? json['ownerName'] ?? json['owner_Name'])?.toString();
     warehouseCondtion = (json['warehouseCondtion'] ?? json['warehouse_condition'] ?? json['warehouseCondtion'])?.toString();
+    var eGodam = json['ExtraGodam'] ?? json['extraGodam'];
+    extraGodam = eGodam != null ? int.tryParse(eGodam.toString()) : null;
   }
 
   Map<String, dynamic> toJson() {
@@ -87,6 +91,7 @@ class WareHouseModel {
     data['construction_year'] = constructionYear;
     data['owner_name'] = ownerName;
     data['warehouseCondition'] = warehouseCondtion;
+    data['ExtraGodam'] = extraGodam;
     return data;
   }
 }

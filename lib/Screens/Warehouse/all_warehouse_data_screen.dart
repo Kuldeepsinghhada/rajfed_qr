@@ -314,6 +314,11 @@ class AllWareHouseDataScreenState extends State<AllWareHouseDataScreen>
               "${item.capacity ?? 'N/A'} MT",
             ),
             _buildDetailRow(
+              Icons.store,
+              "Extra Godam",
+              "${item.extraGodam ?? 'N/A'}",
+            ),
+            _buildDetailRow(
               Icons.badge,
               "Warehouse ID",
               "${item.wareHouseId ?? 'N/A'}",

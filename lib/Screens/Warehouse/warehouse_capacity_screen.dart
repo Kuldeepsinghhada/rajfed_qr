@@ -50,6 +50,7 @@ class _WarehouseCapacityScreenState extends State<WarehouseCapacityScreen> {
   final TextEditingController _latController = TextEditingController();
   final TextEditingController _longController = TextEditingController();
   final TextEditingController _capacityController = TextEditingController();
+  final TextEditingController _extraGodamController = TextEditingController();
   final TextEditingController _ownerNameController = TextEditingController();
   String? selectedConstructionYear;
   final List<String> yearList = [];
@@ -178,6 +179,9 @@ class _WarehouseCapacityScreenState extends State<WarehouseCapacityScreen> {
               _capacityController.text = myWarehouse.capacity!
                   .toInt()
                   .toString();
+            }
+            if (myWarehouse.extraGodam != null) {
+              _extraGodamController.text = myWarehouse.extraGodam!.toString();
             }
             selectedConstructionYear = myWarehouse.constructionYear;
             _ownerNameController.text = myWarehouse.ownerName ?? "";
@@ -319,6 +323,7 @@ class _WarehouseCapacityScreenState extends State<WarehouseCapacityScreen> {
           "lat": "${double.tryParse(_latController.text) ?? 0.0}",
           "long": "${double.tryParse(_longController.text) ?? 0.0}",
           "capacity": double.tryParse(_capacityController.text) ?? 0.0,
+          "ExtraGodam": int.tryParse(_extraGodamController.text) ?? 0,
           "constructionYear": selectedConstructionYear,
           "ownerName": _ownerNameController.text.trim(),
           "construction_year": selectedConstructionYear,
@@ -369,6 +374,7 @@ class _WarehouseCapacityScreenState extends State<WarehouseCapacityScreen> {
               wareHouseDropdown(),
               locationFields(),
               capacityField(),
+              extraGodamField(),
               ownerNameField(),
               constructionYearDropdown(),
               warehouseConditionDropdown(),
@@ -558,15 +564,7 @@ class _WarehouseCapacityScreenState extends State<WarehouseCapacityScreen> {
           .map(
             (String value) => DropdownMenuItem(
               value: value,
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      value,
-                    ),
-                  ),
-                ],
-              ),
+              child: Row(children: [Expanded(child: Text(value))]),
             ),
           )
           .toList(),
@@ -625,6 +623,12 @@ class _WarehouseCapacityScreenState extends State<WarehouseCapacityScreen> {
                         .toInt()
                         .toString();
                   }
+                  if (warehouseObj.extraGodam != null) {
+                    _extraGodamController.text = warehouseObj.extraGodam!
+                        .toString();
+                  } else {
+                    _extraGodamController.clear();
+                  }
                   selectedConstructionYear = warehouseObj.constructionYear;
                   _ownerNameController.text = warehouseObj.ownerName ?? "";
                   if (warehouseObj.warehouseCondtion != null &&
@@ -636,6 +640,7 @@ class _WarehouseCapacityScreenState extends State<WarehouseCapacityScreen> {
                 } else {
                   // Reset fields if not found
                   _capacityController.clear();
+                  _extraGodamController.clear();
                   selectedConstructionYear = null;
                   _ownerNameController.clear();
                   selectedWarehouseCondition = null;
@@ -703,6 +708,20 @@ class _WarehouseCapacityScreenState extends State<WarehouseCapacityScreen> {
         if (value == null || value.isEmpty) {
           return "Please enter capacity";
         }
+        return null;
+      },
+    );
+  }
+
+  Widget extraGodamField() {
+    return TextFormField(
+      controller: _extraGodamController,
+      keyboardType: TextInputType.number,
+      readOnly: isAlreadyUpdated,
+      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+      decoration: _inputDecoration("Other Godown (अतिरिक्त गोदाम संख्या)"),
+      style: const TextStyle(fontWeight: FontWeight.w600),
+      validator: (value) {
         return null;
       },
     );
