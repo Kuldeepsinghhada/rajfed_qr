@@ -11,6 +11,7 @@ import 'package:rajfed_qr/models/saved_qr_model.dart';
 import 'package:rajfed_qr/models/vehicle_model.dart';
 import 'package:rajfed_qr/models/warehouse_model.dart';
 import 'package:rajfed_qr/models/block_model.dart';
+import 'package:rajfed_qr/models/packs_model.dart';
 import 'package:rajfed_qr/utils/enums.dart';
 import 'package:rajfed_qr/utils/toast_formatter.dart';
 
@@ -404,4 +405,59 @@ class InchargeService {
       return null;
     }
   }
+
+  Future<APIResponse?> updatePacksMaster(Map<String, dynamic> body) async {
+    try {
+      var response = await ApiService.instance.apiCall(
+        APIEndPoint.updatePacsMaster,
+        HttpRequestType.post,
+        body,
+      );
+      return response;
+    } catch (e) {
+      showErrorToast("Something went wrong");
+      return null;
+    }
+  }
+
+  Future<APIResponse?> getAllPacksData({String? districtCode}) async {
+    try {
+      var query = "?flag=all";
+      if (districtCode != null && districtCode.isNotEmpty) {
+        query += "&DistrictCode=$districtCode";
+      }
+      var response = await ApiService.instance.apiCall(
+        APIEndPoint.getPacsStatus + query,
+        HttpRequestType.get,
+        null,
+      );
+      if (response.status) {
+        log('getAllPacksData raw response: ${response.data}');
+        List<PacksModel> packsList = [];
+        dynamic dataList;
+        if (response.data is Map) {
+          dataList = response.data['response']?['data'] ??
+              response.data['data'] ??
+              response.data['response'];
+        } else if (response.data is List) {
+          dataList = response.data;
+        }
+
+        if (dataList is List) {
+          packsList = dataList
+              .whereType<Map<String, dynamic>>()
+              .map((item) => PacksModel.fromJson(item))
+              .toList();
+        }
+        log('Parsed packs list count: ${packsList.length}');
+        return APIResponse(true, packsList, "");
+      }
+      return APIResponse(false, null, response.error);
+    } catch (e, st) {
+      log('Error in getAllPacksData: $e\n$st');
+      showErrorToast("Something went wrong");
+      return null;
+    }
+  }
 }
+

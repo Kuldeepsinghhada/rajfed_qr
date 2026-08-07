@@ -39,4 +39,8 @@ class APIEndPoint {
   static String getYield = "Yield";
   static String updateWarehouseMaster = "UpdateWarehouseMaster";
   static String getWarehouseLatLongStatus = "GetWarehouseLatLongStatus";
+
+  // PACS Detail
+  static String updatePacsMaster = "UpdatePacsMaster";
+  static String getPacsStatus = "GetPacsStatus";
 }

@@ -3,8 +3,8 @@ import 'package:rajfed_qr/APIService/api_endpoint.dart';
 import 'package:rajfed_qr/APIService/api_service.dart';
 import 'package:rajfed_qr/APIService/shared_preference_helper.dart';
 import 'package:rajfed_qr/Screens/OpenSource/farmer_desk_screen/farmer_desk_screen.dart';
+import 'package:rajfed_qr/Screens/Packs/packs_list_screen.dart';
 import 'package:rajfed_qr/Screens/Warehouse/all_warehouse_data_screen.dart';
-import 'package:rajfed_qr/Screens/Warehouse/warehouse_capacity_screen.dart';
 import 'package:rajfed_qr/common_views/loader_dialog.dart';
 import 'package:rajfed_qr/utils/enums.dart';
 import 'package:rajfed_qr/utils/toast_formatter.dart';
@@ -19,14 +19,15 @@ class WarehouseManagerScreen extends StatefulWidget {
 class _WarehouseManagerScreenState extends State<WarehouseManagerScreen> {
   int _selectedIndex = 0;
   final GlobalKey<AllWareHouseDataScreenState> _allWarehouseKey = GlobalKey();
+  final GlobalKey<PacksListScreenState> _packsListKey = GlobalKey();
   late List<Widget> _screens;
 
   @override
   void initState() {
     super.initState();
     _screens = [
-      const WarehouseCapacityScreen(showAppBar: false),
       AllWareHouseDataScreen(key: _allWarehouseKey, showAppBar: false),
+      PacksListScreen(key: _packsListKey, showAppBar: false),
     ];
   }
 
@@ -34,8 +35,10 @@ class _WarehouseManagerScreenState extends State<WarehouseManagerScreen> {
     setState(() {
       _selectedIndex = index;
     });
-    if (index == 1) {
+    if (index == 0) {
       _allWarehouseKey.currentState?.fetchData();
+    } else if (index == 1) {
+      _packsListKey.currentState?.fetchData();
     }
   }
 
@@ -62,7 +65,7 @@ class _WarehouseManagerScreenState extends State<WarehouseManagerScreen> {
     } catch (e) {
       if (!mounted) return;
       Navigator.pop(context);
-      showErrorToast("Something went wrong");
+      showErrorToast("कुछ गलत हो गया");
     }
   }
 
@@ -81,11 +84,11 @@ class _WarehouseManagerScreenState extends State<WarehouseManagerScreen> {
               SizedBox(width: 10),
             ],
           ),
-          content: const Text("Are you sure you want to logout?"),
+          content: const Text("क्या आप निश्चित रूप से लॉगआउट करना चाहते हैं?"),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
-              child: const Text("Cancel", style: TextStyle(color: Colors.grey)),
+              child: const Text("रद्द करें", style: TextStyle(color: Colors.grey)),
             ),
             ElevatedButton(
               onPressed: () async {
@@ -93,7 +96,7 @@ class _WarehouseManagerScreenState extends State<WarehouseManagerScreen> {
                 logoutAPICall();
               },
               style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-              child: const Text("Logout", style: TextStyle(color: Colors.white)),
+              child: const Text("लॉगआउट", style: TextStyle(color: Colors.white)),
             ),
           ],
         );
@@ -105,11 +108,12 @@ class _WarehouseManagerScreenState extends State<WarehouseManagerScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(_selectedIndex == 0 ? "Warehouse Details" : "All Warehouse Data"),
+        title: Text(_selectedIndex == 0 ? "वेयरहाउस डेटा" : "पैक्स सूची"),
         actions: [
           IconButton(
             onPressed: () => showLogoutDialog(context),
             icon: const Icon(Icons.logout),
+            tooltip: "लॉगआउट",
           ),
         ],
       ),
@@ -120,16 +124,16 @@ class _WarehouseManagerScreenState extends State<WarehouseManagerScreen> {
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
-            icon: Icon(Icons.add_business),
-            label: 'Add Details',
+            icon: Icon(Icons.store),
+            label: 'वेयरहाउस',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.list_alt),
-            label: 'All Data',
+            icon: Icon(Icons.inventory),
+            label: 'पैक्स',
           ),
         ],
         currentIndex: _selectedIndex,
-        selectedItemColor: Colors.green,
+        selectedItemColor: Colors.green.shade800,
         onTap: _onItemTapped,
       ),
     );

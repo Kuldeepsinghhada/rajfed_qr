@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:rajfed_qr/APIService/shared_preference_helper.dart';
 import 'package:rajfed_qr/Screens/Incharge/incharge_home/incharge_service.dart';
+import 'package:rajfed_qr/Screens/Warehouse/warehouse_capacity_screen.dart';
 import 'package:rajfed_qr/common_views/loader_dialog.dart';
 import 'package:rajfed_qr/models/district_model.dart';
 import 'package:rajfed_qr/models/warehouse_model.dart';
@@ -72,9 +73,8 @@ class AllWareHouseDataScreenState extends State<AllWareHouseDataScreen>
   void fetchData() async {
     await Future.delayed(
       const Duration(milliseconds: 100),
-    ); // Small delay for dialog
+    );
 
-    // Wait for district code to be loaded if not already
     String? dCode = await SharedPreferenceHelper.instance.getDistrictCode();
     if (!mounted) return;
     showLoadingDialog(context);
@@ -87,8 +87,7 @@ class AllWareHouseDataScreenState extends State<AllWareHouseDataScreen>
       final districtResponse = results[0];
       final warehouseResponse = results[1];
 
-      if (!mounted) return;
-      Navigator.pop(context);
+      if (mounted && Navigator.canPop(context)) Navigator.pop(context);
 
       if (districtResponse?.status == true) {
         districtList = districtResponse?.data ?? [];
@@ -101,26 +100,31 @@ class AllWareHouseDataScreenState extends State<AllWareHouseDataScreen>
         });
       } else {
         showErrorToast(
-          warehouseResponse?.error ?? "Failed to load warehouse data",
+          warehouseResponse?.error ?? "वेयरहाउस डेटा लोड करने में विफलता",
         );
       }
     } catch (e) {
-      if (!mounted) return;
-      Navigator.pop(context);
-      showErrorToast("Something went wrong");
+      if (mounted && Navigator.canPop(context)) Navigator.pop(context);
+      if (mounted) showErrorToast("कुछ गलत हो गया");
     }
   }
 
   void _applyFilters() {
     setState(() {
-      String query = _searchController.text.toLowerCase();
-      String selectedTab = statusTabs[_tabController.index].toLowerCase();
+      String query = _searchController.text.toLowerCase().trim();
+      int selectedIdx = _tabController.index;
 
       filteredWarehouses = allWarehouses.where((item) {
-        bool matchesSearch =
-            item.wareHouseName?.toLowerCase().contains(query) ?? false;
-        bool matchesStatus =
-            selectedTab == "all" || item.status?.toLowerCase() == selectedTab;
+        bool matchesSearch = query.isEmpty ||
+            (item.wareHouseName?.toLowerCase().contains(query) ?? false);
+        
+        bool matchesStatus = true;
+        if (selectedIdx == 1) { // Updated
+          matchesStatus = item.status?.toLowerCase() == "updated";
+        } else if (selectedIdx == 2) { // Pending
+          matchesStatus = item.status?.toLowerCase() == "pending";
+        }
+
         bool matchesDistrict =
             selectedDistrict == null || item.districTCODE == selectedDistrict;
         return matchesSearch && matchesStatus && matchesDistrict;
@@ -128,16 +132,30 @@ class AllWareHouseDataScreenState extends State<AllWareHouseDataScreen>
     });
   }
 
-  String _getTabLabel(String status) {
+  String _getTabLabel(int index, String statusName) {
     int count = 0;
-    if (status.toLowerCase() == "all") {
+    if (index == 0) {
       count = allWarehouses.length;
-    } else {
+    } else if (index == 1) {
       count = allWarehouses
-          .where((w) => w.status?.toLowerCase() == status.toLowerCase())
+          .where((w) => w.status?.toLowerCase() == "updated")
+          .length;
+    } else if (index == 2) {
+      count = allWarehouses
+          .where((w) => w.status?.toLowerCase() == "pending")
           .length;
     }
-    return "$status ($count)";
+    return "$statusName ($count)";
+  }
+
+  void _navigateToAddWarehouseDetails() async {
+    await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => const WarehouseCapacityScreen(showAppBar: true),
+      ),
+    );
+    fetchData();
   }
 
   @override
@@ -145,7 +163,14 @@ class AllWareHouseDataScreenState extends State<AllWareHouseDataScreen>
     return Scaffold(
       appBar: widget.showAppBar
           ? AppBar(
-              title: const Text("All Warehouse Data"),
+              title: const Text("सभी वेयरहाउस डेटा"),
+              actions: [
+                IconButton(
+                  onPressed: _navigateToAddWarehouseDetails,
+                  icon: const Icon(Icons.add_circle_outline),
+                  tooltip: "वेयरहाउस विवरण जोड़ें",
+                ),
+              ],
               bottom: TabBar(
                 controller: _tabController,
                 indicatorColor: Colors.green.shade800,
@@ -153,9 +178,10 @@ class AllWareHouseDataScreenState extends State<AllWareHouseDataScreen>
                 unselectedLabelColor: Colors.black54,
                 indicatorWeight: 3,
                 labelStyle: const TextStyle(fontWeight: FontWeight.bold),
-                tabs: statusTabs
-                    .map((status) => Tab(text: _getTabLabel(status)))
-                    .toList(),
+                tabs: List.generate(
+                  statusTabs.length,
+                  (index) => Tab(text: _getTabLabel(index, statusTabs[index])),
+                ),
               ),
             )
           : PreferredSize(
@@ -169,12 +195,19 @@ class AllWareHouseDataScreenState extends State<AllWareHouseDataScreen>
                   unselectedLabelColor: Colors.black54,
                   indicatorWeight: 3,
                   labelStyle: const TextStyle(fontWeight: FontWeight.bold),
-                  tabs: statusTabs
-                      .map((status) => Tab(text: _getTabLabel(status)))
-                      .toList(),
+                  tabs: List.generate(
+                    statusTabs.length,
+                    (index) => Tab(text: _getTabLabel(index, statusTabs[index])),
+                  ),
                 ),
               ),
             ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: _navigateToAddWarehouseDetails,
+        backgroundColor: Colors.green.shade800,
+        icon: const Icon(Icons.add, color: Colors.white),
+        label: const Text("वेयरहाउस विवरण जोड़ें", style: TextStyle(color: Colors.white)),
+      ),
       body: Column(
         children: [
           Padding(
@@ -192,13 +225,13 @@ class AllWareHouseDataScreenState extends State<AllWareHouseDataScreen>
                         borderRadius: BorderRadius.circular(30),
                       ),
                     ),
-                    hint: const Text("Select District"),
+                    hint: const Text("जिला चुनें"),
                     value: selectedDistrict,
                     isExpanded: true,
                     items: [
                       const DropdownMenuItem<String?>(
                         value: null,
-                        child: Text("All Districts"),
+                        child: Text("सभी जिले"),
                       ),
                       ...districtList.where((d) => d.district != null).map((
                         district,
@@ -207,7 +240,7 @@ class AllWareHouseDataScreenState extends State<AllWareHouseDataScreen>
                           value: district.district,
                           child: Text(district.districtNameEN ?? "Unknown"),
                         );
-                      }).toList(),
+                      }),
                     ],
                     onChanged: (value) {
                       setState(() {
@@ -222,7 +255,7 @@ class AllWareHouseDataScreenState extends State<AllWareHouseDataScreen>
                   controller: _searchController,
                   onChanged: (_) => _applyFilters(),
                   decoration: InputDecoration(
-                    hintText: "Search by Name",
+                    hintText: "नाम से खोजें...",
                     prefixIcon: const Icon(Icons.search),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(30),
@@ -242,10 +275,10 @@ class AllWareHouseDataScreenState extends State<AllWareHouseDataScreen>
                 fetchData();
               },
               child: filteredWarehouses.isEmpty
-                  ? const Center(child: Text("No Data Found"))
+                  ? const Center(child: Text("कोई वेयरहाउस डेटा नहीं मिला"))
                   : ListView.builder(
                       physics: const AlwaysScrollableScrollPhysics(),
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      padding: const EdgeInsets.fromLTRB(16, 0, 16, 80),
                       itemCount: filteredWarehouses.length,
                       itemBuilder: (context, index) {
                         final item = filteredWarehouses[index];
@@ -300,42 +333,42 @@ class AllWareHouseDataScreenState extends State<AllWareHouseDataScreen>
             const Divider(height: 20),
             _buildDetailRow(
               Icons.location_city,
-              "District",
+              "जिला",
               _getDistrictName(item.districTCODE),
             ),
             _buildDetailRow(
               Icons.pin_drop,
-              "Coordinates",
+              "स्थान निर्देशांक",
               "${item.lat?.toStringAsFixed(5) ?? 'N/A'}, ${item.long?.toStringAsFixed(5) ?? 'N/A'}",
             ),
             _buildDetailRow(
               Icons.inventory_2,
-              "Capacity",
-              "${item.capacity ?? 'N/A'} MT",
+              "क्षमता",
+              "${item.capacity ?? 'N/A'} मीट्रिक टन (MT)",
             ),
             _buildDetailRow(
               Icons.store,
-              "Extra Godam",
+              "अतिरिक्त गोदाम",
               "${item.extraGodam ?? 'N/A'}",
             ),
             _buildDetailRow(
               Icons.badge,
-              "Warehouse ID",
+              "वेयरहाउस आईडी",
               "${item.wareHouseId ?? 'N/A'}",
             ),
             _buildDetailRow(
               Icons.calendar_today,
-              "Construction Year",
+              "निर्माण का वर्ष",
               item.constructionYear ?? "N/A",
             ),
             _buildDetailRow(
               Icons.person,
-              "Owner Name",
+              "मालिक का नाम",
               item.ownerName ?? "N/A",
             ),
             _buildDetailRow(
               Icons.check_circle_outline,
-              "Condition",
+              "स्थिति",
               item.warehouseCondtion ?? "N/A",
             ),
           ],
@@ -362,21 +395,24 @@ class AllWareHouseDataScreenState extends State<AllWareHouseDataScreen>
 
   Widget _buildStatusBadge(String? status) {
     Color badgeColor = Colors.grey;
+    String statusText = "अज्ञात";
     if (status?.toLowerCase() == "updated") {
       badgeColor = Colors.green;
+      statusText = "अद्यतन (Updated)";
     } else if (status?.toLowerCase() == "pending") {
       badgeColor = Colors.orange;
+      statusText = "लंबित (Pending)";
     }
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
-        color: badgeColor.withOpacity(0.15),
+        color: badgeColor.withValues(alpha: 0.15),
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: badgeColor),
       ),
       child: Text(
-        status ?? "Unknown",
+        statusText,
         style: TextStyle(
           color: badgeColor,
           fontSize: 12,
