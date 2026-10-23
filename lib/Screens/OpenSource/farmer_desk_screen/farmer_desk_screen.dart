@@ -21,38 +21,38 @@ class FarmerDeskScreen extends StatefulWidget {
 
 class _FarmerDeskScreenState extends State<FarmerDeskScreen> {
   /// List of Item
-  final List<DeviceItem> items = const [
-    DeviceItem(
+  final List<DeviceItem> items = [
+    const DeviceItem(
       title: "Registration",
       icon: Icons.how_to_reg,
       color: Color(0xFF26A69A), // Teal
     ),
-    DeviceItem(
+    const DeviceItem(
       title: "Search Farmer",
       icon: Icons.search,
       color: Color(0xFF42A5F5), // Light Blue
     ),
-    DeviceItem(
+    const DeviceItem(
       title: "Search QR",
       icon: Icons.search,
       color: Color(0xFFAB47BC), // Light Blue
     ),
     DeviceItem(
-      title: "MSP Rate 2025",
+      title: "MSP Rate ${DateTime.now().year}",
       icon: Icons.price_change_outlined,
-      color: Color(0xFF66BB6A), // Light Green
+      color: const Color(0xFF66BB6A), // Light Green
     ),
-    DeviceItem(
+    const DeviceItem(
       title: "Crop Calculator",
       icon: Icons.calculate,
       color: Color(0xFFFFA726), // Orange
     ),
-    DeviceItem(
+    const DeviceItem(
       title: "Help",
       icon: Icons.help_outline,
       color: Color(0xFF5C6BC0), // Purple
     ),
-    DeviceItem(
+    const DeviceItem(
       title: "Login",
       icon: Icons.login,
       color: Color(0xFF26A69A), // Teal
@@ -107,9 +107,10 @@ class _FarmerDeskScreenState extends State<FarmerDeskScreen> {
                             .map((item) => "${item.listName} : ${item.message}")
                             .join(", "),
                         style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
-                            color: Colors.white),
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                          color: Colors.white,
+                        ),
                         scrollAxis: Axis.horizontal,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         blankSpace: 20.0,
@@ -132,10 +133,11 @@ class _FarmerDeskScreenState extends State<FarmerDeskScreen> {
                 // physics: NeverScrollableScrollPhysics(),
                 padding: EdgeInsets.all(16),
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    crossAxisSpacing: 8.0,
-                    mainAxisSpacing: 8.0,
-                    childAspectRatio: 1.5),
+                  crossAxisCount: 2,
+                  crossAxisSpacing: 8.0,
+                  mainAxisSpacing: 8.0,
+                  childAspectRatio: 1.5,
+                ),
                 //scrollDirection: Axis.horizontal,
                 itemBuilder: (context, index) {
                   return Card(
@@ -146,68 +148,89 @@ class _FarmerDeskScreenState extends State<FarmerDeskScreen> {
                         // 4: Crop Calculator, 5: Help, 6: Login
                         if (index == 0) {
                           Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => RegistrationWebViewScreen()));
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => RegistrationWebViewScreen(),
+                            ),
+                          );
                         } else if (index == 1) {
                           Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => FarmerDetailScreen()));
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => FarmerDetailScreen(),
+                            ),
+                          );
                         } else if (index == 2) {
                           Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => FarmerSearchByQR()));
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => FarmerSearchByQR(),
+                            ),
+                          );
                         } else if (index == 3) {
                           Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => MspRateScreen()));
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => MspRateScreen(),
+                            ),
+                          );
                         } else if (index == 4) {
                           Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => CropCalculaterScreen()));
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => CropCalculaterScreen(),
+                            ),
+                          );
                         } else if (index == 5) {
                           Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => ContactUsScreen()));
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => ContactUsScreen(),
+                            ),
+                          );
                         } else if (index == 6) {
                           Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => LoginScreen()));
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => LoginScreen(),
+                            ),
+                          );
                         }
                       },
                       child: Padding(
-                        padding:
-                            EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+                        padding: EdgeInsets.symmetric(
+                          vertical: 10,
+                          horizontal: 12,
+                        ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.center,
                           mainAxisAlignment: MainAxisAlignment.start,
                           spacing: 4,
                           children: [
                             Expanded(
-                                child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Icon(items[index].icon,
-                                    size: 36, color: Colors.white),
-                                SizedBox(height: 12),
-                                Text(
-                                  items[index].title,
-                                  //textAlign: TextAlign.center,
-                                  maxLines: 1,
-                                  style: TextStyle(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    items[index].icon,
+                                    size: 36,
+                                    color: Colors.white,
+                                  ),
+                                  SizedBox(height: 12),
+                                  Text(
+                                    items[index].title,
+                                    //textAlign: TextAlign.center,
+                                    maxLines: 1,
+                                    style: TextStyle(
                                       fontWeight: FontWeight.w700,
                                       color: Colors.white,
-                                      fontSize: 16),
-                                ),
-                              ],
-                            )),
+                                      fontSize: 16,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
                           ],
                         ),
                       ),
